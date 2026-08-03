@@ -27,8 +27,7 @@ photography-portfolio/
 │       ├── sports/          <-- 運動賽事照片 (.webp / .jpg)
 │       ├── graduation/      <-- 畢業寫真照片 (.webp / .jpg)
 │       └── landscape/       <-- 風景視覺照片 (.webp / .jpg)
-├── EDITING_GUIDE.md         <-- 📖 本完整指南文件
-├── GUIDE.md                 <-- 📖 本指南之備份/快速參考點
+├── GUIDE.md                 <-- 📖 本完整指南文件
 ├── index.html               <-- 首頁 (關於我 + 合作經歷 + 獲獎紀錄 + 7 大作品分類門戶)
 ├── commercial.html          <-- 商業攝影專頁
 ├── portrait.html            <-- 人像攝影專頁
