@@ -77,6 +77,130 @@ function getImageStyle(item) {
   return `--img-pos: ${pos}; --img-origin: ${pos}; --img-scale: ${scale};`;
 }
 
+// Helper: Parse numerical target and suffix from stat value string (e.g. "6000+" -> { numericValue: 6000, suffix: "+", hasComma: false })
+function parseStatValue(val) {
+  if (typeof val !== 'string') val = String(val || '');
+  const match = val.trim().match(/^([\d,]+)(.*)$/);
+  if (match) {
+    const rawNumStr = match[1];
+    const hasComma = rawNumStr.includes(',');
+    const numericValue = parseInt(rawNumStr.replace(/,/g, ''), 10);
+    const suffix = match[2] || '';
+    if (!isNaN(numericValue)) {
+      return { numericValue, suffix, hasComma };
+    }
+  }
+  return { numericValue: null, suffix: val, hasComma: false };
+}
+
+// Helper: Generate Slot Machine Reel HTML for a single digit or symbol (e.g. '+')
+function createReelHtml(char) {
+  const d = parseInt(char, 10);
+  if (isNaN(d)) {
+    // Suffix symbol (e.g. '+') has blank spaces in earlier reel slots, showing '+' ONLY ONCE at the end of the roll!
+    const totalItems = 30;
+    const targetIndex = 29;
+    const symbolsArr = Array(totalItems).fill('&nbsp;');
+    symbolsArr[targetIndex] = char; // Only the last slot contains '+', all preceding slots are blank
+    const spansHtml = symbolsArr.map(s => `<span class="h-[1.1em] flex items-center justify-center shrink-0">${s}</span>`).join('');
+
+    return `
+      <span class="stat-reel stat-suffix inline-block overflow-hidden relative align-bottom h-[1.1em] leading-none text-center text-amber-400 ml-0.5" style="opacity: 0;">
+        <span class="stat-strip flex flex-col transition-none" data-target-index="${targetIndex}" data-total-items="${totalItems}" style="transform: translateY(0%);">
+          ${spansHtml}
+        </span>
+      </span>
+    `;
+  }
+
+  // 3 sets of 0-9 for slot machine tumbling sequence (0..9, 0..9, 0..9)
+  const digitsArr = [0,1,2,3,4,5,6,7,8,9, 0,1,2,3,4,5,6,7,8,9, 0,1,2,3,4,5,6,7,8,9];
+  const targetIndex = 20 + d; // Target digit in the 3rd set for full slot machine roll
+  const totalItems = digitsArr.length;
+
+  const spansHtml = digitsArr.map(n => `<span class="h-[1.1em] flex items-center justify-center shrink-0">${n}</span>`).join('');
+
+  return `
+    <span class="stat-reel inline-block overflow-hidden relative align-bottom h-[1.1em] leading-none text-center">
+      <span class="stat-strip flex flex-col transition-none" data-target-index="${targetIndex}" data-total-items="${totalItems}" style="transform: translateY(0%);">
+        ${spansHtml}
+      </span>
+    </span>
+  `;
+}
+
+// Function to animate About Me slot machine rolling counter
+function initStatsCounter() {
+  const statStrips = document.querySelectorAll('#stats-grid .stat-strip');
+  if (!statStrips.length) return;
+
+  const DURATION = 3000; // 3.0s total duration for all reels to finish simultaneously
+
+  // Ease-Out Quint easing function: rapid initial slot tumble, smooth deceleration into slot
+  const easeOutQuint = (t) => 1 - Math.pow(1 - t, 5);
+
+  const startAnimation = () => {
+    const startTime = performance.now();
+
+    const animate = (currentTime) => {
+      const elapsedTime = currentTime - startTime;
+      const progress = Math.min(elapsedTime / DURATION, 1);
+      const easedProgress = easeOutQuint(progress);
+
+      statStrips.forEach(strip => {
+        const targetIndex = parseFloat(strip.dataset.targetIndex);
+        const totalItems = parseFloat(strip.dataset.totalItems);
+        if (isNaN(targetIndex) || !totalItems) return;
+
+        const currentTranslatePercent = (targetIndex * easedProgress / totalItems) * 100;
+        strip.style.transform = `translateY(-${currentTranslatePercent}%)`;
+
+        // If strip is inside a stat-suffix, gradually fade in opacity (0 -> 1) synchronously with the roll
+        const parentSuffix = strip.closest('.stat-suffix');
+        if (parentSuffix) {
+          parentSuffix.style.opacity = easedProgress;
+        }
+      });
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        // Animation complete: lock exact target translateY and 100% opacity
+        statStrips.forEach(strip => {
+          const targetIndex = parseFloat(strip.dataset.targetIndex);
+          const totalItems = parseFloat(strip.dataset.totalItems);
+          if (!isNaN(targetIndex) && totalItems) {
+            const finalPercent = (targetIndex / totalItems) * 100;
+            strip.style.transform = `translateY(-${finalPercent}%)`;
+          }
+          const parentSuffix = strip.closest('.stat-suffix');
+          if (parentSuffix) {
+            parentSuffix.style.opacity = 1;
+          }
+        });
+      }
+    };
+
+    requestAnimationFrame(animate);
+  };
+
+  // Trigger animation using IntersectionObserver when in view or immediately on load
+  const statsGrid = document.getElementById('stats-grid');
+  if (statsGrid && 'IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          startAnimation();
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    observer.observe(statsGrid);
+  } else {
+    startAnimation();
+  }
+}
+
 // --------------------------------------------------------------------
 // 1. Render Home Page
 // --------------------------------------------------------------------
@@ -135,13 +259,32 @@ function renderHomePage() {
 
           <!-- Key Stats Grid -->
           ${Array.isArray(data.profile.stats) ? `
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 py-4 border-y border-white/10">
-              ${data.profile.stats.map(stat => `
-                <div class="text-center sm:text-left">
-                  <div class="text-3xl font-bold font-cinzel text-amber-400">${stat.value || ''}</div>
-                  <div class="text-xs text-gray-400 mt-1 uppercase tracking-wider">${stat.label || ''}</div>
-                </div>
-              `).join('')}
+            <div id="stats-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-4 py-4 border-y border-[#ffffff1a]">
+              ${data.profile.stats.map(stat => {
+                const parsed = parseStatValue(stat.value || '');
+                if (parsed.numericValue !== null) {
+                  const numStr = parsed.hasComma ? parsed.numericValue.toLocaleString() : String(parsed.numericValue);
+                  const digits = numStr.split('');
+                  return `
+                    <div class="text-center sm:text-left">
+                      <div class="text-3xl sm:text-4xl font-bold font-cinzel text-amber-400 flex items-baseline justify-center sm:justify-start">
+                        <div class="inline-flex items-baseline tracking-tight">
+                          ${digits.map(d => createReelHtml(d)).join('')}
+                          ${parsed.suffix ? createReelHtml(parsed.suffix) : ''}
+                        </div>
+                      </div>
+                      <div class="text-xs text-gray-400 mt-1 uppercase tracking-wider font-medium">${stat.label || ''}</div>
+                    </div>
+                  `;
+                } else {
+                  return `
+                    <div class="text-center sm:text-left">
+                      <div class="text-3xl sm:text-4xl font-bold font-cinzel text-amber-400">${stat.value || ''}</div>
+                      <div class="text-xs text-gray-400 mt-1 uppercase tracking-wider font-medium">${stat.label || ''}</div>
+                    </div>
+                  `;
+                }
+              }).join('')}
             </div>
           ` : ''}
 
@@ -157,6 +300,9 @@ function renderHomePage() {
         </div>
       </div>
     `;
+
+    // Trigger animated stats counter for About Me
+    initStatsCounter();
   }
 
   // Render Collaborations & Experience Section

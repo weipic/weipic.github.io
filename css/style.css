@@ -549,3 +549,21 @@ body {
   transform: translateY(0);
 }
 
+/* ====================================================================
+   🎰 ABOUT ME SLOT MACHINE ROLLER COUNTER STYLING
+   ==================================================================== */
+.stat-reel {
+  height: 1.1em;
+  line-height: 1.1em;
+  vertical-align: baseline;
+  display: inline-block;
+  overflow: hidden;
+  position: relative;
+}
+
+.stat-strip {
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+
