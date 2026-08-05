@@ -44,7 +44,8 @@ window.PORTFOLIO_DATA = {
     "year": "2026-2027",
     "category": "國際影展",
     "description": "官網封面照片｜商業合作",
-    "logoText": "CEWE"
+    "logoText": "CEWE",
+    "embedUrl": "https://www.instagram.com/p/DLWHrh8h4-C/?img_index=1"
     },
     {
     "id": "collab-21",
@@ -53,7 +54,8 @@ window.PORTFOLIO_DATA = {
     "year": "2026",
     "category": "商業",
     "description": "鏡頭評測",
-    "logoText": "TAMRON"
+    "logoText": "TAMRON",
+    galleryId: "comm-9"
     },
     {
     "id": "collab-20",
@@ -71,7 +73,8 @@ window.PORTFOLIO_DATA = {
     "year": "2026",
     "category": "活動紀錄",
     "description": "中央研究院｜活動紀錄",
-    "logoText": "SITCON"
+    "logoText": "SITCON",
+    galleryId: "ev-5"
     },
     {
     "id": "collab-18",
@@ -80,7 +83,8 @@ window.PORTFOLIO_DATA = {
     "year": "2026",
     "category": "活動紀錄",
     "description": "閃動格子 CyberCube｜活動紀錄",
-    "logoText": "CyberCube"
+    "logoText": "CyberCube",
+    galleryId: "ev-7"
     },
     {
     "id": "collab-17",
@@ -89,7 +93,8 @@ window.PORTFOLIO_DATA = {
     "year": "2026",
     "category": "活動紀錄",
     "description": "社會創新實驗中心｜活動紀錄",
-    "logoText": "LiFUNd"
+    "logoText": "LiFUNd",
+    galleryId: "ev-4"
     },
     {
     "id": "collab-16",
@@ -98,7 +103,8 @@ window.PORTFOLIO_DATA = {
     "year": "2026",
     "category": "商業",
     "description": "品牌合作",
-    "logoText": "Gaston Luga"
+    "logoText": "Gaston Luga",
+    "galleryId": "comm-2"
     },
     {
     "id": "collab-15",
@@ -107,7 +113,8 @@ window.PORTFOLIO_DATA = {
     "year": "2026",
     "category": "活動紀錄",
     "description": "2026 Threads' Party｜活動紀錄",
-    "logoText": "Threads"
+    "logoText": "Threads",
+    galleryId: "ev-6"
     },
     {
     "id": "collab-14",
@@ -116,7 +123,8 @@ window.PORTFOLIO_DATA = {
     "year": "2025",
     "category": "活動紀錄",
     "description": "表彰卓越貢獻傑出校友｜活動紀錄",
-    "logoText": "國立臺北科技大學"
+    "logoText": "國立臺北科技大學",
+    galleryId: "ev-2"
     },
     {
     "id": "collab-13",
@@ -125,7 +133,8 @@ window.PORTFOLIO_DATA = {
     "year": "2025",
     "category": "商業",
     "description": "商業合作",
-    "logoText": "NTUT COLAZ"
+    "logoText": "NTUT COLAZ",
+    galleryId: "comm-3"
     },
     {
     "id": "collab-12",
@@ -134,7 +143,8 @@ window.PORTFOLIO_DATA = {
     "year": "2025",
     "category": "商業",
     "description": "商業合作",
-    "logoText": "HOKKI"
+    "logoText": "HOKKI",
+    galleryId: "comm-4"
     },
     {
     "id": "collab-11",
@@ -143,7 +153,8 @@ window.PORTFOLIO_DATA = {
     "year": "2025",
     "category": "商業",
     "description": "品牌合作",
-    "logoText": "Gaston Luga"
+    "logoText": "Gaston Luga",
+    "galleryId": "comm-1"
     },
     {
     "id": "collab-10",
@@ -152,7 +163,8 @@ window.PORTFOLIO_DATA = {
     "year": "2025",
     "category": "大型商演",
     "description": "攝影師",
-    "logoText": "大環藝術家楊世豪"
+    "logoText": "大環藝術家楊世豪",
+    galleryId: "ev-8"
     },
     {
     "id": "collab-9",
@@ -161,7 +173,8 @@ window.PORTFOLIO_DATA = {
     "year": "2025",
     "category": "商業",
     "description": "鏡頭評測",
-    "logoText": "TAMRON"
+    "logoText": "TAMRON",
+    galleryId: "comm-8"
     },
     {
     "id": "collab-8",
@@ -179,7 +192,8 @@ window.PORTFOLIO_DATA = {
     "year": "2025",
     "category": "演唱會",
     "description": "日本人氣歌手茉ひる亞洲巡演台北站-攝影師",
-    "logoText": "MAHIRU"
+    "logoText": "MAHIRU",
+    galleryId: "conc-6"
     },
     {
     "id": "collab-6",
@@ -188,7 +202,8 @@ window.PORTFOLIO_DATA = {
     "year": "2025",
     "category": "活動紀錄",
     "description": "活動紀錄",
-    "logoText": "NTUT Aliyan"
+    "logoText": "NTUT Aliyan",
+    galleryId: "ev-11"
     },
     {
     "id": "collab-5",
@@ -197,7 +212,8 @@ window.PORTFOLIO_DATA = {
     "year": "2025",
     "category": "商業",
     "description": "品牌合作",
-    "logoText": "PNGL"
+    "logoText": "PNGL",
+    galleryId: "comm-7"
     },
     {
     "id": "collab-4",
@@ -206,7 +222,8 @@ window.PORTFOLIO_DATA = {
     "year": "2025",
     "category": "商業",
     "description": "委託合作",
-    "logoText": "ACMEITEM"
+    "logoText": "ACMEITEM",
+    galleryId: "comm-6"
     },
     {
     "id": "collab-3",
@@ -224,7 +241,8 @@ window.PORTFOLIO_DATA = {
     "year": "2024",
     "category": "商業",
     "description": "器材評測",
-    "logoText": "PENTAX"
+    "logoText": "PENTAX",
+    galleryId: "comm-10"
     },
     {
     "id": "collab-1",

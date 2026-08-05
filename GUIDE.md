@@ -250,20 +250,51 @@ profile: {
 
 ## 🤝 8. 品牌與活動合作經歷管理 (Collaborations)
 
-找到 `js/portfolio-data.js` 的 `collaborations` 陣列：
+找到 `js/portfolio-data.js` 的 `collaborations` 陣列進行編輯。合作字卡支援**「點擊彈出大圖燈箱」**、**「大框框內嵌入網站」**或**「直接連結攝影作品輯」**的功能（關閉視窗後依然停留在合作經歷區塊）：
 
 ```javascript
 collaborations: [
+  // 🌟 範例 1：點擊在大框框內【嵌入外部網站】(不轉頁也不另開分頁)
   {
     id: "collab-22",
-    brand: "CEWE",                             // 品牌或合作單位名稱
-    role: "CEWE攝影大獎2027青年才華獎",          // 你的角色 / 專案名稱
-    year: "2026-2027",                        // 合作年份
-    category: "國際影展",                      // 類型標籤
-    description: "官網封面照片｜商業合作",       // 簡短說明
-    logoText: "CEWE"                          // 卡片上顯示的大字 Logo 標誌
+    brand: "CEWE",
+    role: "CEWE攝影大獎2027青年才華獎",
+    year: "2026-2027",
+    category: "國際影展",
+    description: "官網封面照片｜商業合作",
+    logoText: "CEWE",
+    embedUrl: "https://cewe-photoworld.com"       // 🌐 設定要嵌入的大框框網站網址
   },
-  // ... 其他合作項目
+
+  // 🌟 範例 2：點擊直接開啟【攝影分類裡的某個作品輯】(不跳轉頁面，關閉後留在合作經歷)
+  {
+    id: "collab-16",
+    brand: "Gaston Luga",
+    role: "Spläsh 2.0 - 16, Sage",
+    year: "2026",
+    category: "商業",
+    description: "品牌合作",
+    logoText: "Gaston Luga",
+    galleryId: "comm-2"                         // 📷 填寫對應攝影作品輯的 ID (例如 "comm-2")
+  },
+
+  // 🌟 範例 3：點擊開啟【該字卡專屬的相簿與說明】
+  {
+    id: "collab-18",
+    brand: "閃動格子",
+    role: "臺北市2026高中職升學進路博覽會",
+    year: "2026",
+    category: "活動紀錄",
+    description: "閃動格子 CyberCube｜活動紀錄",
+    logoText: "CyberCube",
+    photos: [                                   // 📷 該卡片點開後的相簿大圖清單
+      "assets/images/event/event_1.webp",
+      "assets/images/event/event_2.webp"
+    ],
+    links: [                                    // 🔗 彈出視窗內的相關連結按鈕
+      { label: "活動紀錄官網", url: "https://example.com" }
+    ]
+  }
 ]
 ```
 
@@ -275,24 +306,51 @@ collaborations: [
 
 ## 🏆 9. 攝影獎項與榮譽紀錄管理 (Awards)
 
-找到 `js/portfolio-data.js` 的 `awards` 陣列：
+找到 `js/portfolio-data.js` 的 `awards` 陣列進行編輯。獲獎字卡同樣支援點擊彈出視窗、嵌入網站或連結相簿：
 
 ```javascript
 awards: [
+  // 🌟 範例 1：點擊開啟攝影分類中的獲獎作品大圖燈箱
+  {
+    id: "award-7",
+    year: "2025",
+    title: "國家地理雜誌臺灣攝影大賽",
+    category: "青少年組",
+    result: "入圍",
+    description: "入圍 2025 國家地理雜誌臺灣攝影大賽青少年組。",
+    galleryId: "land-1"                        // 📷 填寫對應的作品 ID (點開直接看照片大圖)
+  },
+
+  // 🌟 範例 2：點擊在大框框嵌入獎項報導/展覽官網
   {
     id: "award-1",
     year: "2026",
-    title: "TIFA Tokyo International Foto Awards", // 競賽名稱
-    category: "Advertising / Beauty",              // 獲獎類別
-    result: "Gold Winner (金獎)",                   // 獲獎名次 (顯示金黃色 Badge)
-    description: "《Urban Elegance》作品榮獲東京國際攝影大獎金獎。"
-  },
-  // ... 其他獎項
+    title: "TIFA Tokyo International Foto Awards",
+    category: "Advertising / Beauty",
+    result: "Gold Winner (金獎)",
+    description: "《Urban Elegance》作品榮獲東京國際攝影大獎金獎。",
+    embedUrl: "https://tokyofotoawards.jp"     // 🌐 點開大框框直接預覽展覽官網
+  }
 ]
 ```
 
-### ⚡ 折疊與漸層遮罩機制 (`toggleAwards`)
-* 當獎項超過 2 項時，系統會開啟折疊與底層遮罩。點擊可切換展開/收起，並支援平滑滾動。
+### 💡 合作經歷與獎項字卡點擊功能三種模式總結：
+
+1. **模式 1：連結攝影作品集 (`galleryId`)**
+   * **寫法**：在字卡物件中加上 `galleryId: "對應作品ID"` (如 `"comm-1"`、`"port-2"`)。
+   * **效果**：點擊字卡後，直接在畫面中央彈出該相簿大圖燈箱 Modal（包含多圖切換 `<` `>`、縮圖列表與相關按鈕），關閉後依然保留在原本的合作經歷/獲獎紀錄區塊。
+
+2. **模式 2：大框框嵌入網站 (`embedUrl`)**
+   * **寫法**：在字卡物件中加上 `embedUrl: "目標網站網址"` (如 `"https://cewe-photoworld.com"`)。
+   * **效果**：點擊字卡後，彈出大框框直接內嵌該網址，不另開分頁也不離開原網頁，右上角亦附有「另開新頁」與「關閉 X」按鈕。
+   > [!NOTE]
+   > **⚠️ 關於部份網站顯示「拒絕連線 (Refused to Connect)」的原因說明：**
+   > 這**不是因為您在本地測試未發布**，而是因為部份大型網站（如 Google、Instagram、Facebook 或特定品牌官網）基於資安考量設有 `X-Frame-Options: SAMEORIGIN / DENY` 政策，強制禁止其他網頁透過 `<iframe>` 內嵌。
+   > 無論是在本地或是發布後，遇到此類設定的網站，訪客皆可直接點擊大框框右上角的**「另開新頁」**按鈕前往瀏覽；或建議對此類合作改用**模式 1 (`galleryId`)** 展示您拍攝的高解析照片大圖作品！
+
+3. **模式 3：特有照片與文字詳情 (`photos` / `links`)**
+   * **寫法**：在字卡物件中加上 `photos: [...]` 陣列或 `links: [...]` 陣列。
+   * **效果**：點擊字卡彈出該卡片獨有的照片輯或詳細說明視窗。
 
 ---
 

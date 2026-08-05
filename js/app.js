@@ -324,7 +324,7 @@ function renderHomePage() {
           <div id="collab-grid-wrapper" class="overflow-hidden transition-all duration-700 ease-in-out ${hasMoreCollabs ? 'max-h-[340px]' : ''} relative">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4 pb-6 px-1">
               ${collabs.map(collab => `
-                <div class="luxury-card p-6 flex flex-col justify-between group">
+                <div class="luxury-card p-6 flex flex-col justify-between group cursor-pointer" onclick="openCardModal('collab', '${collab.id}')">
                   <div>
                     <div class="flex items-center justify-between mb-3">
                       <span class="text-2xl font-black font-cinzel text-amber-400 tracking-wider group-hover:text-amber-300 transition-colors">
@@ -343,12 +343,12 @@ function renderHomePage() {
                       </p>
                     ` : ''}
                   </div>
-                  ${collab.category ? `
-                    <div class="mt-5 pt-4 border-t border-white/5 flex items-center justify-between text-xs text-gray-500">
-                      <span>類型</span>
-                      <span class="text-gray-300 font-medium">${collab.category}</span>
-                    </div>
-                  ` : ''}
+                  <div class="mt-5 pt-4 border-t border-white/5 flex items-center justify-between text-xs text-gray-500">
+                    <span>${collab.category || '合作項目'}</span>
+                    <span class="text-amber-400/80 group-hover:text-amber-400 font-medium flex items-center gap-1 transition-colors">
+                      ${collab.galleryId || (Array.isArray(collab.photos) && collab.photos.length > 0) ? '觀看相簿 📷' : (collab.embedUrl ? '網站預覽 🌐' : '檢視詳情 ↗')}
+                    </span>
+                  </div>
                 </div>
               `).join('')}
             </div>
@@ -394,7 +394,7 @@ function renderHomePage() {
           <div id="awards-grid-wrapper" class="overflow-hidden transition-all duration-700 ease-in-out ${hasMoreAwards ? 'max-h-[330px]' : ''} relative">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 pb-6 px-1">
               ${awards.map(award => `
-                <div class="luxury-card p-6 sm:p-8 flex flex-col justify-between group">
+                <div class="luxury-card p-6 sm:p-8 flex flex-col justify-between group cursor-pointer" onclick="openCardModal('award', '${award.id}')">
                   <div class="space-y-3">
                     <div class="flex items-center justify-between">
                       ${award.year ? `
@@ -427,6 +427,13 @@ function renderHomePage() {
                         ${award.description}
                       </p>
                     ` : ''}
+                  </div>
+
+                  <div class="mt-5 pt-4 border-t border-white/5 flex items-center justify-between text-xs text-gray-500">
+                    <span>${award.category || '獲獎紀錄'}</span>
+                    <span class="text-amber-400/80 group-hover:text-amber-400 font-medium flex items-center gap-1 transition-colors">
+                      ${award.galleryId || (Array.isArray(award.photos) && award.photos.length > 0) ? '觀看作品 📷' : (award.embedUrl ? '網站預覽 🌐' : '檢視詳情 ↗')}
+                    </span>
                   </div>
                 </div>
               `).join('')}
@@ -823,11 +830,34 @@ async function handleFormSubmit(e) {
 // --------------------------------------------------------------------
 function openProjectAlbum(projectId, categoryId) {
   const data = window.PORTFOLIO_DATA;
-  if (!data || !data.galleries[categoryId]) return;
+  if (!data || !data.galleries) return;
 
-  const project = data.galleries[categoryId].find(p => p.id === projectId);
-  if (!project) return;
+  let project = null;
 
+  if (categoryId && data.galleries[categoryId]) {
+    project = data.galleries[categoryId].find(p => p.id === projectId);
+  }
+
+  // Auto-search across all categories if categoryId is omitted or not found directly
+  if (!project) {
+    for (const catKey in data.galleries) {
+      const p = data.galleries[catKey].find(item => item.id === projectId);
+      if (p) {
+        project = p;
+        break;
+      }
+    }
+  }
+
+  if (!project) {
+    console.warn(`Project with id "${projectId}" not found.`);
+    return;
+  }
+
+  openCustomProjectModal(project);
+}
+
+function openCustomProjectModal(project) {
   currentAlbumPhotos = (project.photos && project.photos.length) ? project.photos : [project.cover || project.image];
   currentPhotoIndex = 0;
 
@@ -1003,6 +1033,204 @@ function handleLightboxKeyboard(e) {
   if (e.key === 'Escape') closeLightbox();
   if (e.key === 'ArrowLeft') navigatePhoto(-1);
   if (e.key === 'ArrowRight') navigatePhoto(1);
+}
+
+/* ====================================================================
+   5. COLLABORATION & AWARD CARD MODAL HANDLERS (EMBED WEBSITE & GALLERIES)
+   ==================================================================== */
+function openCardModal(type, itemId) {
+  const data = window.PORTFOLIO_DATA;
+  if (!data) return;
+
+  const items = (type === 'collab') ? data.collaborations : data.awards;
+  if (!Array.isArray(items)) return;
+
+  const item = items.find(i => i.id === itemId);
+  if (!item) return;
+
+  // 1. Direct link to a photo gallery project (e.g. galleryId: "comm-1")
+  if (item.galleryId) {
+    openProjectAlbum(item.galleryId, item.galleryCategory);
+    return;
+  }
+
+  // 2. Embedded website modal (e.g. embedUrl: "https://example.com")
+  if (item.embedUrl) {
+    openEmbedModal({
+      title: item.brand || item.title || item.role,
+      subtitle: item.role || item.result || (item.year ? `${item.year} · ${item.category || ''}` : item.category),
+      embedUrl: item.embedUrl,
+      externalUrl: item.link || (Array.isArray(item.links) && item.links[0]?.url) || item.embedUrl
+    });
+    return;
+  }
+
+  // 3. Custom photo array attached directly to card (e.g. photos: [...])
+  if (Array.isArray(item.photos) && item.photos.length > 0) {
+    const customProject = {
+      id: item.id,
+      title: item.role || item.title || item.brand,
+      client: item.brand || item.category || '紀錄',
+      year: item.year || '',
+      description: item.description || '',
+      photos: item.photos,
+      position: item.position || 'center',
+      scale: item.scale || 1,
+      links: item.links || (item.link ? [{ label: item.linkLabel || '觀看相關連結', url: item.link }] : [])
+    };
+    openCustomProjectModal(customProject);
+    return;
+  }
+
+  // 4. Default: Open detail card modal with text and links
+  openDetailInfoModal(item, type);
+}
+
+function openEmbedModal(data) {
+  let modal = document.getElementById('iframe-embed-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'iframe-embed-modal';
+    modal.className = 'fixed inset-0 z-[999] bg-black/95 backdrop-blur-md flex items-center justify-center p-2 sm:p-6 transition-opacity duration-300 opacity-0 pointer-events-none';
+    document.body.appendChild(modal);
+  }
+
+  const embedUrl = data.embedUrl || data.url;
+  const externalUrl = data.externalUrl || embedUrl;
+  const title = data.title || '網站預覽';
+  const subtitle = data.subtitle || '';
+
+  modal.innerHTML = `
+    <div class="relative max-w-6xl w-full h-[90vh] sm:h-[88vh] bg-[#101116] border border-white/10 rounded-2xl overflow-hidden shadow-2xl flex flex-col">
+      
+      <!-- Top Header Bar -->
+      <div class="px-5 py-3.5 bg-[#161820] border-b border-white/10 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3 overflow-hidden pr-4">
+          <div class="w-3 h-3 rounded-full bg-amber-400 shrink-0 animate-pulse"></div>
+          <div class="truncate">
+            <h3 class="text-sm sm:text-base font-bold text-white truncate font-serif-title">${title}</h3>
+            ${subtitle ? `<p class="text-[11px] text-gray-400 truncate">${subtitle}</p>` : ''}
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-2 shrink-0">
+          <a href="${externalUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-amber-400 hover:text-black bg-amber-500/10 hover:bg-amber-400 border border-amber-500/30 rounded-lg transition-all font-medium no-underline">
+            <span>另開新頁</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+          </a>
+          <button onclick="closeEmbedModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-amber-400 hover:text-black text-gray-200 flex items-center justify-center text-lg transition-colors" aria-label="Close Modal">
+            &times;
+          </button>
+        </div>
+      </div>
+
+      <!-- Iframe Frame Container -->
+      <div class="flex-grow w-full bg-black relative overflow-hidden">
+        <iframe src="${embedUrl}" title="${title}" class="w-full h-full border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      </div>
+
+    </div>
+  `;
+
+  modal.classList.remove('opacity-0', 'pointer-events-none');
+  modal.classList.add('opacity-100');
+
+  window.addEventListener('keydown', handleEmbedModalKeyboard);
+}
+
+function closeEmbedModal() {
+  const modal = document.getElementById('iframe-embed-modal');
+  if (modal) {
+    modal.classList.add('opacity-0', 'pointer-events-none');
+    modal.classList.remove('opacity-100');
+    setTimeout(() => {
+      const iframe = modal.querySelector('iframe');
+      if (iframe) iframe.src = 'about:blank';
+    }, 300);
+  }
+  window.removeEventListener('keydown', handleEmbedModalKeyboard);
+}
+
+function handleEmbedModalKeyboard(e) {
+  if (e.key === 'Escape') closeEmbedModal();
+}
+
+function openDetailInfoModal(item, type) {
+  let modal = document.getElementById('card-detail-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'card-detail-modal';
+    modal.className = 'fixed inset-0 z-[999] bg-black/95 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 transition-opacity duration-300 opacity-0 pointer-events-none';
+    document.body.appendChild(modal);
+  }
+
+  const title = item.brand || item.title || '';
+  const roleTitle = item.role || item.result || '';
+  const category = item.category || '';
+  const year = item.year || '';
+  const desc = item.description || '';
+  const links = item.links || (item.link ? [{ label: item.linkLabel || '相關連結', url: item.link }] : []);
+
+  modal.innerHTML = `
+    <div class="relative max-w-lg w-full bg-[#101116] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-5">
+      <button onclick="closeDetailModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 hover:bg-amber-400 hover:text-black text-gray-200 flex items-center justify-center text-lg transition-colors" aria-label="Close">
+        &times;
+      </button>
+
+      <div class="space-y-1 pr-6">
+        <div class="flex items-center gap-2">
+          ${year ? `<span class="text-xs font-mono px-2.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-400 font-semibold">${year}</span>` : ''}
+          ${category ? `<span class="text-xs text-gray-400 uppercase tracking-wider font-medium">${category}</span>` : ''}
+        </div>
+        <h3 class="text-2xl font-bold font-serif-title text-white pt-2">${title}</h3>
+        ${roleTitle ? `<p class="text-sm font-semibold text-amber-300">${roleTitle}</p>` : ''}
+      </div>
+
+      ${desc ? `
+        <div class="text-sm text-gray-300 leading-relaxed border-t border-white/10 pt-4">
+          ${desc}
+        </div>
+      ` : ''}
+
+      ${links.length > 0 ? `
+        <div class="space-y-2 border-t border-white/10 pt-4">
+          <p class="text-xs text-amber-400 font-medium uppercase tracking-wider">相關連結</p>
+          <div class="flex flex-col gap-2">
+            ${links.map(l => `
+              <a href="${l.url}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-between px-4 py-2.5 text-xs text-amber-400 hover:text-black bg-amber-500/10 hover:bg-amber-400 border border-amber-500/30 rounded-xl transition-all font-medium no-underline group">
+                <span class="truncate">${l.label || '觀看相關連結'}</span>
+                <svg class="w-4 h-4 flex-shrink-0 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+              </a>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
+
+      <div class="pt-2">
+        <button onclick="closeDetailModal()" class="w-full btn-outline text-xs py-2.5">
+          關閉視窗
+        </button>
+      </div>
+    </div>
+  `;
+
+  modal.classList.remove('opacity-0', 'pointer-events-none');
+  modal.classList.add('opacity-100');
+
+  window.addEventListener('keydown', handleDetailModalKeyboard);
+}
+
+function closeDetailModal() {
+  const modal = document.getElementById('card-detail-modal');
+  if (modal) {
+    modal.classList.add('opacity-0', 'pointer-events-none');
+    modal.classList.remove('opacity-100');
+  }
+  window.removeEventListener('keydown', handleDetailModalKeyboard);
+}
+
+function handleDetailModalKeyboard(e) {
+  if (e.key === 'Escape') closeDetailModal();
 }
 
 function initNavbarScroll() {
