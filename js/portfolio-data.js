@@ -475,9 +475,12 @@ window.PORTFOLIO_DATA = {
       {
         id: "comm-5",
         title: "棒球女孩LOLO-美若康矽水膠隱形眼鏡中職明星賽抽獎活動視覺",
-        client: "miacare",
+        client: "Miacare",
         year: "2025",
         cover: "assets/images/commercial/LoloMiacare (1).webp",
+        links: [
+        { label: "Miacare 美若康 貼文", url: "https://www.facebook.com/Miacareservice/photos/711-14-lolo-%E5%8B%95%E6%84%9F%E6%87%89%E6%8F%B4-%E8%88%92%E9%81%A9%E8%BF%BD%E7%90%83%E5%B0%B1%E9%9D%A0%E7%BE%8E%E8%8B%A5%E5%BA%B7%E6%8A%BD%E9%96%80%E7%A5%A8%E4%BE%86%E4%BE%86%E4%BE%86%E4%B8%AD%E8%81%B7%E6%98%8E%E6%98%9F%E8%B3%BD%E5%B0%87%E5%9C%A8-719-720-%E7%86%B1%E8%A1%80%E9%96%8B%E8%B7%91%E7%9C%8B%E7%90%83%E8%B3%BD%E6%9C%80%E9%87%8D%E8%A6%81%E7%9A%84%E5%B0%B1%E6%98%AF%E8%88%92%E9%81%A9%E7%9A%84%E8%A6%96%E8%A6%BA%E9%AB%94%E9%A9%97%E7%BE%8E%E8%8B%A5%E5%BA%B7%E7%89%B9%E5%88%A5%E9%82%80%E8%AB%8B-lolo/1178670870967949/" }
+        ],
         photos: [
           "assets/images/commercial/LoloMiacare (1).webp",
           "assets/images/commercial/LoloMiacare (2).webp",
