@@ -345,9 +345,6 @@ function renderHomePage() {
                   </div>
                   <div class="mt-5 pt-4 border-t border-white/5 flex items-center justify-between text-xs text-gray-500">
                     <span>${collab.category || '合作項目'}</span>
-                    <span class="text-amber-400/80 group-hover:text-amber-400 font-medium flex items-center gap-1 transition-colors">
-                      ${collab.galleryId || (Array.isArray(collab.photos) && collab.photos.length > 0) ? '觀看相簿 📷' : (collab.embedUrl ? '網站預覽 🌐' : '檢視詳情 ↗')}
-                    </span>
                   </div>
                 </div>
               `).join('')}
@@ -431,9 +428,6 @@ function renderHomePage() {
 
                   <div class="mt-5 pt-4 border-t border-white/5 flex items-center justify-between text-xs text-gray-500">
                     <span>${award.category || '獲獎紀錄'}</span>
-                    <span class="text-amber-400/80 group-hover:text-amber-400 font-medium flex items-center gap-1 transition-colors">
-                      ${award.galleryId || (Array.isArray(award.photos) && award.photos.length > 0) ? '觀看作品 📷' : (award.embedUrl ? '網站預覽 🌐' : '檢視詳情 ↗')}
-                    </span>
                   </div>
                 </div>
               `).join('')}

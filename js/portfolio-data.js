@@ -45,7 +45,6 @@ window.PORTFOLIO_DATA = {
     "category": "國際影展",
     "description": "官網封面照片｜商業合作",
     "logoText": "CEWE",
-    "embedUrl": "https://www.instagram.com/p/DLWHrh8h4-C/?img_index=1"
     },
     {
     "id": "collab-21",
