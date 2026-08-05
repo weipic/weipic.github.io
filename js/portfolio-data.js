@@ -264,7 +264,7 @@ window.PORTFOLIO_DATA = {
     "title"       : "國家地理雜誌臺灣攝影大賽",
     "category"    : "青少年組",
     "result"      : "入圍",
-    "description" : "入圍 2025 國家地理雜誌臺灣攝影大賽青少年組。"
+    "description" : "入圍 2025 國家地理雜誌臺灣攝影大賽青少年組"
     },
     {
     "id"          : "award-6",
@@ -272,7 +272,7 @@ window.PORTFOLIO_DATA = {
     "title"       : "Canon Taiwan 6th 校園大使",
     "category"    : "校園大使",
     "result"      : "決選入選",
-    "description" : "入選 Canon Taiwan 第 6 屆校園攝影大使決選名單。"
+    "description" : "入選 Canon Taiwan 第 6 屆校園攝影大使決選名單"
     },
     {
     "id"          : "award-5",
@@ -280,7 +280,7 @@ window.PORTFOLIO_DATA = {
     "title"       : "全國學生攝影比賽",
     "category"    : "學生競賽",
     "result"      : "特別獎",
-    "description" : "榮獲 2025 全國學生攝影比賽特別獎。"
+    "description" : "榮獲 2025 全國學生攝影比賽特別獎"
     },
     {
     "id"          : "award-4",
@@ -288,7 +288,7 @@ window.PORTFOLIO_DATA = {
     "title"       : "全國學生攝影比賽",
     "category"    : "學生競賽",
     "result"      : "銅獎",
-    "description" : "榮獲 2025 全國學生攝影比賽銅獎。"
+    "description" : "榮獲 2025 全國學生攝影比賽銅獎"
     },
     {
     "id"          : "award-3",
@@ -296,7 +296,7 @@ window.PORTFOLIO_DATA = {
     "title"       : "青攝獎全國大專盃",
     "category"    : "大專競賽",
     "result"      : "入圍",
-    "description" : "入圍 2025 第 12 屆青攝獎全國大專盃。"
+    "description" : "入圍 2025 第 12 屆青攝獎全國大專盃"
     },
     {
     "id"          : "award-2",
@@ -304,7 +304,7 @@ window.PORTFOLIO_DATA = {
     "title"       : "日本高中生攝影大賽",
     "category"    : "單張照片部門",
     "result"      : "入選",
-    "description" : "榮獲第 12 屆日本高中生攝影大賽單張照片部門入選。"
+    "description" : "榮獲第 12 屆日本高中生攝影大賽單張照片部門入選"
     },
     {
     "id"          : "award-1",
@@ -312,7 +312,7 @@ window.PORTFOLIO_DATA = {
     "title"       : "日本高中生攝影大賽",
     "category"    : "單張照片部門",
     "result"      : "入選",
-    "description" : "榮獲第 11 屆日本高中生攝影大賽單張照片部門入選。"
+    "description" : "榮獲第 11 屆日本高中生攝影大賽單張照片部門入選"
     }
   ],
 

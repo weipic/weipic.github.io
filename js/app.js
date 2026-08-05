@@ -409,14 +409,8 @@ function renderHomePage() {
                       ` : ''}
                     </div>
 
-                    ${award.category ? `
-                      <p class="text-xs text-amber-400/80 font-medium uppercase tracking-wider">
-                        ${award.category}
-                      </p>
-                    ` : ''}
-
                     ${award.description ? `
-                      <p class="text-xs sm:text-sm text-gray-400 leading-relaxed pt-1">
+                      <p class="text-xs sm:text-sm text-amber-400/90 leading-relaxed">
                         ${award.description}
                       </p>
                     ` : ''}
