@@ -201,6 +201,15 @@ function initStatsCounter() {
   }
 }
 
+// Helper: Check if a collaboration or award item links to a gallery or contains photos
+function hasPhotosOrGallery(item) {
+  if (!item) return false;
+  if (item.galleryId) return true;
+  if (Array.isArray(item.photos) && item.photos.filter(Boolean).length > 0) return true;
+  if (item.cover || item.image) return true;
+  return false;
+}
+
 // --------------------------------------------------------------------
 // 1. Render Home Page
 // --------------------------------------------------------------------
@@ -323,8 +332,10 @@ function renderHomePage() {
         <div class="relative">
           <div id="collab-grid-wrapper" class="overflow-hidden transition-all duration-700 ease-in-out ${hasMoreCollabs ? 'max-h-[340px]' : ''} relative">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-4 pb-6 px-1">
-              ${collabs.map(collab => `
-                <div class="luxury-card p-6 flex flex-col justify-between group cursor-pointer" onclick="openCardModal('collab', '${collab.id}')">
+              ${collabs.map(collab => {
+                const hasPhotos = hasPhotosOrGallery(collab);
+                return `
+                <div class="luxury-card p-6 flex flex-col justify-between group ${hasPhotos ? 'cursor-pointer' : 'cursor-default non-clickable'}" ${hasPhotos ? `onclick="openCardModal('collab', '${collab.id}')"` : ''}>
                   <div>
                     <div class="flex items-center justify-between mb-3">
                       <span class="text-2xl font-black font-cinzel text-amber-400 tracking-wider group-hover:text-amber-300 transition-colors">
@@ -347,7 +358,8 @@ function renderHomePage() {
                     <span>${collab.category || '合作項目'}</span>
                   </div>
                 </div>
-              `).join('')}
+              `;
+              }).join('')}
             </div>
           </div>
 
@@ -390,8 +402,10 @@ function renderHomePage() {
         <div class="relative">
           <div id="awards-grid-wrapper" class="overflow-hidden transition-all duration-700 ease-in-out ${hasMoreAwards ? 'max-h-[330px]' : ''} relative">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 pb-6 px-1">
-              ${awards.map(award => `
-                <div class="luxury-card p-6 sm:p-8 flex flex-col justify-between group cursor-pointer" onclick="openCardModal('award', '${award.id}')">
+              ${awards.map(award => {
+                const hasPhotos = hasPhotosOrGallery(award);
+                return `
+                <div class="luxury-card p-6 sm:p-8 flex flex-col justify-between group ${hasPhotos ? 'cursor-pointer' : 'cursor-default non-clickable'}" ${hasPhotos ? `onclick="openCardModal('award', '${award.id}')"` : ''}>
                   <div class="space-y-3">
                     <div class="flex items-start justify-between gap-4">
                       ${award.title ? `
@@ -420,7 +434,8 @@ function renderHomePage() {
                     <span>${award.category || '獲獎紀錄'}</span>
                   </div>
                 </div>
-              `).join('')}
+              `;
+              }).join('')}
             </div>
           </div>
 
@@ -842,7 +857,8 @@ function openProjectAlbum(projectId, categoryId) {
 }
 
 function openCustomProjectModal(project) {
-  currentAlbumPhotos = (project.photos && project.photos.length) ? project.photos : [project.cover || project.image];
+  const rawPhotos = (project.photos && project.photos.length) ? project.photos : [project.cover || project.image];
+  currentAlbumPhotos = rawPhotos.filter(Boolean);
   currentPhotoIndex = 0;
 
   let modal = document.getElementById('lightbox-modal');
@@ -866,7 +882,7 @@ function renderModalContent(project) {
   if (!modal) return;
 
   const total = currentAlbumPhotos.length;
-  const currentPhotoSrc = currentAlbumPhotos[currentPhotoIndex];
+  const currentPhotoSrc = total > 0 ? currentAlbumPhotos[currentPhotoIndex] : null;
   const customPos = project.position ? `object-position: ${project.position};` : '';
 
   modal.innerHTML = `
@@ -880,8 +896,22 @@ function renderModalContent(project) {
       <!-- Main Photo Display Area with Previous/Next Arrows -->
       <div class="md:w-3/4 bg-black flex items-center justify-center p-3 sm:p-5 relative min-h-[280px] sm:min-h-[400px] md:min-h-[550px] overflow-hidden group">
         
-        <!-- Main Image (Supports custom object-position & vertical image boundaries on mobile) -->
-        <img id="modal-main-img" src="${currentPhotoSrc}" alt="${project.title}" draggable="false" style="${customPos}" class="max-h-[48vh] sm:max-h-[65vh] md:max-h-[76vh] w-auto max-w-full object-contain rounded-lg shadow-xl transition-all duration-300" />
+        ${total > 0 ? `
+          <!-- Main Image (Supports custom object-position & vertical image boundaries on mobile) -->
+          <img id="modal-main-img" src="${currentPhotoSrc}" alt="${project.title}" draggable="false" style="${customPos}" class="max-h-[48vh] sm:max-h-[65vh] md:max-h-[76vh] w-auto max-w-full object-contain rounded-lg shadow-xl transition-all duration-300" />
+        ` : `
+          <!-- Placeholder when no photo is uploaded yet -->
+          <div class="w-full h-full flex flex-col items-center justify-center p-8 text-center bg-gradient-to-b from-[#14161f] to-[#0a0a0d] border border-white/5 rounded-xl space-y-4 min-h-[280px] sm:min-h-[400px]">
+            <div class="w-16 h-16 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shadow-inner">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 002-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </div>
+            <div class="space-y-1">
+              <h4 class="text-base font-bold text-white font-serif-title">${project.title}</h4>
+              <p class="text-xs text-gray-400">此紀錄目前尚未加入相片檔</p>
+              <p class="text-[11px] text-amber-400/80 font-mono pt-1">照片儲存路徑：assets/images/${project.isAward ? 'award' : 'collaboration'}/</p>
+            </div>
+          </div>
+        `}
 
         <!-- Left Nav Arrow (<) -->
         ${total > 1 ? `
@@ -1020,7 +1050,7 @@ function handleLightboxKeyboard(e) {
 }
 
 /* ====================================================================
-   5. COLLABORATION & AWARD CARD MODAL HANDLERS (EMBED WEBSITE & GALLERIES)
+   5. COLLABORATION & AWARD CARD MODAL HANDLERS (PHOTO ALBUM / LIGHTBOX)
    ==================================================================== */
 function openCardModal(type, itemId) {
   const data = window.PORTFOLIO_DATA;
@@ -1030,44 +1060,54 @@ function openCardModal(type, itemId) {
   if (!Array.isArray(items)) return;
 
   const item = items.find(i => i.id === itemId);
-  if (!item) return;
+  if (!item || !hasPhotosOrGallery(item)) return;
 
-  // 1. Direct link to a photo gallery project (e.g. galleryId: "comm-1")
+  // 1. Direct link to a photo gallery project in categories (e.g. galleryId: "comm-1")
   if (item.galleryId) {
     openProjectAlbum(item.galleryId, item.galleryCategory);
     return;
   }
 
-  // 2. Embedded website modal (e.g. embedUrl: "https://example.com")
-  if (item.embedUrl) {
-    openEmbedModal({
-      title: item.brand || item.title || item.role,
-      subtitle: item.role || item.result || (item.year ? `${item.year} · ${item.category || ''}` : item.category),
-      embedUrl: item.embedUrl,
-      externalUrl: item.link || (Array.isArray(item.links) && item.links[0]?.url) || item.embedUrl
-    });
-    return;
+  // 2. Open as Photo Album Lightbox Modal (matching category project viewer)
+  const isAward = (type === 'award');
+  const rawPhotos = Array.isArray(item.photos) && item.photos.length > 0
+    ? item.photos
+    : (item.cover ? [item.cover] : (item.image ? [item.image] : []));
+
+  // Build unified links list
+  const links = [];
+  if (Array.isArray(item.links) && item.links.length > 0) {
+    links.push(...item.links);
+  } else if (item.link) {
+    links.push({ label: item.linkLabel || '觀看相關連結', url: item.link });
   }
 
-  // 3. Custom photo array attached directly to card (e.g. photos: [...])
-  if (Array.isArray(item.photos) && item.photos.length > 0) {
-    const customProject = {
-      id: item.id,
-      title: item.role || item.title || item.brand,
-      client: item.brand || item.category || '紀錄',
-      year: item.year || '',
-      description: item.description || '',
-      photos: item.photos,
-      position: item.position || 'center',
-      scale: item.scale || 1,
-      links: item.links || (item.link ? [{ label: item.linkLabel || '觀看相關連結', url: item.link }] : [])
-    };
-    openCustomProjectModal(customProject);
-    return;
+  if (item.embedUrl && !links.some(l => l.url === item.embedUrl)) {
+    links.push({ label: '瀏覽官方網站', url: item.embedUrl });
   }
 
-  // 4. Default: Open detail card modal with text and links
-  openDetailInfoModal(item, type);
+  const titleText = isAward
+    ? (item.result ? `${item.title} — ${item.result}` : item.title)
+    : (item.role || item.title || item.brand);
+
+  const clientText = isAward
+    ? (item.category ? `攝影獎項 · ${item.category}` : '攝影獎項')
+    : (item.brand || item.category || '合作經歷');
+
+  const customProject = {
+    id: item.id,
+    title: titleText,
+    client: clientText,
+    year: item.year || '',
+    description: item.description || '',
+    photos: rawPhotos,
+    isAward: isAward,
+    position: item.position || 'center',
+    scale: item.scale || 1,
+    links: links
+  };
+
+  openCustomProjectModal(customProject);
 }
 
 function openEmbedModal(data) {
@@ -1262,7 +1302,9 @@ function initMobileTouchHover() {
   function getCardFromTouch(touch) {
     if (!touch) return null;
     const target = document.elementFromPoint(touch.clientX, touch.clientY);
-    return target ? target.closest('.luxury-card, .gallery-item') : null;
+    const card = target ? target.closest('.luxury-card, .gallery-item') : null;
+    if (card && card.classList.contains('non-clickable')) return null;
+    return card;
   }
 
   document.addEventListener('touchstart', (e) => {

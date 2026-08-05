@@ -35,6 +35,8 @@ window.PORTFOLIO_DATA = {
 
   // ------------------------------------------------------------------
   // 2. 合作經歷與品牌 clients (Collaborations & Experience)
+  // 點擊後會以「照片集燈箱 Modal」顯示。
+  // 專屬照片可放於 assets/images/collaboration/ 資料夾中，並在 photos: [...] 填寫路徑
   // ------------------------------------------------------------------
   collaborations: [
     {
@@ -45,6 +47,12 @@ window.PORTFOLIO_DATA = {
     "category": "國際影展",
     "description": "官網封面照片｜商業合作",
     "logoText": "CEWE",
+    photos: [             
+      "assets/images/collaboration/cewe.webp",
+    ],
+    links: [              
+      { label: "CEWE Photo Award", url: "https://contest.cewe.co.uk/cewephotoaward2027/en_gb/youngtalentaward" }
+    ]
     },
     {
     "id": "collab-21",
@@ -62,8 +70,11 @@ window.PORTFOLIO_DATA = {
     "role": "第13屆青攝獎全國大專盃",
     "year": "2026",
     "category": "競賽",
-    "description": "學生評審",
-    "logoText": "青攝獎"
+    "description": "學生評審 with 廖文瑄老師 @ontheay.today",
+    "logoText": "青攝獎",
+    photos: [             
+      "assets/images/collaboration/ntutphotoclub.webp",
+    ],
     },
     {
     "id": "collab-19",
@@ -182,7 +193,8 @@ window.PORTFOLIO_DATA = {
     "year": "2025",
     "category": "商業",
     "description": "棒球女孩LOLO-美若康矽水膠隱形眼鏡中職明星賽抽獎活動視覺授權",
-    "logoText": "美若康隱形眼鏡"
+    "logoText": "美若康隱形眼鏡",
+    galleryId: "comm-5"
     },
     {
     "id": "collab-7",
@@ -256,6 +268,8 @@ window.PORTFOLIO_DATA = {
 
   // ------------------------------------------------------------------
   // 3. 獲獎紀錄與榮譽 (Awards & Honors)
+  // 點擊後會以「照片集燈箱 Modal」顯示。
+  // 專屬照片或證書可放於 assets/images/award/ 資料夾中，並在 photos: [...] 填寫路徑
   // ------------------------------------------------------------------
   awards: [
     {
@@ -264,15 +278,31 @@ window.PORTFOLIO_DATA = {
     "title"       : "國家地理雜誌臺灣攝影大賽",
     "category"    : "青少年組",
     "result"      : "入圍",
-    "description" : "入圍 2025 國家地理雜誌臺灣攝影大賽青少年組"
+    "description" : "入圍 2025 國家地理雜誌臺灣攝影大賽青少年組",
+    photos: [             
+      "assets/images/award/國家地理台灣青年入圍.webp",
+    ],
+    links: [              
+      { label: "Instagram 貼文", url: "https://www.instagram.com/p/DNqclZphgC4/" }
+    ]
     },
     {
     "id"          : "award-6",
     "year"        : "2025",
-    "title"       : "Canon Taiwan 6th 校園大使",
-    "category"    : "校園大使",
-    "result"      : "決選入選",
-    "description" : "入選 Canon Taiwan 第 6 屆校園攝影大使決選名單"
+    "title"       : "全國學生攝影比賽",
+    "category"    : "學生競賽",
+    "result"      : "銅獎",
+    "description" : "榮獲 2025 全國學生攝影比賽銅獎",
+    photos: [             
+      "assets/images/award/全國學生攝影銅獎 (1).webp",
+      "assets/images/award/全國學生攝影銅獎 (2).webp",
+      "assets/images/award/全國學生攝影銅獎 (3).webp",
+      "assets/images/award/全國學生攝影銅獎 (4).webp",
+      "assets/images/award/全國學生攝影銅獎 (5).webp",
+    ],
+    links: [              
+      { label: "Instagram 貼文", url: "https://www.instagram.com/p/DJ-_kXTJV9s/?img_index=1" }
+    ]
     },
     {
     "id"          : "award-5",
@@ -280,15 +310,25 @@ window.PORTFOLIO_DATA = {
     "title"       : "全國學生攝影比賽",
     "category"    : "學生競賽",
     "result"      : "特別獎",
-    "description" : "榮獲 2025 全國學生攝影比賽特別獎"
+    "description" : "榮獲 2025 全國學生攝影比賽特別獎",
+    photos: [             
+      "assets/images/award/全國學生攝影特別獎 (1).webp",
+      "assets/images/award/全國學生攝影特別獎 (2).webp",
+      "assets/images/award/全國學生攝影特別獎 (3).webp",
+      "assets/images/award/全國學生攝影特別獎 (4).webp",
+      "assets/images/award/全國學生攝影特別獎 (5).webp",
+    ],
+    links: [              
+      { label: "Instagram 貼文", url: "https://www.instagram.com/p/DJtfuj9hZH6/?img_index=1" }
+    ]
     },
     {
     "id"          : "award-4",
     "year"        : "2025",
-    "title"       : "全國學生攝影比賽",
-    "category"    : "學生競賽",
-    "result"      : "銅獎",
-    "description" : "榮獲 2025 全國學生攝影比賽銅獎"
+    "title"       : "Canon Taiwan 6th 校園大使",
+    "category"    : "校園大使",
+    "result"      : "決選入選",
+    "description" : "入選 Canon Taiwan 第 6 屆校園攝影大使決選名單"
     },
     {
     "id"          : "award-3",

@@ -229,6 +229,11 @@ img, picture, .no-download {
   transform: translateX(4px);
 }
 
+/* Non-clickable card overrides - keep hover effect, only default cursor */
+.luxury-card.non-clickable {
+  cursor: default !important;
+}
+
 .image-hover-zoom {
   overflow: hidden;
   position: relative;
