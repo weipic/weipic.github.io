@@ -393,25 +393,21 @@ function renderHomePage() {
               ${awards.map(award => `
                 <div class="luxury-card p-6 sm:p-8 flex flex-col justify-between group cursor-pointer" onclick="openCardModal('award', '${award.id}')">
                   <div class="space-y-3">
-                    <div class="flex items-center justify-between">
-                      ${award.year ? `
-                        <span class="text-xs font-mono px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 font-semibold">
-                          ${award.year}
-                        </span>
-                      ` : '<span></span>'}
-                      ${award.result ? `
-                        <span class="px-3 py-1 rounded-full bg-gradient-to-r from-amber-500/20 to-amber-300/10 border border-amber-400/40 text-amber-300 font-bold text-xs flex items-center gap-1.5 shadow-sm">
-                          <svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l2.4 7.4h7.6l-6.2 4.5 2.4 7.4-6.2-4.5-6.2 4.5 2.4-7.4-6.2-4.5h7.6z"/></svg>
-                          ${award.result}
+                    <div class="flex items-start justify-between gap-4">
+                      ${award.title ? `
+                        <h3 class="text-xl font-bold text-white font-serif-title group-hover:text-amber-400 transition-colors">
+                          ${award.title}
+                        </h3>
+                      ` : '<div></div>'}
+                      ${(award.year || award.result) ? `
+                        <span class="text-xs px-2.5 py-1 rounded bg-amber-500/10 border border-amber-500/30 font-semibold shrink-0">
+                          ${[
+                            award.year ? `<span class="text-white">${award.year}</span>` : '',
+                            award.result ? `<span class="text-amber-400">${award.result}</span>` : ''
+                          ].filter(Boolean).join('<span class="text-gray-400/60 mx-1 font-normal">｜</span>')}
                         </span>
                       ` : ''}
                     </div>
-
-                    ${award.title ? `
-                      <h3 class="text-xl font-bold text-white font-serif-title group-hover:text-amber-400 transition-colors pt-1">
-                        ${award.title}
-                      </h3>
-                    ` : ''}
 
                     ${award.category ? `
                       <p class="text-xs text-amber-400/80 font-medium uppercase tracking-wider">
