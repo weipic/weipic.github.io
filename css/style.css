@@ -571,4 +571,201 @@ body {
   backface-visibility: hidden;
 }
 
+/* ====================================================================
+   🎬 1.5s PAGE LOADING SCREEN (GPU-ACCELERATED SILKY ANIMATION)
+   ==================================================================== */
+.loading-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background-color: var(--bg-primary, #0a0a0c);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  user-select: none;
+  contain: strict;
+  will-change: transform, opacity, visibility;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+  animation: loadingScreenExit 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.loading-screen-glow {
+  position: absolute;
+  width: 380px;
+  height: 380px;
+  background: radial-gradient(circle, rgba(218, 165, 32, 0.14) 0%, rgba(10, 10, 12, 0) 70%);
+  filter: blur(50px);
+  pointer-events: none;
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+.loader-logo-wrapper {
+  position: relative;
+  width: 280px;
+  max-width: 75vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 22px rgba(218, 165, 32, 0.15));
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+.loader-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+  shape-rendering: geometricPrecision;
+  text-rendering: geometricPrecision;
+}
+
+/* --------------------------------------------------------------------
+   Phase 1: [0.0s - 0.7s] (Stroke Drawing & Aperture Scale)
+   -------------------------------------------------------------------- */
+
+/* Left Camera Outer Frame: GPU-accelerated Stroke Drawing from bottom clockwise */
+.loader-camera-frame {
+  fill: #ffffff;
+  fill-opacity: 0;
+  stroke: #ffffff;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 2000;
+  stroke-dashoffset: 2000;
+  will-change: stroke-dashoffset, fill-opacity, stroke-opacity;
+  transform: translateZ(0);
+  animation: cameraFrameDraw 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes cameraFrameDraw {
+  0% {
+    stroke-dashoffset: 2000;
+    fill-opacity: 0;
+    stroke: #ffffff;
+    stroke-opacity: 1;
+  }
+  46.7% { /* 0.7s - Stroke drawing completes */
+    stroke-dashoffset: 0;
+    fill-opacity: 0;
+    stroke: #ffffff;
+    stroke-opacity: 1;
+  }
+  66.7% { /* 1.0s - Smooth solid fill transition */
+    stroke-dashoffset: 0;
+    fill-opacity: 1;
+    stroke: #ffffff;
+    stroke-opacity: 0;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    fill-opacity: 1;
+    stroke: transparent;
+    stroke-opacity: 0;
+  }
+}
+
+/* Center Aperture Blades: GPU Scale 0 to 1 & Fade-in */
+.loader-aperture-blades {
+  fill: #ffffff;
+  transform-origin: 115px 137px;
+  opacity: 0;
+  transform: scale(0) rotate(-35deg) translateZ(0);
+  will-change: transform, opacity;
+  animation: apertureScaleFade 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes apertureScaleFade {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(-35deg) translateZ(0);
+  }
+  46.7% { /* 0.7s */
+    opacity: 1;
+    transform: scale(1) rotate(0deg) translateZ(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg) translateZ(0);
+  }
+}
+
+/* --------------------------------------------------------------------
+   Phase 2: [0.3s - 1.0s] (Text WEI & Pictures Early Staggered Fade-in)
+   Starts slowly fading in when aperture blades reach ~50% (at 0.3s)
+   -------------------------------------------------------------------- */
+
+/* Right WEI Text: Starts at 0.3s (20% keyframe) when aperture is halfway open */
+.loader-text-wei {
+  fill: #ffffff;
+  opacity: 0;
+  transform: translate3d(0, 8px, 0);
+  will-change: transform, opacity;
+  animation: weiTextFadeIn 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes weiTextFadeIn {
+  0%, 20% { /* 0.0s - 0.3s */
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+  }
+  56.7% { /* 0.85s - Smooth fade-in completed */
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Right Pictures Text: Starts at 0.4s (26.7% keyframe) with 0.1s staggered delay */
+.loader-text-pictures {
+  fill: #ffffff;
+  opacity: 0;
+  transform: translate3d(0, 8px, 0);
+  will-change: transform, opacity;
+  animation: picturesTextFadeIn 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes picturesTextFadeIn {
+  0%, 26.7% { /* 0.0s - 0.4s */
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+  }
+  63.3% { /* 0.95s - Smooth fade-in completed */
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* --------------------------------------------------------------------
+   Phase 3: [1.2s - 1.5s] (Pause & Smooth Slide Up + Fade Out)
+   -------------------------------------------------------------------- */
+@keyframes loadingScreenExit {
+  0%, 80% { /* 0.0s - 1.2s */
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    visibility: visible;
+    pointer-events: auto;
+  }
+  100% { /* 1.5s - GPU composited smooth exit */
+    opacity: 0;
+    transform: translate3d(0, -24px, 0) scale(0.98);
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+
+
 

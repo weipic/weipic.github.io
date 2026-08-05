@@ -9,6 +9,17 @@ let currentPhotoIndex = 0;
 let isCollabExpanded = false;
 let isAwardsExpanded = false;
 
+// Helper: Send GA4 Custom Event with Chinese Name
+function trackGAEvent(eventName, eventParams = {}) {
+  try {
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', eventName, eventParams);
+    }
+  } catch (err) {
+    console.warn('GA tracking error:', err);
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   initProtectImages();
   adaptLinksForEnvironment();
@@ -17,6 +28,20 @@ document.addEventListener('DOMContentLoaded', () => {
   initMobileTouchHover();
   initLanguageSelector();
   
+  // Track external link clicks automatically
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest('a[href]');
+    if (!link) return;
+    const href = link.getAttribute('href');
+    if (href && (href.startsWith('http') || href.startsWith('mailto:')) && !href.includes(window.location.hostname)) {
+      const text = (link.innerText || link.getAttribute('aria-label') || href).trim().substring(0, 50);
+      trackGAEvent('點擊外部連結', {
+        '連結標題': text,
+        '目標網址': href
+      });
+    }
+  });
+
   // Determine current page and render appropriate section
   const currentPage = getCurrentPageName();
   
@@ -511,6 +536,7 @@ function toggleCollaborations() {
   if (!wrapper) return;
 
   isCollabExpanded = !isCollabExpanded;
+  trackGAEvent(isCollabExpanded ? '展開合作經歷' : '收合合作經歷');
 
   if (isCollabExpanded) {
     wrapper.style.maxHeight = (wrapper.scrollHeight + 40) + 'px';
@@ -544,6 +570,7 @@ function toggleAwards() {
   if (!wrapper) return;
 
   isAwardsExpanded = !isAwardsExpanded;
+  trackGAEvent(isAwardsExpanded ? '展開獲獎紀錄' : '收合獲獎紀錄');
 
   if (isAwardsExpanded) {
     wrapper.style.maxHeight = (wrapper.scrollHeight + 40) + 'px';
@@ -806,6 +833,10 @@ async function handleFormSubmit(e) {
         statusMsg.className = 'text-xs py-3 px-4 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-medium block';
         statusMsg.innerText = '✅ 預約訊息已成功送出！將會於 24 小時內與您聯繫。';
       }
+      trackGAEvent('送出聯絡表單', {
+        '預約類別': category,
+        '聯絡人姓名': name
+      });
       form.reset();
     } else {
       throw new Error(data.message || '發送失敗');
@@ -860,6 +891,12 @@ function openCustomProjectModal(project) {
   const rawPhotos = (project.photos && project.photos.length) ? project.photos : [project.cover || project.image];
   currentAlbumPhotos = rawPhotos.filter(Boolean);
   currentPhotoIndex = 0;
+
+  trackGAEvent('查看作品相本', {
+    '相本名稱': project.title || '作品集細節',
+    '類別或品牌': project.client || '',
+    '年份': project.year || ''
+  });
 
   let modal = document.getElementById('lightbox-modal');
   if (!modal) {
@@ -1124,6 +1161,11 @@ function openEmbedModal(data) {
   const title = data.title || '網站預覽';
   const subtitle = data.subtitle || '';
 
+  trackGAEvent('查看社群預覽', {
+    '預覽標題': title,
+    '目標網址': externalUrl
+  });
+
   modal.innerHTML = `
     <div class="relative max-w-6xl w-full h-[90vh] sm:h-[88vh] bg-[#101116] border border-white/10 rounded-2xl overflow-hidden shadow-2xl flex flex-col">
       
@@ -1194,6 +1236,12 @@ function openDetailInfoModal(item, type) {
   const year = item.year || '';
   const desc = item.description || '';
   const links = item.links || (item.link ? [{ label: item.linkLabel || '相關連結', url: item.link }] : []);
+
+  trackGAEvent('查看詳細介紹', {
+    '項目標題': title,
+    '類別': category,
+    '年份': year
+  });
 
   modal.innerHTML = `
     <div class="relative max-w-lg w-full bg-[#101116] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-5">
@@ -1393,6 +1441,10 @@ window.googleTranslateElementInit = function() {
 
 window.setLanguage = function(langCode) {
   const currentDomain = window.location.hostname;
+
+  trackGAEvent('切換網站語言', {
+    '目標語言': langCode
+  });
   
   if (langCode === 'zh-TW') {
     document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
