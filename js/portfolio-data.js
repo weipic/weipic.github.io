@@ -1558,17 +1558,481 @@ window.PORTFOLIO_DATA = {
     ],
     landscape: [
       {
-        id: "land-1",
+        id: "land26",
         title: "合龍之前：世紀之約",
         client: "Danjiang Bridge",
         year: "2026",
         cover: "assets/images/landscape/landscape1.webp",
         position: "60% 60%",
         scale: 1.5,
+        links: [
+        { label: "Instagram 貼文", url: "https://www.instagram.com/p/DYCL2foGb-e/?img_index=1" }
+        ],
         photos: [
           "assets/images/landscape/landscape1.webp"
         ],
         description: "在淡水河口，見證世界級地標從虛無到實體的誕生紀實。"
+      },
+      {
+        id: "land-25",
+        title: "盛夏的喧囂與寂靜",
+        client: "Dadaocheng Fireworks",
+        year: "2026",
+        cover: "assets/images/landscape/landscape (1).webp",
+        position: "50% 50%",
+        scale: 1.0,
+        links: [
+          { label: "Instagram 貼文", url: "https://www.instagram.com/p/DbqMEVsAeG0/" }
+        ],
+        photos: [
+          "assets/images/landscape/landscape (1).webp"
+        ],
+        description: "於老城頂樓，看萬家燈火與漫天花火同時綻放"
+      },
+      {
+        id: "land-24",
+        title: "極東的海潮時間",
+        client: "Magang Fishing Village",
+        year: "2026",
+        cover: "assets/images/landscape/landscape (2).webp",
+        position: "50% 50%",
+        scale: 1.0,
+        links: [
+          { label: "Instagram 貼文", url: "https://www.instagram.com/p/Da4SD_FmVwc/?img_index=1" }
+        ],
+        photos: [
+          "assets/images/landscape/landscape (2).webp",
+          "assets/images/landscape/landscape (3).webp",
+          "assets/images/landscape/landscape (4).webp"
+        ],
+        description: "石厝與海蝕平台交錯，凝固台灣邊陲最寂靜的歲月"
+      },
+      {
+        id: "land-23",
+        title: "風車與暮色的交界",
+        client: "Itoshima Kuroiso Coast",
+        year: "2025",
+        cover: "assets/images/landscape/landscape (5).webp",
+        position: "50% 50%",
+        scale: 1.0,
+        links: [
+          { label: "Instagram 貼文", url: "https://www.instagram.com/p/DVGMI28kx7l/?img_index=1" }
+        ],
+        photos: [
+          "assets/images/landscape/landscape (5).webp",
+          "assets/images/landscape/landscape (6).webp",
+          "assets/images/landscape/landscape (7).webp",
+          "assets/images/landscape/landscape (8).webp",
+          "assets/images/landscape/landscape (9).webp",
+          "assets/images/landscape/landscape (10).webp"
+        ],
+        description: "層巒遠山的輪廓裡，佇立著聽潮轉動的剪影"
+      },
+      {
+        id: "land-22",
+        title: "在遼闊世界裡遇見渺小的自己",
+        client: "Aso",
+        year: "2025",
+        cover: "assets/images/landscape/landscape (11).webp",
+        position: "50% 50%",
+        scale: 1.0,
+        links: [
+          { label: "Instagram 貼文", url: "https://www.instagram.com/p/DWdqAQ5GZnk/?img_index=1" }
+        ],
+        photos: [
+          "assets/images/landscape/landscape (11).webp",
+          "assets/images/landscape/landscape (12).webp",
+          "assets/images/landscape/landscape (13).webp",
+          "assets/images/landscape/landscape (14).webp",
+          "assets/images/landscape/landscape (15).webp"
+        ],
+        description: "漫步於金黃草原的褶皺中，感受火山包容萬物的心跳"
+      },
+      {
+        id: "land-21",
+        title: "日復一日的南國海岸",
+        client: "Aoshima",
+        year: "2025",
+        cover: "assets/images/landscape/landscape (16).webp",
+        position: "50% 50%",
+        scale: 1.0,
+        links: [
+          { label: "Instagram 貼文", url: "https://www.instagram.com/p/DTg7ahdk6bq/?img_index=1" }
+        ],
+        photos: [
+          "assets/images/landscape/landscape (16).webp"
+        ],
+        description: "陽光與微風落下的地方，停格著最平實的日常風景"
+      },
+      {
+        id: "land-20",
+        title: "當光觸碰了大海",
+        client: "Hyuga Cape",
+        year: "2025",
+        cover: "assets/images/landscape/landscape (17).webp",
+        position: "50% 50%",
+        scale: 1.0,
+        links: [
+          { label: "Instagram 貼文", url: "https://www.instagram.com/p/DR2Dn8EE7yH/?img_index=1" }
+        ],
+        photos: [
+          "assets/images/landscape/landscape (17).webp",
+          "assets/images/landscape/landscape (18).webp",
+          "assets/images/landscape/landscape (19).webp",
+          "assets/images/landscape/landscape (20).webp",
+          "assets/images/landscape/landscape (21).webp",
+          "assets/images/landscape/landscape (22).webp",
+          "assets/images/landscape/landscape (23).webp",
+          "assets/images/landscape/landscape (24).webp"
+        ],
+        description: "芒花迎風搖曳，在蔚藍波光裡折射出閃耀的微光"
+      },
+      {
+        id: "land-19",
+        title: "歲月與神明的祝福",
+        client: "Kato Shrine",
+        year: "2025",
+        cover: "assets/images/landscape/landscape (25).webp",
+        position: "50% 50%",
+        scale: 1.0,
+        links: [
+          { label: "熊本市官方貼文", url: "https://www.instagram.com/p/DU9r74YD2oA/?img_index=1" }
+        ],
+        photos: [
+          "assets/images/landscape/landscape (25).webp",
+          "assets/images/landscape/landscape (26).webp",
+          "assets/images/landscape/landscape (27).webp",
+          "assets/images/landscape/landscape (28).webp",
+          "assets/images/landscape/landscape (29).webp",
+          "assets/images/landscape/landscape (30).webp"
+        ],
+        description: "銀杏與木造社殿交織，紀錄神前結婚儀式最莊嚴的誓言"
+      },
+      {
+        id: "land-18",
+        title: "童年的地平線",
+        client: "Qingtiangang",
+        year: "2025",
+        cover: "assets/images/landscape/landscape (31).webp",
+        position: "50% 50%",
+        scale: 1.2,
+        links: [
+          { label: "Instagram 貼文", url: "https://www.instagram.com/p/DOVsSC4k1bE/?img_index=1" }
+        ],
+        photos: [
+          "assets/images/landscape/landscape (31).webp",
+          "assets/images/landscape/landscape (32).webp",
+          "assets/images/landscape/landscape (33).webp",
+          "assets/images/landscape/landscape (34).webp",
+          "assets/images/landscape/landscape (35).webp"
+        ],
+        description: "微風徐徐的木欄杆旁，奔跑玩耍著最純粹的天真與快樂"
+      },
+      {
+        id: "land-17",
+        title: "飛向暮色的歸途",
+        client: "Qingtiangang",
+        year: "2025",
+        cover: "assets/images/landscape/landscape (36).webp",
+        position: "50% 50%",
+        scale: 1.2,
+        links: [
+          { label: "Instagram 貼文", url: "https://www.instagram.com/p/DPRcXKnEwv0/?img_index=1" }
+        ],
+        photos: [
+          "assets/images/landscape/landscape (36).webp",
+          "assets/images/landscape/landscape (37).webp",
+          "assets/images/landscape/landscape (38).webp",
+          "assets/images/landscape/landscape (39).webp",
+          "assets/images/landscape/landscape (40).webp",
+          "assets/images/landscape/landscape (41).webp"
+        ],
+        description: "於夕陽餘暉的粉色天空，凝望遠方飛機與歸巢的飛鳥"
+      },
+      {
+        id: "land-16",
+        title: "大地共生的樂章",
+        client: "Qingtiangang",
+        year: "2025",
+        cover: "assets/images/landscape/landscape (42).webp",
+        position: "50% 50%",
+        scale: 1.2,
+        links: [
+          { label: "Instagram 貼文", url: "https://www.instagram.com/p/DOqbzSukxJq/?img_index=1" }
+        ],
+        photos: [
+          "assets/images/landscape/landscape (42).webp",
+          "assets/images/landscape/landscape (43).webp",
+          "assets/images/landscape/landscape (44).webp",
+          "assets/images/landscape/landscape (45).webp",
+          "assets/images/landscape/landscape (46).webp",
+          "assets/images/landscape/landscape (47).webp"
+        ],
+        description: "草原上水牛與白鷺鷥和平共處，演繹自然界最美麗的平衡"
+      },
+      {
+        id: "land-15",
+        title: "潮汐間的童真記憶",
+        client: "Laomei",
+        year: "2025",
+        cover: "assets/images/landscape/landscape (48).webp",
+        position: "50% 50%",
+        scale: 1.0,
+        links: [
+          { label: "Instagram 貼文", url: "https://www.instagram.com/p/DPYsaWekx0h/?img_index=1" }
+        ],
+        photos: [
+          "assets/images/landscape/landscape (48).webp",
+          "assets/images/landscape/landscape (49).webp",
+          "assets/images/landscape/landscape (50).webp"
+        ],
+        description: "踏在綠意盎然的海蝕平台上，紀錄孩子們戲水捉蟹的純真時光"
+      },
+      {
+        id: "land-14",
+        title: "俯瞰幾何之城",
+        client: "Urban Geometry",
+        year: "2026",
+        cover: "assets/images/landscape/landscape (51).webp",
+        position: "50% 50%",
+        scale: 1.0,
+        links: [
+          { label: "Instagram 貼文", url: "https://www.instagram.com/p/DVp3LzlGS4t/" }
+        ],
+        photos: [
+          "assets/images/landscape/landscape (51).webp"
+        ],
+        description: "以上帝視角切開街巷脈絡，交織出日常生活的平行線"
+      },
+      {
+        id: "land-13",
+        title: "秋風裡的孤獨背影",
+        client: "Lengshuikeng",
+        year: "2025",
+        cover: "assets/images/landscape/landscape (52).webp",
+        position: "50% 50%",
+        scale: 1.0,
+        links: [
+          { label: "Instagram 貼文", url: "https://www.instagram.com/p/DQkq2Llk3O5/?img_index=1" }
+        ],
+        photos: [
+          "assets/images/landscape/landscape (52).webp",
+          "assets/images/landscape/landscape (53).webp",
+          "assets/images/landscape/landscape (54).webp",
+          "assets/images/landscape/landscape (55).webp",
+          "assets/images/landscape/landscape (56).webp"
+        ],
+        description: "沿著階梯走入銀白芒草，與整個秋天不期而遇"
+      },
+      {
+        id: "land-12",
+        title: "年節喧囂與老街歲月",
+        client: "Dihua Street New Year Market",
+        year: "2025",
+        cover: "assets/images/landscape/landscape (57).webp",
+        position: "50% 50%",
+        scale: 1.0,
+        links: [
+          { label: "Instagram 貼文", url: "https://www.instagram.com/p/DUp_axzE2T6/?img_index=1" }
+        ],
+        photos: [
+          "assets/images/landscape/landscape (57).webp",
+          "assets/images/landscape/landscape (58).webp",
+          "assets/images/landscape/landscape (59).webp",
+          "assets/images/landscape/landscape (60).webp",
+          "assets/images/landscape/landscape (61).webp",
+          "assets/images/landscape/landscape (62).webp",
+          "assets/images/landscape/landscape (63).webp",
+          "assets/images/landscape/landscape (64).webp",
+          "assets/images/landscape/landscape (65).webp",
+          "assets/images/landscape/landscape (66).webp"
+        ],
+        description: "紅燈籠高掛與熙攘人潮，映照出舊城區最濃厚的煙火氣"
+      },
+      {
+        id: "land-11",
+        title: "黑夜裡的血脈",
+        client: "National Highway",
+        year: "2025",
+        cover: "assets/images/landscape/landscape (67).webp",
+        position: "50% 50%",
+        scale: 1.0,
+        links: [
+          { label: "Instagram 貼文", url: "https://www.instagram.com/p/DN1kb2LBhkD/" }
+        ],
+        photos: [
+          "assets/images/landscape/landscape (67).webp"
+        ],
+        description: "流動的光軌劃破靜謐夜空，串連起城市不曾停歇的呼吸"
+      },
+      {
+        id: "land-10",
+        title: "雲霧間的山脊線",
+        client: "Keelung Mountain",
+        year: "2025",
+        cover: "assets/images/landscape/landscape (68).webp",
+        position: "50% 50%",
+        scale: 1.0,
+        links: [
+          { label: "Instagram 貼文", url: "https://www.instagram.com/p/DMFLMjKhfAW/?img_index=1" }
+        ],
+        photos: [
+          "assets/images/landscape/landscape (68).webp"
+        ],
+        description: "順著石階直上峰頂，在蒼翠山海間尋找風的痕跡"
+      },
+      {
+        id: "land-9",
+        title: "燈火初上山城夜",
+        client: "Jiufen",
+        year: "2025",
+        cover: "assets/images/landscape/landscape (69).webp",
+        position: "50% 50%",
+        scale: 1.0,
+        links: [
+          { label: "Instagram 貼文", url: "https://www.instagram.com/p/DLmSPiwhtVz/?img_index=1" }
+        ],
+        photos: [
+          "assets/images/landscape/landscape (69).webp"
+        ],
+        description: "微光點亮紅燈籠，斜陽餘暉下的茶樓疊印出歲月的漫長"
+      },
+      {
+        id: "land-8",
+        title: "神木參道的日常",
+        client: "Kengun Shrine",
+        year: "2024",
+        cover: "assets/images/landscape/landscape (70).webp",
+        position: "50% 50%",
+        scale: 1.0,
+        links: [
+          { label: "Instagram 貼文", url: "https://www.instagram.com/p/DKj9Eg5Bv9Z/" }
+        ],
+        photos: [
+          "assets/images/landscape/landscape (70).webp"
+        ],
+        description: "綠意覆蓋古老社殿，獨自漫步於古道，感受寧靜肅穆的晨光時刻"
+      },
+      {
+        id: "land-7",
+        title: "溪谷間的綠色星河",
+        client: "Jinping Creek",
+        year: "2025",
+        cover: "assets/images/landscape/landscape (71).webp",
+        position: "50% 50%",
+        scale: 1.0,
+        links: [
+          { label: "Instagram 貼文", url: "https://www.instagram.com/p/DLITEgpBBgD/" }
+        ],
+        photos: [
+          "assets/images/landscape/landscape (71).webp"
+        ],
+        description: "夜幕低垂，點點螢光在清澈溪流與幽暗山林間穿梭飛舞"
+      },
+      {
+        id: "land-6",
+        title: "水墨層巒的遠眺",
+        client: "Jianshi",
+        year: "2025",
+        cover: "assets/images/landscape/landscape (72).webp",
+        position: "50% 50%",
+        scale: 1.0,
+        links: [
+          { label: "Instagram 貼文", url: "https://www.instagram.com/p/DJtfuj9hZH6/?img_index=1" }
+        ],
+        photos: [
+          "assets/images/landscape/landscape (72).webp",
+          "assets/images/landscape/landscape (73).webp",
+          "assets/images/landscape/landscape (74).webp",
+          "assets/images/landscape/landscape (75).webp",
+          "assets/images/landscape/landscape (76).webp"
+        ],
+        description: "黑白影調勾勒出山脊的粗獷，雲霧輕覆遠方連綿的稜線"
+      },
+      {
+        id: "land-5",
+        title: "太陽落下的軌跡",
+        client: "Manhattanhenge",
+        year: "2025",
+        cover: "assets/images/landscape/landscape (77).webp",
+        position: "50% 50%",
+        scale: 1.0,
+        links: [
+          { label: "Instagram 貼文", url: "https://www.instagram.com/p/DJJlsShBbE_/?img_index=1" }
+        ],
+        photos: [
+          "assets/images/landscape/landscape (77).webp"
+        ],
+        description: "金色烈陽沿著天際軌跡緩降，將整座樓房林立的城市染成溫暖金黃"
+      },
+      {
+        id: "land-4",
+        title: "枕海而生的日常",
+        client: "Jinshan",
+        year: "2025",
+        cover: "assets/images/landscape/landscape (78).webp",
+        position: "50% 50%",
+        scale: 1.0,
+        links: [
+          { label: "Instagram 貼文", url: "https://www.instagram.com/p/DIqz6uLBAbj/?img_index=1" }
+        ],
+        photos: [
+          "assets/images/landscape/landscape (78).webp",
+          "assets/images/landscape/landscape (79).webp",
+          "assets/images/landscape/landscape (80).webp",
+          "assets/images/landscape/landscape (81).webp",
+          "assets/images/landscape/landscape (82).webp"
+        ],
+        description: "海堤上的老檔車與釣客，刻劃出北海岸靠海吃海、隨遇而安的歲月風情"
+      },
+      {
+        id: "land-3",
+        title: "雲隙間的光芒與航線",
+        client: "Sunset",
+        year: "2025",
+        cover: "assets/images/landscape/landscape (83).webp",
+        position: "50% 50%",
+        scale: 1.2,
+        links: [
+          { label: "Instagram 貼文", url: "https://www.instagram.com/p/DIQx_9GJcn_/?img_index=1" }
+        ],
+        photos: [
+          "assets/images/landscape/landscape (83).webp"
+        ],
+        description: "夕暮雲層透出萬丈光芒，微小的飛機劃過天際，駛向夜幕低垂的遠方"
+      },
+      {
+        id: "land-2",
+        title: "旋轉的宇宙年輪",
+        client: "Star Trails",
+        year: "2025",
+        cover: "assets/images/landscape/landscape (84).webp",
+        position: "50% 50%",
+        scale: 1.0,
+        links: [
+          { label: "Instagram 貼文", url: "https://www.instagram.com/p/DGsJRsOJGjf/?img_index=1" }
+        ],
+        photos: [
+          "assets/images/landscape/landscape (84).webp",
+        ],
+        description: "時間在夜空下靜靜旋轉，於山脊上方烙印出星辰運行的軌跡"
+      },
+      {
+        id: "land-1",
+        title: "林間小徑的螢光微光",
+        client: "Shiding",
+        year: "2026",
+        cover: "assets/images/landscape/landscape (85).webp",
+        position: "50% 50%",
+        scale: 1.0,
+        links: [
+          { label: "Instagram 貼文", url: "https://www.instagram.com/p/DW_f7LEGaPN/?img_index=1" }
+        ],
+        photos: [
+          "assets/images/landscape/landscape (85).webp",
+          "assets/images/landscape/landscape (86).webp"
+        ],
+        description: "漫步幽靜步道，看黃綠色的微光在樹林間點亮夜的微光"
       }
     ]
   }
