@@ -771,24 +771,42 @@ export default {
 
         if (gallery) {
           const { password: _, ...safeGallery } = gallery;
-          const baseUrl = gallery.baseUrl || '';
+          const baseUrl = (gallery.baseUrl || '').trim();
+          const previewBaseUrl = (gallery.previewBaseUrl || '').trim();
 
-          // ⚡ 將 photos 轉換為包含物件的 photosList 陣列 (支援 Cloudflare Image Resizing)
+          const combineUrl = (base, name) => {
+            if (!base) return name;
+            return base.endsWith('/') ? (base + name) : (base + '/' + name);
+          };
+
+          // ⚡ 將 photos 轉換為包含物件的 photosList 陣列 (安全判斷與優化)
           const photosList = (gallery.photos || []).map(photo => {
-            const filename = typeof photo === 'string' ? photo : (photo.filename || photo.name || '');
-            const originalUrl = photo.originalUrl || (baseUrl.endsWith('/') ? (baseUrl + filename) : (baseUrl + '/' + filename));
-            
-            let origin = '';
-            try {
-              origin = new URL(originalUrl).origin;
-            } catch (e) {
-              origin = '';
-            }
+            const isObj = typeof photo === 'object' && photo !== null;
+            const filename = isObj ? (photo.filename || photo.name || '') : String(photo);
+            const originalUrl = isObj && photo.originalUrl ? photo.originalUrl : combineUrl(baseUrl, filename);
 
-            // 格式：/cdn-cgi/image/width=800,quality=80,format=auto/ 加上 originalUrl
-            const displayUrl = photo.displayUrl || (origin 
-              ? `${origin}/cdn-cgi/image/width=800,quality=80,format=auto/${originalUrl}` 
-              : `/cdn-cgi/image/width=800,quality=80,format=auto/${originalUrl}`);
+            let displayUrl = isObj ? (photo.displayUrl || photo.previewUrl || photo.thumbUrl || '') : '';
+
+            if (!displayUrl) {
+              if (previewBaseUrl) {
+                displayUrl = combineUrl(previewBaseUrl, filename);
+              } else {
+                let origin = '';
+                try {
+                  origin = new URL(originalUrl).origin;
+                } catch (e) {
+                  origin = '';
+                }
+
+                // 注意：*.r2.dev 網域不支援 Cloudflare Image Resizing (/cdn-cgi/image/)
+                // 只有自訂 Cloudflare 網域 (非 r2.dev) 才啟用縮圖功能
+                if (origin && !origin.includes('r2.dev')) {
+                  displayUrl = `${origin}/cdn-cgi/image/width=800,quality=80,format=auto/${originalUrl}`;
+                } else {
+                  displayUrl = originalUrl;
+                }
+              }
+            }
 
             return {
               filename: filename,

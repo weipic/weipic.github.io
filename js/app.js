@@ -1616,10 +1616,30 @@ let currentActiveConfig = null;
 function getEncodedPhotoUrl(rawUrl) {
   if (!rawUrl) return '';
   try {
-    return encodeURI(decodeURI(rawUrl));
+    const parsed = new URL(rawUrl);
+    let pathname = decodeURIComponent(parsed.pathname);
+    parsed.pathname = pathname.split('/').map(seg => encodeURIComponent(seg)).join('/');
+    return parsed.toString();
   } catch (e) {
-    return encodeURI(rawUrl);
+    try {
+      return encodeURI(decodeURI(rawUrl));
+    } catch (err) {
+      return encodeURI(rawUrl);
+    }
   }
+}
+
+// Lightweight CDN Image Resizing Helper (wsrv.nl) for fast web thumbnail preview & smooth UX
+function getThumbnailUrl(rawOriginalUrl, width = 800) {
+  if (!rawOriginalUrl) return '';
+  const cleanOriginal = getEncodedPhotoUrl(rawOriginalUrl);
+  if (!cleanOriginal.startsWith('http://') && !cleanOriginal.startsWith('https://')) {
+    return cleanOriginal;
+  }
+  if (cleanOriginal.includes('wsrv.nl')) {
+    return cleanOriginal;
+  }
+  return `https://wsrv.nl/?url=${encodeURIComponent(cleanOriginal)}&w=${width}&q=80&output=webp`;
 }
 
 function getGalleriesList() {
@@ -2245,7 +2265,7 @@ async function downloadAllPhotosAsZip(config) {
       `;
     }
 
-    const CONCURRENCY_LIMIT = 3;
+    const CONCURRENCY_LIMIT = 6;
     const queue = photos.map((p, i) => ({ photo: p, idx: i }));
     let addedCount = 0;
 
@@ -2257,7 +2277,7 @@ async function downloadAllPhotosAsZip(config) {
         const rawPhoto = item.photo;
         const idx = item.idx;
         const photo = typeof rawPhoto === 'string' ? { filename: rawPhoto } : rawPhoto;
-        const rawImgUrl = photo.url || (baseUrl + (photo.filename || ''));
+        const rawImgUrl = photo.originalUrl || photo.url || (baseUrl + (photo.filename || ''));
         const imgUrl = getEncodedPhotoUrl(rawImgUrl);
         const defaultFilename = `photo_${String(idx + 1).padStart(3, '0')}.jpg`;
         const filename = photo.filename || defaultFilename;
@@ -2274,7 +2294,7 @@ async function downloadAllPhotosAsZip(config) {
           } catch (err) {
             retries--;
             if (retries > 0) {
-              await new Promise(r => setTimeout(r, 600 * (6 - retries)));
+              await new Promise(r => setTimeout(r, 400 * (6 - retries)));
             } else {
               console.error(`Failed to download ${imgUrl} after 5 retries:`, err);
             }
@@ -2366,10 +2386,17 @@ function normalizePhotoItem(rawItem, config) {
   const baseUrl = item.baseUrl || cfg.baseUrl || '';
   const filename = item.filename || (typeof rawItem === 'string' ? rawItem : '');
 
-  const originalUrl = item.originalUrl || item.url || (baseUrl.endsWith('/') ? (baseUrl + filename) : (baseUrl + '/' + filename));
+  const originalUrl = getEncodedPhotoUrl(item.originalUrl || item.url || (baseUrl.endsWith('/') ? (baseUrl + filename) : (baseUrl + '/' + filename)));
 
   let displayUrl = item.displayUrl || item.previewUrl || item.thumbUrl;
-  if (!displayUrl) {
+
+  // 防護機制：若是 r2.dev 且包含 /cdn-cgi/image/，代表為無效的 Cloudflare Image Resizing 網址，將其清除並使用降級方案
+  if (displayUrl && displayUrl.includes('r2.dev') && displayUrl.includes('/cdn-cgi/image/')) {
+    displayUrl = null;
+  }
+
+  // 若 displayUrl 為空、或直接指向原始高畫質圖片大檔，則將網頁預覽呈現改為高效 WebP 縮圖
+  if (!displayUrl || displayUrl === originalUrl || (originalUrl && displayUrl.includes(originalUrl))) {
     const previewBaseUrl = item.previewBaseUrl || cfg.previewBaseUrl || cfg.thumbBaseUrl;
     if (previewBaseUrl) {
       let fullPreviewBase = previewBaseUrl;
@@ -2379,23 +2406,19 @@ function normalizePhotoItem(rawItem, config) {
       if (!fullPreviewBase.endsWith('/')) {
         fullPreviewBase += '/';
       }
-      displayUrl = fullPreviewBase + filename;
-    } else if (originalUrl && (originalUrl.startsWith('http://') || originalUrl.startsWith('https://'))) {
-      try {
-        const origin = new URL(originalUrl).origin;
-        displayUrl = `${origin}/cdn-cgi/image/width=800,quality=80,format=auto/${originalUrl}`;
-      } catch (e) {
-        displayUrl = `/cdn-cgi/image/width=800,quality=80,format=auto/${originalUrl}`;
-      }
+      displayUrl = getEncodedPhotoUrl(fullPreviewBase + filename);
     } else {
-      displayUrl = originalUrl;
+      displayUrl = getThumbnailUrl(originalUrl, 800);
     }
+  } else {
+    displayUrl = getEncodedPhotoUrl(displayUrl);
   }
 
   return {
     filename: filename,
     originalUrl: originalUrl,
     displayUrl: displayUrl,
+    lightboxUrl: getThumbnailUrl(originalUrl, 1600),
     title: item.title || filename
   };
 }
@@ -2411,7 +2434,7 @@ function downloadSinglePhotoByIndex(index, btnEl = null) {
 
 function getGalleryPreviewUrl(rawItem, config) {
   const norm = normalizePhotoItem(rawItem, config);
-  return getEncodedPhotoUrl(norm.displayUrl);
+  return norm.displayUrl;
 }
 
 function renderDownloadPhotoGrid(config) {
@@ -2432,14 +2455,15 @@ function renderDownloadPhotoGrid(config) {
 
   gridContainer.innerHTML = photos.map((rawItem, index) => {
     const norm = normalizePhotoItem(rawItem, config);
-    let displayUrl = getEncodedPhotoUrl(norm.displayUrl);
+    let displayUrl = norm.displayUrl;
+    let origUrl = norm.originalUrl;
     let numStr = String(index + 1).padStart(2, '0');
     let title = norm.title || numStr;
 
     return `
       <div class="group relative bg-[#121318] border border-white/10 rounded-2xl overflow-hidden shadow-xl transition-all duration-300 hover:border-amber-400/50 hover:shadow-2xl">
         <div class="aspect-[3/2] w-full overflow-hidden bg-[#181920] relative cursor-pointer" onclick="openDownloadLightbox(${index})">
-          <img src="${displayUrl}" alt="${title}" loading="lazy" decoding="async" draggable="false" crossorigin="anonymous" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
+          <img src="${displayUrl}" alt="${title}" loading="lazy" decoding="async" draggable="false" crossorigin="anonymous" onerror="if(this.dataset.fb!=='1'){this.dataset.fb='1';this.src='${origUrl}';}else{this.style.opacity='0.3';}" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
           
           <div class="photo-hover-overlay absolute inset-0 opacity-0 group-hover:opacity-100 flex flex-col justify-between p-4 pointer-events-none transition-all duration-300">
             <div class="flex items-center justify-between w-full">
@@ -2490,9 +2514,6 @@ async function downloadSinglePhoto(photoUrl, filename, btnEl = null) {
 
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
-  // Synchronously prepare a window popup placeholder to bypass pop-up blockers if fetch fails or fallback is needed
-  let popupWindow = null;
-
   let fetchedBlob = null;
   let retries = 3;
 
@@ -2516,7 +2537,6 @@ async function downloadSinglePhoto(photoUrl, filename, btnEl = null) {
     const safeFilename = filename || photoUrl.split('/').pop() || 'photo.jpg';
     const mimeType = fetchedBlob.type || 'image/jpeg';
 
-    // 📱 Mobile Web Share API support (iOS 15+ & Android native share to Photos/Files)
     if (isMobile && navigator.canShare) {
       try {
         const file = new File([fetchedBlob], safeFilename, { type: mimeType });
@@ -2532,7 +2552,6 @@ async function downloadSinglePhoto(photoUrl, filename, btnEl = null) {
         if (shareErr.name !== 'AbortError') {
           console.warn('Web Share API error:', shareErr);
         } else {
-          // User cancelled share dialog
           resetBtn();
           return;
         }
@@ -2550,7 +2569,6 @@ async function downloadSinglePhoto(photoUrl, filename, btnEl = null) {
       a.click();
 
       if (isMobile) {
-        // Mobile browser fallback if a.click() doesn't prompt save
         window.location.href = blobUrl;
       }
 
@@ -2564,7 +2582,6 @@ async function downloadSinglePhoto(photoUrl, filename, btnEl = null) {
     }
   } else {
     console.warn('Single photo fetch failed (likely CORS or Network), navigating directly to image URL.');
-    // Direct open fallback
     const windowTarget = isMobile ? '_self' : '_blank';
     window.open(cleanUrl, windowTarget);
   }
@@ -2587,12 +2604,21 @@ function openDownloadLightbox(index) {
 
   const rawPhoto = photos[index];
   const norm = normalizePhotoItem(rawPhoto, activeCfg);
-  const displayUrl = getEncodedPhotoUrl(norm.displayUrl);
-  const originalUrl = getEncodedPhotoUrl(norm.originalUrl);
+  const lightboxUrl = norm.lightboxUrl || norm.displayUrl;
+  const originalUrl = norm.originalUrl;
   const filename = norm.filename || `photo_${index + 1}.jpg`;
 
-  imgEl.src = displayUrl;
-  if (displayUrl !== originalUrl) {
+  imgEl.onerror = () => {
+    if (imgEl.src !== originalUrl) {
+      imgEl.src = originalUrl;
+    }
+  };
+
+  // 先呈現 1600px 秒開高畫質縮圖
+  imgEl.src = lightboxUrl;
+
+  // 背景預載與平滑替換為無損原圖
+  if (lightboxUrl !== originalUrl) {
     const highResImg = new Image();
     highResImg.src = originalUrl;
     highResImg.onload = () => {
