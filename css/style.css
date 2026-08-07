@@ -293,7 +293,7 @@ img, picture, .no-download {
 .gallery-item-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(10, 10, 12, 0.95) 0%, rgba(10, 10, 12, 0.4) 50%, transparent 100%);
+  background: linear-gradient(to top, rgba(10, 10, 12, 0.95) 0%, rgba(10, 10, 12, 0.45) 20%, transparent 33.3%);
   opacity: 0;
   display: flex;
   flex-direction: column;
@@ -792,10 +792,26 @@ body {
 
 /* Photo Card Hover Overlay */
 .photo-hover-overlay {
-  background: linear-gradient(180deg, rgba(10, 10, 12, 0.3) 0%, rgba(10, 10, 12, 0.88) 100%);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: linear-gradient(to top, rgba(10, 10, 12, 0.92) 0%, rgba(10, 10, 12, 0.45) 20%, transparent 33.3%);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  opacity: 0;
+  pointer-events: none;
   transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .group:hover .photo-hover-overlay,
+  .gallery-item:hover .gallery-item-overlay {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+.group.touch-active .photo-hover-overlay,
+.gallery-item.touch-active .gallery-item-overlay {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 /* Gold Glow Accent */

@@ -1352,7 +1352,7 @@ function initMobileTouchHover() {
   function getCardFromTouch(touch) {
     if (!touch) return null;
     const target = document.elementFromPoint(touch.clientX, touch.clientY);
-    const card = target ? target.closest('.luxury-card, .gallery-item') : null;
+    const card = target ? target.closest('.luxury-card, .gallery-item, .group') : null;
     if (card && card.classList.contains('non-clickable')) return null;
     return card;
   }
@@ -1369,14 +1369,7 @@ function initMobileTouchHover() {
       fadeTimeout = null;
     }
 
-    const card = getCardFromTouch(touch);
-    if (card) {
-      if (activeCard && activeCard !== card) {
-        activeCard.classList.remove('touch-active');
-      }
-      activeCard = card;
-      activeCard.classList.add('touch-active');
-    }
+    clearActiveCard();
   }, { passive: true });
 
   document.addEventListener('touchmove', (e) => {
@@ -1385,21 +1378,17 @@ function initMobileTouchHover() {
     const dx = Math.abs(touch.clientX - startX);
     const dy = Math.abs(touch.clientY - startY);
 
-    if (dx > 8 || dy > 8) {
+    if (dx > 6 || dy > 6) {
       isScrolling = true;
-    }
-
-    const card = getCardFromTouch(touch);
-    if (card) {
-      if (activeCard && activeCard !== card) {
-        activeCard.classList.remove('touch-active');
-      }
-      activeCard = card;
-      activeCard.classList.add('touch-active');
-    } else {
-      if (activeCard) {
-        activeCard.classList.remove('touch-active');
-        activeCard = null;
+      const card = getCardFromTouch(touch);
+      if (card) {
+        if (activeCard && activeCard !== card) {
+          activeCard.classList.remove('touch-active');
+        }
+        activeCard = card;
+        activeCard.classList.add('touch-active');
+      } else {
+        clearActiveCard();
       }
     }
   }, { passive: true });
@@ -1408,11 +1397,9 @@ function initMobileTouchHover() {
     if (isScrolling) {
       fadeTimeout = setTimeout(() => {
         clearActiveCard();
-      }, 400);
+      }, 500);
     } else {
-      fadeTimeout = setTimeout(() => {
-        clearActiveCard();
-      }, 300);
+      clearActiveCard();
     }
   }, { passive: true });
 
@@ -1947,7 +1934,7 @@ function renderDownloadPhotoGrid(config) {
         <div class="aspect-[3/2] w-full overflow-hidden bg-[#181920] relative cursor-pointer" onclick="openDownloadLightbox(${index})">
           <img src="${previewUrl}" alt="${title}" loading="lazy" draggable="false" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
           
-          <div class="photo-hover-overlay absolute inset-0 opacity-0 group-hover:opacity-100 flex flex-col justify-between p-4 pointer-events-none transition-all duration-300">
+          <div class="photo-hover-overlay absolute inset-0 flex flex-col justify-between p-4 pointer-events-none transition-all duration-300">
             <div class="flex items-center justify-between w-full">
               <span class="text-[11px] font-mono tracking-wider bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10 text-gray-300">
                 ${numStr}
