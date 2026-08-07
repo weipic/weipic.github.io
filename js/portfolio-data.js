@@ -2057,7 +2057,7 @@ window.PORTFOLIO_DATA = {
     zipSize: "動態打包",
 
     // Cloudflare R2 單張照片下載與預覽網址 (末端記得加上斜線 /)
-    baseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/weipic-deliveries/2026WelcomeParty/",
+    baseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/2026WelcomeParty/",
 
     // 照片檔名清單 (共 72 張高畫質照片)
     photos: [
