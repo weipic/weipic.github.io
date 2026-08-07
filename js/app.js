@@ -1834,22 +1834,13 @@ function initDownloadPage() {
     });
   }
 
-  // Check if session is already unlocked with a valid password
-  const savedPass = sessionStorage.getItem('wei_gallery_unlocked_pass');
-  let activeConfig = null;
-  if (savedPass) {
-    activeConfig = findGalleryByPassword(savedPass);
-  }
-
-  if (activeConfig && !checkAlbumIsExpired(activeConfig)) {
-    unlockGalleryView(activeConfig);
-  } else {
-    sessionStorage.removeItem('wei_gallery_unlocked_pass');
-    sessionStorage.removeItem('wei_gallery_unlocked');
-    passwordSection.classList.remove('hidden');
-    deliverySection.classList.add('hidden');
-    if (expiredSection) expiredSection.classList.add('hidden');
-  }
+  // Always require password re-entry on page load / reload
+  sessionStorage.removeItem('wei_gallery_unlocked_pass');
+  sessionStorage.removeItem('wei_gallery_unlocked');
+  passwordSection.classList.remove('hidden', 'opacity-0', 'scale-95');
+  deliverySection.classList.add('hidden');
+  if (expiredSection) expiredSection.classList.add('hidden');
+  if (passwordInput) passwordInput.value = '';
 
   // Handle Password Submit (Verify password first, then check if active or expired/deleted)
   if (passwordForm) {
