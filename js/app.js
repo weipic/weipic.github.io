@@ -2386,7 +2386,11 @@ function normalizePhotoItem(rawItem, config) {
   const baseUrl = item.baseUrl || cfg.baseUrl || '';
   const filename = item.filename || (typeof rawItem === 'string' ? rawItem : '');
 
-  const originalUrl = getEncodedPhotoUrl(item.originalUrl || item.url || (baseUrl.endsWith('/') ? (baseUrl + filename) : (baseUrl + '/' + filename)));
+  let rawOriginal = item.originalUrl || item.url;
+  if (!rawOriginal && baseUrl) {
+    rawOriginal = baseUrl.endsWith('/') ? (baseUrl + filename) : (baseUrl + '/' + filename);
+  }
+  const originalUrl = getEncodedPhotoUrl(rawOriginal);
 
   let displayUrl = item.displayUrl || item.previewUrl || item.thumbUrl;
 
@@ -2395,7 +2399,7 @@ function normalizePhotoItem(rawItem, config) {
     displayUrl = null;
   }
 
-  // 若 displayUrl 為空、或直接指向原始高畫質圖片大檔，則將網頁預覽呈現改為高效 WebP 縮圖
+  // 若 displayUrl 為空、或直接指向原始高畫質圖片大檔，則將網頁預覽呈現改為高效 800px WebP 縮圖
   if (!displayUrl || displayUrl === originalUrl || (originalUrl && displayUrl.includes(originalUrl))) {
     const previewBaseUrl = item.previewBaseUrl || cfg.previewBaseUrl || cfg.thumbBaseUrl;
     if (previewBaseUrl) {
@@ -2463,7 +2467,7 @@ function renderDownloadPhotoGrid(config) {
     return `
       <div class="group relative bg-[#121318] border border-white/10 rounded-2xl overflow-hidden shadow-xl transition-all duration-300 hover:border-amber-400/50 hover:shadow-2xl">
         <div class="aspect-[3/2] w-full overflow-hidden bg-[#181920] relative cursor-pointer" onclick="openDownloadLightbox(${index})">
-          <img src="${displayUrl}" alt="${title}" loading="lazy" decoding="async" draggable="false" crossorigin="anonymous" onerror="if(this.dataset.fb!=='1'){this.dataset.fb='1';this.src='${origUrl}';}else{this.style.opacity='0.3';}" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
+          <img src="${displayUrl}" alt="${title}" loading="lazy" decoding="async" draggable="false" onerror="if(this.dataset.fb!=='1'){this.dataset.fb='1';this.src='${origUrl}';}" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
           
           <div class="photo-hover-overlay absolute inset-0 opacity-0 group-hover:opacity-100 flex flex-col justify-between p-4 pointer-events-none transition-all duration-300">
             <div class="flex items-center justify-between w-full">
@@ -2614,20 +2618,8 @@ function openDownloadLightbox(index) {
     }
   };
 
-  // 先呈現 1600px 秒開高畫質縮圖
+  // 呈現 1600px 高畫質 WebP 縮圖（滑動體驗極致順暢）
   imgEl.src = lightboxUrl;
-
-  // 背景預載與平滑替換為無損原圖
-  if (lightboxUrl !== originalUrl) {
-    const highResImg = new Image();
-    highResImg.src = originalUrl;
-    highResImg.onload = () => {
-      if (currentDownloadPhotoIndex === index) {
-        imgEl.src = originalUrl;
-      }
-    };
-  }
-
   imgEl.alt = norm.title || `${index + 1}`;
 
   if (counterEl) {
