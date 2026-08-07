@@ -1610,6 +1610,17 @@ function initProtectImages() {
 // ====================================================================
 let currentDownloadPhotos = [];
 let currentDownloadPhotoIndex = 0;
+let currentActiveConfig = null;
+
+// Safe URL encoder helper to handle spaces and special characters without double-encoding
+function getEncodedPhotoUrl(rawUrl) {
+  if (!rawUrl) return '';
+  try {
+    return encodeURI(decodeURI(rawUrl));
+  } catch (e) {
+    return encodeURI(rawUrl);
+  }
+}
 
 function getGalleriesList() {
   const data = window.PORTFOLIO_DATA || {};
@@ -1654,6 +1665,7 @@ function updateOpenGraphMetaTags(gallery) {
   if (!image) {
     image = "https://weipic.github.io/assets/images/og_cover.jpg";
   }
+  image = getEncodedPhotoUrl(image);
 
   setMetaTagContent('property', 'og:title', title);
   setMetaTagContent('name', 'twitter:title', title);
@@ -1664,6 +1676,8 @@ function updateOpenGraphMetaTags(gallery) {
   setMetaTagContent('name', 'description', description);
 
   setMetaTagContent('property', 'og:image', image);
+  setMetaTagContent('property', 'og:image:secure_url', image);
+  setMetaTagContent('property', 'og:image:type', 'image/jpeg');
   setMetaTagContent('name', 'twitter:image', image);
 }
 
@@ -1721,6 +1735,32 @@ function getAlbumIdFromUrl() {
   return null;
 }
 
+function matchesPassword(gallery, pass) {
+  if (!gallery || !pass) return false;
+  const trimmed = pass.trim().toLowerCase();
+  const rawPass = gallery.password;
+  let isMatch = false;
+
+  if (rawPass) {
+    if (Array.isArray(rawPass)) {
+      isMatch = rawPass.some(p => (p || '').toString().trim().toLowerCase() === trimmed);
+    } else {
+      const str = rawPass.toString();
+      const list = str.split(/[,|/]/).map(p => p.trim().toLowerCase());
+      isMatch = list.includes(trimmed);
+    }
+  }
+
+  // Also check if entered password matches gallery id (case-insensitive)
+  if (!isMatch && gallery.id) {
+    if (gallery.id.toString().trim().toLowerCase() === trimmed) {
+      isMatch = true;
+    }
+  }
+
+  return isMatch;
+}
+
 function findGalleryByPassword(pass) {
   const list = getGalleriesList();
   const trimmed = (pass || '').trim();
@@ -1729,12 +1769,17 @@ function findGalleryByPassword(pass) {
   const targetId = getAlbumIdFromUrl();
   if (targetId) {
     const matchedById = findGalleryByIdOrSlug(targetId);
-    if (matchedById && (matchedById.password || '').trim() === trimmed) {
-      return matchedById;
+    if (matchedById) {
+      if (matchesPassword(matchedById, trimmed)) {
+        return matchedById;
+      }
+      // When on a dedicated album page, typing a password for this album must verify against this album
+      // and not fallback to unlocking a completely different album!
+      return null;
     }
   }
 
-  return list.find(g => (g.password || '').trim() === trimmed) || null;
+  return list.find(g => matchesPassword(g, trimmed)) || null;
 }
 
 function initDownloadPage() {
@@ -1796,19 +1841,7 @@ function initDownloadPage() {
     activeConfig = findGalleryByPassword(savedPass);
   }
 
-  // If no saved password, check legacy unlock flag fallback
-  if (!activeConfig && sessionStorage.getItem('wei_gallery_unlocked') === 'true') {
-    if (targetGallery) {
-      activeConfig = targetGallery;
-    } else {
-      const list = getGalleriesList();
-      if (list.length > 0) activeConfig = list[0];
-    }
-  }
-
   if (activeConfig && !checkAlbumIsExpired(activeConfig)) {
-    currentActiveConfig = activeConfig;
-    currentDownloadPhotos = activeConfig.photos || [];
     unlockGalleryView(activeConfig);
   } else {
     sessionStorage.removeItem('wei_gallery_unlocked_pass');
@@ -1938,6 +1971,11 @@ function unlockGalleryView(config) {
   const deliverySection = document.getElementById('delivery-gallery-section');
   if (!deliverySection) return;
 
+  if (config) {
+    currentActiveConfig = config;
+    currentDownloadPhotos = config.photos || [];
+  }
+
   if (passwordSection) passwordSection.classList.add('hidden');
   deliverySection.classList.remove('hidden');
   deliverySection.classList.add('opacity-100');
@@ -2030,16 +2068,6 @@ async function downloadAllPhotosAsZip(config) {
     const CONCURRENCY_LIMIT = 3;
     const queue = photos.map((p, i) => ({ photo: p, idx: i }));
     let addedCount = 0;
-
-// Safe URL encoder helper to handle spaces and special characters without double-encoding
-function getEncodedPhotoUrl(rawUrl) {
-  if (!rawUrl) return '';
-  try {
-    return encodeURI(decodeURI(rawUrl));
-  } catch (e) {
-    return encodeURI(rawUrl);
-  }
-}
 
     const downloadWorker = async () => {
       while (queue.length > 0) {

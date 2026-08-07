@@ -2156,7 +2156,7 @@ window.PORTFOLIO_DATA = {
   {
       id: "2026WelcomeParty",
 
-      password: "2026WP",
+      password: "2026WP, 2026WelcomeParty",
 
       clientName: "Wei",
       albumTitle: "2026 Welcome Party",
@@ -2165,7 +2165,7 @@ window.PORTFOLIO_DATA = {
 
       ogTitle: "【2026 Welcome Party】Wei's Portfolio",
       ogDescription: "請輸入密碼解鎖高畫質下載與單張預覽",
-      ogImage: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/2026WelcomeParty/LINE_ALBUM_20260306 Welcome Party_260807_1.jpg",
+      ogImage: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/2026WelcomeParty/LINE_ALBUM_20260306%20Welcome%20Party_260807_1.jpg",
 
       zipFilename: "2026_Welcome_Party",
 
@@ -2214,7 +2214,7 @@ window.PORTFOLIO_DATA = {
   {
       id: "yeh_photo.notes",
 
-      password: "20260807",
+      password: "yeh_photo.notes",
 
       clientName: "Wei",
       albumTitle: "yeh_photo.notes 調色",
@@ -2223,9 +2223,9 @@ window.PORTFOLIO_DATA = {
 
       ogTitle: "【yeh_photo.notes 調色】Wei's Portfolio",
       ogDescription: "請輸入密碼解鎖高畫質下載與單張預覽",
-      ogImage: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/20260807/.jpg",
+      ogImage: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/2026WelcomeParty/LINE_ALBUM_20260306%20Welcome%20Party_260807_1.jpg",
 
-      zipFilename: "2026_Welcome_Party",
+      zipFilename: "yeh_photo_notes",
 
       deliveryDate: "2026.08.07",
       expiryDays: 14,
@@ -2234,7 +2234,7 @@ window.PORTFOLIO_DATA = {
       zipUrl: "auto",
       zipSize: "動態打包",
 
-      baseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/20260807/",
+      baseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/2026WelcomeParty/",
 
       photos: [
       "LINE_ALBUM_20260306 Welcome Party_260807_1.jpg",
