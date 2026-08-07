@@ -2240,6 +2240,40 @@ window.PORTFOLIO_DATA = {
       "ODSC09729.JPG",
     ]
   },
+  {
+      id: "KumamotoCityGuide",
+
+      password: "Kumamoto",
+
+      clientName: "Wei",
+      albumTitle: "【ご提供】加藤神社_写真データ",
+
+      pageTitle: "【ご提供】加藤神社_写真データ｜Wei's Portfolio",
+
+      zipFilename: "KumamotoCityGuide",
+
+      deliveryDate: "2026.08.07",
+      expiryDays: 14,
+      isDeleted: false,
+
+      zipUrl: "auto",
+      zipSize: "動態打包",
+
+      baseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/KumamotoCityGuide/",
+
+      photos: [
+        "1-IMG_0843.jpg",
+        "2-IMG_0839.jpg",
+        "3-IMG_0838.jpg",
+        "4-IMG_0847.jpg",
+        "5-IMG_0840.jpg",
+        "6-IMG_0835.jpg",
+        "7-IMG_0851.jpg",
+        "8-IMG_0852.jpg",
+        "9-IMG_0850.jpg",
+        "10-IMG_0849.jpg"
+      ]
+  },
 ]
 };
 
