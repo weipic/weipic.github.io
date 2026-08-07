@@ -1765,7 +1765,8 @@ async function downloadAllPhotosAsZip(config) {
       `;
     }
 
-    const fetchPromises = photos.map(async (photo, idx) => {
+    const fetchPromises = photos.map(async (rawPhoto, idx) => {
+      const photo = typeof rawPhoto === 'string' ? { filename: rawPhoto } : rawPhoto;
       const imgUrl = photo.url || (baseUrl + (photo.filename || ''));
       const defaultFilename = `photo_${String(idx + 1).padStart(3, '0')}.jpg`;
       const filename = photo.filename || defaultFilename;
