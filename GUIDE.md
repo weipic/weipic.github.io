@@ -562,58 +562,63 @@ git push
 
 ---
 
-### 👥 3. 如何新增與管理多個接案客戶 (ID 編號多案子清單)
+### 🔒 3. 如何在 Cloudflare Workers 後端新增相簿與修改密碼 (私密相簿資安防護)
 
-與首頁作品分類一樣，客戶交圖專區支援用 **`id` 編號** 來劃分多個案子。您只需在 `js/portfolio-data.js` 的 `clientGalleries` 陣列中**向下滑動並複製結構在最下方持續新增**即可：
+基於資安升級，**所有客戶私密相簿的存取密碼、Cloudflare R2 baseUrl 與照片清單已安全搬移至 Cloudflare Workers API 後端**（`weipic-api`）。
+前端網頁與 `portfolio-data.js` 不再存放任何密碼，即使有心人士使用 F12 檢查碼也**完全無法竊取密碼或私密照片連結**！
+
+#### 🛠️ 後端管理與新增相簿操作步驟：
+
+1. **登入 Cloudflare Dashboard**：
+   前往 [Cloudflare Dashboard](https://dash.cloudflare.com/) 登入您的帳號。
+2. **開啟 Worker 編輯器**：
+   - 點擊左側選單 **Workers & Pages** ➔ 選擇您的應用程式 **`weipic-api`**。
+   - 點擊頁面右上角的 **「Edit code」（編輯程式碼）** 或 **「Quick Edit」** 按鈕。
+3. **編輯相簿資料 (`CLIENT_GALLERIES`)**：
+   在網頁編輯器中找到 `const CLIENT_GALLERIES = [...]` 陣列：
 
 ```javascript
-// 🌟 在 js/portfolio-data.js 中維護多案子清單 (使用 id 區分)：
-clientGalleries: [
+// 🌟 在 Cloudflare Worker 後端維護多案子清單：
+const CLIENT_GALLERIES = [
 
   // 🟢 案子 1：進行中/可存取的案子
   {
-    id: "case-2026-wp",                            // 1. 獨一無二的案子 ID (可用於網址指定 ?id=case-2026-wp)
-    password: "2026WP",                            // 2. 客戶專屬存取密碼
+    id: "johnson50",                               // 1. 獨一無二的案子 ID (用於網址對應)
+    password: "johnson50",                         // 🔑 2. 客戶專屬存取密碼 (可隨時在此修改密碼)
     clientName: "Wei",                             // 3. 客戶名稱
-    albumTitle: "2026 Welcome Party",              // 4. 相簿標題 (帶入 ?id= 參數時，輸入密碼頁面標頭會自動變更為此標題)
-
-    // 🌐 5. 瀏覽器頁籤分頁標頭 (Browser Tab Title，未填寫時自動顯示：「相簿標題 - 客戶交圖專區 | Wei's Portfolio」)
-    pageTitle: "2026 Welcome Party 專屬寫真相片全輯 | Wei's Portfolio",
-
-    // 💬 6. 社群分享預覽卡片 (LINE, FB, iMessage 貼上連結時顯示的自訂標題、敘述與縮圖網址)
-    ogTitle: "【2026 Welcome Party】Wei's Portfolio 客戶精選相片全輯",
-    ogDescription: "歡迎存取專屬精選寫真全輯。請輸入專屬密碼解鎖高畫質下載與單張預覽。",
-    ogImage: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/2026WelcomeParty/1-IMG_0500.jpg",
-
-    zipFilename: "2026_Welcome_Party",             // 7. 自訂 ZIP 下載檔名
-    deliveryDate: "2026.08.07",                    // 8. 交圖日期 (YYYY.MM.DD)
-    expiryDays: 14,                                // 9. 保存天數 (預設 14 天)
-    isDeleted: false,                              // 10. 狀態 (false 為正常，true 為下架刪除)
-    zipUrl: "auto",                                // 11. 自動動態打包
-    baseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/2026WelcomeParty/", // 12. R2 原圖高畫質網址 (下載用)
-    previewBaseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/2026WelcomeParty/thumbs/", // ⚡ 13. 網頁輕量縮圖網址 (網頁載入極速顯示)
-    photos: [                                      // 14. 照片清單
+    albumTitle: "喬山50週年感恩慈善演唱會",             // 4. 相簿標題
+    pageTitle: "喬山50週年感恩慈善演唱會 | Wei's Portfolio",
+    zipFilename: "2026_Johnson_50",                // 5. ZIP 下載預設檔名
+    deliveryDate: "2026.08.07",                    // 6. 交圖日期 (YYYY.MM.DD)
+    expiryDays: 14,                                // 7. 保存天數 (預設 14 天)
+    isDeleted: false,                              // 8. 狀態 (false 為正常，true 為下架刪除)
+    zipUrl: "auto",                                // 9. 自動動態打包 ZIP
+    zipSize: "動態打包",
+    baseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/2026Johnson50/", // 10. Cloudflare R2 高畫質照片資料夾網址
+    previewBaseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/2026Johnson50/thumbs/", // ⚡ 11. 網頁輕量縮圖網址 (選填)
+    photos: [                                      // 12. 照片檔名清單 (從 1.jpg 到最後一張)
       "1-IMG_0500.jpg",
       "2-IMG_0501.jpg"
     ]
   },
 
-  // 🟡 案子 2：另一個進行中的客戶案子 (複製上方程式碼在下方新增)
+  // ➕ 未來新增案子：複製上方區塊，在下方加上逗號 `,` 貼上並修改 ID、密碼與照片清單即可！
   {
     id: "wedding-chen-2026",
-    password: "Wedding1010",
+    password: "Wedding1010",                       // 👈 在此設定此客戶的密碼
     clientName: "陳先生 & 林小姐",
     albumTitle: "美式戶外婚禮全輯",
     zipFilename: "Chen_Lin_Wedding",
-    deliveryDate: "2026.08.01",
+    deliveryDate: "2026.08.10",
     expiryDays: 30,
     isDeleted: false,
     zipUrl: "auto",
-    baseUrl: "https://pub-xxx.r2.dev/Wedding1010/",
+    zipSize: "動態打包",
+    baseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/Wedding2026/",
     photos: ["wedding_001.jpg", "wedding_002.jpg"]
   },
 
-  // 🔴 案子 3：已結案 / 已下架刪除的案子
+  // 🔴 已下架/已刪除的案子：
   {
     id: "portrait-chang-2025",
     password: "OLD2025",
@@ -622,10 +627,14 @@ clientGalleries: [
     isDeleted: true,                               // 👈 標記為 true，客戶輸入此密碼後會提示「相簿已失效或已刪除」
     photos: []
   }
-
-  // ➕ 提示：未來新增第 4、5 個案子，只需在最下方加上逗號 `,` 並複製上述結構貼上即可！
-]
+];
 ```
+
+4. **儲存並部署 (Save and Deploy)**：
+   編輯完成後，點擊編輯器右上角的 **「Save and deploy」（儲存並部署）**。
+   * ⚡ 雲端 API 會在 **1 秒內立即生效**，無需重新 commit 到 GitHub，客戶立刻就能用新密碼解鎖相簿！
+
+---
 
 #### 🎯 案子專屬 HTML 頁面與 LINE / FB 自訂縮圖設定 (Custom HTML & Social Preview Cards)：
 1. **極簡直覺的案子專屬網址**：建立檔名為 `案子ID.html` 的檔案，傳送給客戶時網址即為：
@@ -638,8 +647,8 @@ clientGalleries: [
      - `<meta property="og:description" content="請輸入密碼解鎖高畫質下載與單張預覽" />`
      - `<meta property="og:image" content="縮圖網址..." />`
    - LINE / FB 貼上連結時即可完美呈現該案子的專屬縮圖與描述！
-3. **相簿資料與密碼設定**：
-   - 頁面會自動載入 `portfolio-data.js` 中對應 `id` 的專屬密碼與照片檔名清單（`portfolio-data.js` 中無需再放 `ogTitle`/`ogImage`，純粹處理密碼與相片載入）。
+3. **相簿密碼驗證**：
+   - 頁面會自動呼叫 Cloudflare Worker API 進行雲端密碼驗證，密碼正確後自動回傳並渲染相片與下載按鈕。
 4. **燈箱預覽高清大圖**：點擊照片牆縮圖即可開啟全螢幕高解析度燈箱預覽與單張下載。
 
 ---

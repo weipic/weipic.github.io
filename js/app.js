@@ -1743,6 +1743,35 @@ function matchesPassword(gallery, pass) {
   return isMatch;
 }
 
+const WORKER_API_ENDPOINT = (window.PORTFOLIO_DATA && window.PORTFOLIO_DATA.workerApiEndpoint) || "https://weipic-api.weipic2023.workers.dev/";
+
+async function verifyPasswordWithWorker(albumId, password) {
+  const trimmed = (password || '').trim();
+  if (!trimmed) return null;
+
+  try {
+    const res = await fetch(WORKER_API_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        albumId: albumId || '',
+        password: trimmed
+      })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.success && data.gallery) {
+        return data.gallery;
+      }
+    }
+  } catch (err) {
+    console.error('Worker API verify error:', err);
+  }
+
+  return null;
+}
+
 function findGalleryByPassword(pass) {
   const list = getGalleriesList();
   const trimmed = (pass || '').trim();
@@ -1756,8 +1785,6 @@ function findGalleryByPassword(pass) {
       if (matchesPassword(matchedById, trimmed)) {
         return matchedById;
       }
-      // When explicitly visiting a specific album (e.g. KumamotoCityGuide.html or download.html?id=KumamotoCityGuide),
-      // password verification must only check against this target album.
       return null;
     }
   }
@@ -1794,7 +1821,7 @@ function initDownloadPage() {
 
   // Handle invalid case ID on custom route or 404 page
   const is404Page = window.location.pathname.includes('404.html') || window.location.pathname.includes('404');
-  if (targetId && !targetGallery && error404Section && is404Page) {
+  if (targetId && !targetGallery && error404Section && is404Page && galleries.length > 0) {
     passwordSection.classList.add('hidden');
     deliverySection.classList.add('hidden');
     if (expiredSection) expiredSection.classList.add('hidden');
@@ -1832,12 +1859,45 @@ function initDownloadPage() {
   if (expiredSection) expiredSection.classList.add('hidden');
   if (passwordInput) passwordInput.value = '';
 
-  // Handle Password Submit (Verify password first, then check if active or expired/deleted)
+  // Handle Password Submit (Verify via Cloudflare Worker API)
   if (passwordForm) {
-    passwordForm.addEventListener('submit', (e) => {
+    passwordForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const enteredPass = (passwordInput.value || '').trim();
-      const matchedGallery = findGalleryByPassword(enteredPass);
+      const enteredPass = (passwordInput ? passwordInput.value : '').trim();
+      if (!enteredPass) return;
+
+      const submitBtn = passwordForm.querySelector('button[type="submit"]');
+      let originalBtnHtml = '';
+      if (submitBtn) {
+        originalBtnHtml = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `
+          <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          驗證中...
+        `;
+      }
+
+      let matchedGallery = null;
+      try {
+        // Try local list first if available, otherwise call Cloudflare Worker API
+        matchedGallery = findGalleryByPassword(enteredPass);
+        if (!matchedGallery) {
+          matchedGallery = await verifyPasswordWithWorker(targetId, enteredPass);
+          if (!matchedGallery && targetId) {
+            matchedGallery = await verifyPasswordWithWorker(null, enteredPass);
+          }
+        }
+      } catch (err) {
+        console.error('Password verification error:', err);
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalBtnHtml;
+        }
+      }
 
       if (matchedGallery) {
         if (matchedGallery.id) {
