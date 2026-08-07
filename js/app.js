@@ -2087,7 +2087,8 @@ async function downloadAllPhotosAsZip(config) {
 
         while (retries > 0 && !fetchedBuffer) {
           try {
-            const resp = await fetch(imgUrl, { mode: 'cors', cache: 'force-cache' });
+            const fetchUrl = imgUrl + (imgUrl.includes('?') ? '&dl=1' : '?dl=1');
+            const resp = await fetch(fetchUrl, { mode: 'cors' });
             if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
             fetchedBuffer = await resp.arrayBuffer();
           } catch (err) {
@@ -2218,7 +2219,7 @@ function renderDownloadPhotoGrid(config) {
     return `
       <div class="group relative bg-[#121318] border border-white/10 rounded-2xl overflow-hidden shadow-xl transition-all duration-300 hover:border-amber-400/50 hover:shadow-2xl">
         <div class="aspect-[3/2] w-full overflow-hidden bg-[#181920] relative cursor-pointer" onclick="openDownloadLightbox(${index})">
-          <img src="${previewUrl}" alt="${title}" loading="lazy" draggable="false" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
+          <img src="${previewUrl}" alt="${title}" loading="lazy" draggable="false" crossorigin="anonymous" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
           
           <div class="photo-hover-overlay absolute inset-0 opacity-0 group-hover:opacity-100 flex flex-col justify-between p-4 pointer-events-none transition-all duration-300">
             <div class="flex items-center justify-between w-full">
@@ -2277,7 +2278,8 @@ async function downloadSinglePhoto(photoUrl, filename, btnEl = null) {
 
   while (retries > 0 && !fetchedBlob) {
     try {
-      const resp = await fetch(cleanUrl, { mode: 'cors', cache: 'force-cache' });
+      const fetchUrl = cleanUrl + (cleanUrl.includes('?') ? '&dl=1' : '?dl=1');
+      const resp = await fetch(fetchUrl, { mode: 'cors' });
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       fetchedBlob = await resp.blob();
     } catch (err) {
