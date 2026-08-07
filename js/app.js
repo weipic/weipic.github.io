@@ -1341,6 +1341,7 @@ function initMobileTouchHover() {
   let startY = 0;
   let isScrolling = false;
   let fadeTimeout = null;
+  let lastTouchOpenTime = 0;
 
   function clearActiveCard() {
     if (activeCard) {
@@ -1368,7 +1369,6 @@ function initMobileTouchHover() {
       clearTimeout(fadeTimeout);
       fadeTimeout = null;
     }
-
     clearActiveCard();
   }, { passive: true });
 
@@ -1393,12 +1393,29 @@ function initMobileTouchHover() {
     }
   }, { passive: true });
 
-  document.addEventListener('touchend', () => {
+  document.addEventListener('touchend', (e) => {
     if (isScrolling) {
       fadeTimeout = setTimeout(() => {
         clearActiveCard();
       }, 500);
     } else {
+      const touch = e.changedTouches ? e.changedTouches[0] : null;
+      const target = touch ? document.elementFromPoint(touch.clientX, touch.clientY) : null;
+      
+      if (target && target.closest('button[onclick*="downloadSinglePhoto"]')) {
+        clearActiveCard();
+        return;
+      }
+
+      const card = target ? target.closest('[onclick*="openDownloadLightbox"]') : null;
+      if (card) {
+        const onclickAttr = card.getAttribute('onclick');
+        const match = onclickAttr ? onclickAttr.match(/openDownloadLightbox\((\d+)\)/) : null;
+        if (match && match[1] !== undefined) {
+          lastTouchOpenTime = Date.now();
+          openDownloadLightbox(parseInt(match[1], 10));
+        }
+      }
       clearActiveCard();
     }
   }, { passive: true });
@@ -1412,6 +1429,14 @@ function initMobileTouchHover() {
       e.preventDefault();
       e.stopPropagation();
       isScrolling = false;
+      return;
+    }
+    if (Date.now() - lastTouchOpenTime < 400) {
+      const card = e.target.closest('[onclick*="openDownloadLightbox"]');
+      if (card) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
     }
   }, true);
 }
@@ -1930,11 +1955,11 @@ function renderDownloadPhotoGrid(config) {
     let title = item.title || numStr;
 
     return `
-      <div class="group relative bg-[#121318] border border-white/10 rounded-2xl overflow-hidden shadow-xl transition-all duration-300 hover:border-amber-400/50 hover:shadow-2xl flex flex-col justify-between">
+      <div class="group relative bg-[#121318] border border-white/10 rounded-2xl overflow-hidden shadow-xl transition-all duration-300 hover:border-amber-400/50 hover:shadow-2xl">
         <div class="aspect-[3/2] w-full overflow-hidden bg-[#181920] relative cursor-pointer" onclick="openDownloadLightbox(${index})">
           <img src="${previewUrl}" alt="${title}" loading="lazy" draggable="false" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
           
-          <div class="photo-hover-overlay absolute inset-0 flex flex-col justify-between p-4 pointer-events-none transition-all duration-300">
+          <div class="photo-hover-overlay absolute inset-0 opacity-0 group-hover:opacity-100 flex flex-col justify-between p-4 pointer-events-none transition-all duration-300">
             <div class="flex items-center justify-between w-full">
               <span class="text-[11px] font-mono tracking-wider bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10 text-gray-300">
                 ${numStr}
@@ -1944,22 +1969,13 @@ function renderDownloadPhotoGrid(config) {
               </button>
             </div>
 
-            <div class="pointer-events-auto hidden sm:block">
+            <div class="pointer-events-auto">
               <button type="button" onclick="event.stopPropagation(); downloadSinglePhoto('${imgUrl}', '${filename}', this)" class="w-full py-2.5 px-3 bg-amber-400 hover:bg-amber-300 text-black font-semibold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-lg hover:shadow-amber-400/20 active:scale-98">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                 <span>Download</span>
               </button>
             </div>
           </div>
-        </div>
-
-        <!-- Mobile Card Footer (Direct single photo download on mobile screen) -->
-        <div class="p-3 sm:hidden border-t border-white/10 flex items-center justify-between bg-[#15161d]">
-          <span class="text-[11px] font-mono text-gray-400 truncate max-w-[55%]">${numStr}. ${filename}</span>
-          <button type="button" onclick="event.stopPropagation(); downloadSinglePhoto('${imgUrl}', '${filename}', this)" class="py-1.5 px-3 bg-amber-400 hover:bg-amber-300 text-black font-semibold text-xs rounded-lg flex items-center gap-1 transition-all active:scale-95">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-            <span>下載</span>
-          </button>
         </div>
       </div>
     `;
