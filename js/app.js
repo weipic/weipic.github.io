@@ -1634,16 +1634,7 @@ function getGalleriesList() {
   } else if (data.clientGallery && typeof data.clientGallery === 'object') {
     list = [data.clientGallery];
   } else {
-    list = [{
-      password: "2026WelcomeParty",
-      clientName: "Wei & Clients",
-      albumTitle: "2026 精選寫真與活動紀錄全輯",
-      deliveryDate: "2026.08.07",
-      expiryDays: 14,
-      zipUrl: "auto",
-      zipSize: "動態打包",
-      photos: []
-    }];
+    list = [];
   }
   return list;
 }
@@ -1703,12 +1694,10 @@ function findGalleryByIdOrSlug(targetStr) {
 
   return list.find(g => {
     const idNorm = normalizeSlug(g.id);
-    const passNorm = normalizeSlug(g.password);
     const zipNorm = normalizeSlug(g.zipFilename);
     const titleNorm = normalizeSlug(g.albumTitle);
 
     return (idNorm && (idNorm === targetNorm || idNorm.includes(targetNorm) || targetNorm.includes(idNorm))) ||
-           (passNorm && passNorm === targetNorm) ||
            (zipNorm && zipNorm === targetNorm) ||
            (titleNorm && titleNorm === targetNorm);
   }) || null;
@@ -1737,24 +1726,17 @@ function getAlbumIdFromUrl() {
 
 function matchesPassword(gallery, pass) {
   if (!gallery || !pass) return false;
-  const trimmed = pass.trim().toLowerCase();
+  const trimmed = pass.trim();
   const rawPass = gallery.password;
   let isMatch = false;
 
   if (rawPass) {
     if (Array.isArray(rawPass)) {
-      isMatch = rawPass.some(p => (p || '').toString().trim().toLowerCase() === trimmed);
+      isMatch = rawPass.some(p => (p || '').toString().trim() === trimmed);
     } else {
       const str = rawPass.toString();
-      const list = str.split(/[,|/]/).map(p => p.trim().toLowerCase());
+      const list = str.split(/[,|/]/).map(p => p.trim());
       isMatch = list.includes(trimmed);
-    }
-  }
-
-  // Also check if entered password matches gallery id (case-insensitive)
-  if (!isMatch && gallery.id) {
-    if (gallery.id.toString().trim().toLowerCase() === trimmed) {
-      isMatch = true;
     }
   }
 
@@ -1767,22 +1749,16 @@ function findGalleryByPassword(pass) {
   if (!trimmed) return null;
 
   const urlId = getAlbumIdFromUrl();
-  const sessionLastId = sessionStorage.getItem('wei_last_album_id');
-  const targetId = urlId || sessionLastId;
 
-  if (targetId) {
-    const matchedById = findGalleryByIdOrSlug(targetId);
+  if (urlId) {
+    const matchedById = findGalleryByIdOrSlug(urlId);
     if (matchedById) {
       if (matchesPassword(matchedById, trimmed)) {
         return matchedById;
       }
-      // When on a dedicated album page (e.g. johnson50.html), typing a password for this album must verify against this album
-      // and not fallback to unlocking a completely different album!
-      const path = window.location.pathname || '';
-      const isGenericDownload = path.endsWith('download.html') || path.endsWith('download') || path.endsWith('/') || path === '';
-      if (!isGenericDownload && urlId) {
-        return null;
-      }
+      // When explicitly visiting a specific album (e.g. KumamotoCityGuide.html or download.html?id=KumamotoCityGuide),
+      // password verification must only check against this target album.
+      return null;
     }
   }
 

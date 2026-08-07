@@ -2157,7 +2157,7 @@ window.PORTFOLIO_DATA = {
   {
       id: "2026WelcomeParty",
 
-      password: "2026WP, 2026WelcomeParty",
+      password: "2026WP",
 
       clientName: "Wei",
       albumTitle: "2026 Welcome Party",
