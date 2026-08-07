@@ -2048,7 +2048,7 @@ window.PORTFOLIO_DATA = {
       clientName: "喬山健康科技",
       albumTitle: "喬山50週年感恩慈善演唱會",
       pageTitle: "喬山50週年感恩慈善演唱會 | Wei's Portfolio",
-      zipFilename: "喬山50週年感恩慈善演唱會",
+      zipFilename: "2026_Johnson_50",
       deliveryDate: "2026.08.07",
       expiryDays: 14,
       isDeleted: false,
