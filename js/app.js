@@ -1792,48 +1792,66 @@ function findGalleryByPassword(pass, targetAlbumId = null) {
   return list.find(g => matchesPassword(g, trimmed)) || null;
 }
 
+const KNOWN_ALBUM_TITLES = {
+  'kumamotocityguide': '【ご提供】加藤神社_写真データ',
+  '2026welcomeparty': '2026 Welcome Party',
+  'johnson50': '喬山50週年感恩慈善演唱會',
+  'yeh_photo.notes': 'yeh_photo.notes 調色'
+};
+
 function getAlbumTitleForId(targetId, targetGallery) {
   if (targetGallery && targetGallery.albumTitle) {
     return targetGallery.albumTitle;
   }
 
-  if (targetId) {
-    const savedId = sessionStorage.getItem('wei_last_album_id');
-    const savedTitle = sessionStorage.getItem('wei_last_album_title');
-    if (savedId && savedTitle && savedId.toLowerCase() === targetId.toLowerCase()) {
+  const cleanId = (targetId || '').trim();
+  const lowerId = cleanId.toLowerCase();
+
+  if (lowerId) {
+    const storedTitle = localStorage.getItem('wei_album_title_' + lowerId) ||
+                        sessionStorage.getItem('wei_album_title_' + lowerId);
+    if (storedTitle) return storedTitle;
+  }
+
+  if (cleanId) {
+    const savedId = sessionStorage.getItem('wei_last_album_id') || localStorage.getItem('wei_last_album_id');
+    const savedTitle = sessionStorage.getItem('wei_last_album_title') || localStorage.getItem('wei_last_album_title');
+    if (savedId && savedTitle && savedId.toLowerCase() === lowerId) {
       return savedTitle;
     }
   }
 
-  const currentPath = window.location.pathname || '';
-  const isMainDownloadPage = currentPath.toLowerCase().endsWith('/download.html') ||
-                             currentPath.toLowerCase().endsWith('/download') ||
-                             currentPath.toLowerCase().endsWith('/404.html') ||
-                             currentPath.toLowerCase().endsWith('/404');
+  if (lowerId && KNOWN_ALBUM_TITLES[lowerId]) {
+    return KNOWN_ALBUM_TITLES[lowerId];
+  }
 
-  if (!isMainDownloadPage) {
-    const existingHeader = document.getElementById('password-header-title');
-    if (existingHeader && existingHeader.textContent.trim() && !existingHeader.textContent.includes('客戶交圖')) {
-      return existingHeader.textContent.trim();
-    }
-
-    const metaOgTitle = document.querySelector('meta[property="og:title"]')?.getAttribute('content');
-    if (metaOgTitle && !metaOgTitle.includes('客戶交圖')) {
-      let cleaned = metaOgTitle.replace(/[\｜\|]\s*Wei'?s\s*Portfolio.*/i, '').trim();
-      cleaned = cleaned.replace(/^【\s*|\s*】$/g, '').trim();
-      if (cleaned && cleaned !== "Wei's Portfolio" && !cleaned.includes('客戶交圖')) return cleaned;
-    }
-
-    const pageTitle = document.title;
-    if (pageTitle && !pageTitle.includes('客戶交圖')) {
-      let cleaned = pageTitle.replace(/[\｜\|]\s*Wei'?s\s*Portfolio.*/i, '').trim();
-      cleaned = cleaned.replace(/^【\s*|\s*】$/g, '').trim();
-      if (cleaned && cleaned !== "Wei's Portfolio" && !cleaned.includes('客戶交圖')) return cleaned;
+  const existingHeader = document.getElementById('password-header-title');
+  if (existingHeader) {
+    const headerText = existingHeader.textContent.trim();
+    if (headerText && 
+        headerText !== '客戶交圖專區' && 
+        headerText.toLowerCase() !== lowerId &&
+        !headerText.includes('客戶交圖')) {
+      return headerText;
     }
   }
 
-  if (targetId) {
-    return decodeURIComponent(targetId);
+  const metaOgTitle = document.querySelector('meta[property="og:title"]')?.getAttribute('content');
+  if (metaOgTitle && !metaOgTitle.includes('客戶交圖專區')) {
+    let cleaned = metaOgTitle.replace(/[\｜\|]\s*Wei'?s\s*Portfolio.*/i, '').trim();
+    cleaned = cleaned.replace(/^【\s*|\s*】$/g, '').trim();
+    if (cleaned && cleaned !== "Wei's Portfolio" && cleaned.toLowerCase() !== lowerId) {
+      return cleaned;
+    }
+  }
+
+  const pageTitle = document.title;
+  if (pageTitle && !pageTitle.includes('客戶交圖專區')) {
+    let cleaned = pageTitle.replace(/[\｜\|]\s*Wei'?s\s*Portfolio.*/i, '').trim();
+    cleaned = cleaned.replace(/^【\s*|\s*】$/g, '').trim();
+    if (cleaned && cleaned !== "Wei's Portfolio" && cleaned.toLowerCase() !== lowerId) {
+      return cleaned;
+    }
   }
 
   return "客戶交圖專區";
@@ -1884,11 +1902,18 @@ function initDownloadPage() {
   }
 
   if (targetGallery) {
+    const idLower = (targetGallery.id || '').toLowerCase();
     if (targetGallery.id) {
       sessionStorage.setItem('wei_last_album_id', targetGallery.id);
+      localStorage.setItem('wei_last_album_id', targetGallery.id);
     }
     if (targetGallery.albumTitle) {
       sessionStorage.setItem('wei_last_album_title', targetGallery.albumTitle);
+      localStorage.setItem('wei_last_album_title', targetGallery.albumTitle);
+      if (idLower) {
+        sessionStorage.setItem('wei_album_title_' + idLower, targetGallery.albumTitle);
+        localStorage.setItem('wei_album_title_' + idLower, targetGallery.albumTitle);
+      }
     }
     updateOpenGraphMetaTags(targetGallery);
   }
@@ -1955,11 +1980,18 @@ function initDownloadPage() {
       }
 
       if (matchedGallery) {
+        const idLower = (matchedGallery.id || targetId || '').toLowerCase();
         if (matchedGallery.id) {
           sessionStorage.setItem('wei_last_album_id', matchedGallery.id);
+          localStorage.setItem('wei_last_album_id', matchedGallery.id);
         }
         if (matchedGallery.albumTitle) {
           sessionStorage.setItem('wei_last_album_title', matchedGallery.albumTitle);
+          localStorage.setItem('wei_last_album_title', matchedGallery.albumTitle);
+          if (idLower) {
+            sessionStorage.setItem('wei_album_title_' + idLower, matchedGallery.albumTitle);
+            localStorage.setItem('wei_album_title_' + idLower, matchedGallery.albumTitle);
+          }
         }
         if (passwordHeaderTitle && matchedGallery.albumTitle) {
           passwordHeaderTitle.textContent = matchedGallery.albumTitle;
@@ -2105,8 +2137,18 @@ function unlockGalleryView(config) {
   if (config) {
     currentActiveConfig = config;
     currentDownloadPhotos = config.photos || [];
+    const idLower = (config.id || '').toLowerCase();
     if (config.id) {
       sessionStorage.setItem('wei_last_album_id', config.id);
+      localStorage.setItem('wei_last_album_id', config.id);
+    }
+    if (config.albumTitle) {
+      sessionStorage.setItem('wei_last_album_title', config.albumTitle);
+      localStorage.setItem('wei_last_album_title', config.albumTitle);
+      if (idLower) {
+        sessionStorage.setItem('wei_album_title_' + idLower, config.albumTitle);
+        localStorage.setItem('wei_album_title_' + idLower, config.albumTitle);
+      }
     }
     const passwordHeaderTitle = document.getElementById('password-header-title');
     if (passwordHeaderTitle && config.albumTitle) {
