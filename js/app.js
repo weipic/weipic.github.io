@@ -1642,10 +1642,10 @@ function getGalleriesList() {
 function updateOpenGraphMetaTags(gallery) {
   if (!gallery) return;
 
-  const tabTitle = gallery.pageTitle || gallery.tabTitle || (gallery.albumTitle ? `${gallery.albumTitle} - 客戶交圖專區 | Wei's Portfolio` : "【客戶專屬交圖】Wei's Portfolio 相片全輯下載");
+  const tabTitle = gallery.pageTitle || gallery.tabTitle || (gallery.albumTitle ? `${gallery.albumTitle} - 客戶交圖專區 | Wei's Portfolio` : "客戶交圖專區");
   document.title = tabTitle;
 
-  const title = gallery.ogTitle || (gallery.albumTitle ? `【${gallery.albumTitle}】相片全輯與線上交圖` : "【客戶專屬交圖】Wei's Portfolio 相片全輯下載");
+  const title = gallery.ogTitle || (gallery.albumTitle ? `【${gallery.albumTitle}】相片全輯與線上交圖` : "客戶交圖專區");
   const description = gallery.ogDescription || `歡迎存取 ${gallery.clientName || '貴賓'} 的 ${gallery.albumTitle || '相片全輯'}。請輸入專屬密碼進行高畫質相片全輯下載與單張預覽。`;
   
   let image = gallery.ogImage || gallery.ogCover;
@@ -1772,12 +1772,12 @@ async function verifyPasswordWithWorker(albumId, password) {
   return null;
 }
 
-function findGalleryByPassword(pass) {
+function findGalleryByPassword(pass, targetAlbumId = null) {
   const list = getGalleriesList();
   const trimmed = (pass || '').trim();
   if (!trimmed) return null;
 
-  const urlId = getAlbumIdFromUrl();
+  const urlId = targetAlbumId || getAlbumIdFromUrl();
 
   if (urlId) {
     const matchedById = findGalleryByIdOrSlug(urlId);
@@ -1797,18 +1797,39 @@ function getAlbumTitleForId(targetId, targetGallery) {
     return targetGallery.albumTitle;
   }
 
-  const metaOgTitle = document.querySelector('meta[property="og:title"]')?.getAttribute('content');
-  if (metaOgTitle && !metaOgTitle.includes('客戶專屬交圖')) {
-    let cleaned = metaOgTitle.replace(/[\｜\|]\s*Wei'?s\s*Portfolio.*/i, '').trim();
-    cleaned = cleaned.replace(/^【\s*|\s*】$/g, '').trim();
-    if (cleaned && cleaned !== "Wei's Portfolio") return cleaned;
+  if (targetId) {
+    const savedId = sessionStorage.getItem('wei_last_album_id');
+    const savedTitle = sessionStorage.getItem('wei_last_album_title');
+    if (savedId && savedTitle && savedId.toLowerCase() === targetId.toLowerCase()) {
+      return savedTitle;
+    }
   }
 
-  const pageTitle = document.title;
-  if (pageTitle && !pageTitle.includes('客戶專屬交圖')) {
-    let cleaned = pageTitle.replace(/[\｜\|]\s*Wei'?s\s*Portfolio.*/i, '').trim();
-    cleaned = cleaned.replace(/^【\s*|\s*】$/g, '').trim();
-    if (cleaned && cleaned !== "Wei's Portfolio") return cleaned;
+  const currentPath = window.location.pathname || '';
+  const isMainDownloadPage = currentPath.toLowerCase().endsWith('/download.html') ||
+                             currentPath.toLowerCase().endsWith('/download') ||
+                             currentPath.toLowerCase().endsWith('/404.html') ||
+                             currentPath.toLowerCase().endsWith('/404');
+
+  if (!isMainDownloadPage) {
+    const existingHeader = document.getElementById('password-header-title');
+    if (existingHeader && existingHeader.textContent.trim() && !existingHeader.textContent.includes('客戶交圖')) {
+      return existingHeader.textContent.trim();
+    }
+
+    const metaOgTitle = document.querySelector('meta[property="og:title"]')?.getAttribute('content');
+    if (metaOgTitle && !metaOgTitle.includes('客戶交圖')) {
+      let cleaned = metaOgTitle.replace(/[\｜\|]\s*Wei'?s\s*Portfolio.*/i, '').trim();
+      cleaned = cleaned.replace(/^【\s*|\s*】$/g, '').trim();
+      if (cleaned && cleaned !== "Wei's Portfolio" && !cleaned.includes('客戶交圖')) return cleaned;
+    }
+
+    const pageTitle = document.title;
+    if (pageTitle && !pageTitle.includes('客戶交圖')) {
+      let cleaned = pageTitle.replace(/[\｜\|]\s*Wei'?s\s*Portfolio.*/i, '').trim();
+      cleaned = cleaned.replace(/^【\s*|\s*】$/g, '').trim();
+      if (cleaned && cleaned !== "Wei's Portfolio" && !cleaned.includes('客戶交圖')) return cleaned;
+    }
   }
 
   if (targetId) {
@@ -1866,6 +1887,9 @@ function initDownloadPage() {
     if (targetGallery.id) {
       sessionStorage.setItem('wei_last_album_id', targetGallery.id);
     }
+    if (targetGallery.albumTitle) {
+      sessionStorage.setItem('wei_last_album_title', targetGallery.albumTitle);
+    }
     updateOpenGraphMetaTags(targetGallery);
   }
 
@@ -1913,7 +1937,7 @@ function initDownloadPage() {
       let matchedGallery = null;
       try {
         // Try local list first if available, otherwise call Cloudflare Worker API
-        matchedGallery = findGalleryByPassword(enteredPass);
+        matchedGallery = findGalleryByPassword(enteredPass, targetId);
         if (!matchedGallery) {
           if (targetId) {
             matchedGallery = await verifyPasswordWithWorker(targetId, enteredPass);
@@ -1933,6 +1957,9 @@ function initDownloadPage() {
       if (matchedGallery) {
         if (matchedGallery.id) {
           sessionStorage.setItem('wei_last_album_id', matchedGallery.id);
+        }
+        if (matchedGallery.albumTitle) {
+          sessionStorage.setItem('wei_last_album_title', matchedGallery.albumTitle);
         }
         if (passwordHeaderTitle && matchedGallery.albumTitle) {
           passwordHeaderTitle.textContent = matchedGallery.albumTitle;
@@ -2008,13 +2035,11 @@ function initDownloadPage() {
         passwordInput.value = '';
         passwordInput.focus();
       }
-      const activeId = (currentActiveConfig && currentActiveConfig.id) || sessionStorage.getItem('wei_last_album_id') || getAlbumIdFromUrl();
-      if (activeId) {
-        const g = findGalleryByIdOrSlug(activeId);
-        if (g && g.albumTitle && passwordHeaderTitle) {
-          passwordHeaderTitle.textContent = g.albumTitle;
-          updateOpenGraphMetaTags(g);
-        }
+      const activeId = getAlbumIdFromUrl() || (currentActiveConfig && currentActiveConfig.id) || sessionStorage.getItem('wei_last_album_id');
+      const activeGallery = currentActiveConfig || (activeId ? findGalleryByIdOrSlug(activeId) : null);
+      const displayTitle = getAlbumTitleForId(activeId, activeGallery);
+      if (passwordHeaderTitle && displayTitle) {
+        passwordHeaderTitle.textContent = displayTitle;
       }
     });
   }
@@ -2031,13 +2056,11 @@ function initDownloadPage() {
         passwordInput.value = '';
         passwordInput.focus();
       }
-      const activeId = (currentActiveConfig && currentActiveConfig.id) || sessionStorage.getItem('wei_last_album_id') || getAlbumIdFromUrl();
-      if (activeId) {
-        const g = findGalleryByIdOrSlug(activeId);
-        if (g && g.albumTitle && passwordHeaderTitle) {
-          passwordHeaderTitle.textContent = g.albumTitle;
-          updateOpenGraphMetaTags(g);
-        }
+      const activeId = getAlbumIdFromUrl() || (currentActiveConfig && currentActiveConfig.id) || sessionStorage.getItem('wei_last_album_id');
+      const activeGallery = currentActiveConfig || (activeId ? findGalleryByIdOrSlug(activeId) : null);
+      const displayTitle = getAlbumTitleForId(activeId, activeGallery);
+      if (passwordHeaderTitle && displayTitle) {
+        passwordHeaderTitle.textContent = displayTitle;
       }
     });
   }
@@ -2295,69 +2318,86 @@ async function downloadAllPhotosAsZip(config) {
   }
 }
 
+function normalizePhotoItem(rawItem, config) {
+  const item = typeof rawItem === 'string' ? { filename: rawItem } : (rawItem || {});
+  const cfg = config || {};
+  const baseUrl = item.baseUrl || cfg.baseUrl || '';
+  const filename = item.filename || (typeof rawItem === 'string' ? rawItem : '');
+
+  const originalUrl = item.originalUrl || item.url || (baseUrl.endsWith('/') ? (baseUrl + filename) : (baseUrl + '/' + filename));
+
+  let displayUrl = item.displayUrl || item.previewUrl || item.thumbUrl;
+  if (!displayUrl) {
+    const previewBaseUrl = item.previewBaseUrl || cfg.previewBaseUrl || cfg.thumbBaseUrl;
+    if (previewBaseUrl) {
+      let fullPreviewBase = previewBaseUrl;
+      if (!previewBaseUrl.startsWith('http://') && !previewBaseUrl.startsWith('https://') && !previewBaseUrl.startsWith('/')) {
+        fullPreviewBase = baseUrl.endsWith('/') ? (baseUrl + previewBaseUrl) : (baseUrl + '/' + previewBaseUrl);
+      }
+      if (!fullPreviewBase.endsWith('/')) {
+        fullPreviewBase += '/';
+      }
+      displayUrl = fullPreviewBase + filename;
+    } else if (originalUrl && (originalUrl.startsWith('http://') || originalUrl.startsWith('https://'))) {
+      try {
+        const origin = new URL(originalUrl).origin;
+        displayUrl = `${origin}/cdn-cgi/image/width=800,quality=80,format=auto/${originalUrl}`;
+      } catch (e) {
+        displayUrl = `/cdn-cgi/image/width=800,quality=80,format=auto/${originalUrl}`;
+      }
+    } else {
+      displayUrl = originalUrl;
+    }
+  }
+
+  return {
+    filename: filename,
+    originalUrl: originalUrl,
+    displayUrl: displayUrl,
+    title: item.title || filename
+  };
+}
+
 function downloadSinglePhotoByIndex(index, btnEl = null) {
-  const photos = currentDownloadPhotos || [];
+  const activeCfg = currentActiveConfig || (getGalleriesList()[0] || {});
+  const photos = (activeCfg && (activeCfg.photosList || activeCfg.photos)) || currentDownloadPhotos || [];
   const rawPhoto = photos[index];
   if (!rawPhoto) return;
-  const photo = typeof rawPhoto === 'string' ? { filename: rawPhoto } : rawPhoto;
-  const activeCfg = currentActiveConfig || (getGalleriesList()[0] || {});
-  const baseUrl = photo.baseUrl || activeCfg.baseUrl || '';
-  const imgUrl = photo.url || (baseUrl + (photo.filename || ''));
-  const filename = photo.filename || `photo_${index + 1}.jpg`;
-  downloadSinglePhoto(imgUrl, filename, btnEl);
+  const norm = normalizePhotoItem(rawPhoto, activeCfg);
+  downloadSinglePhoto(norm.originalUrl, norm.filename || `photo_${index + 1}.jpg`, btnEl);
 }
 
 function getGalleryPreviewUrl(rawItem, config) {
-  const item = typeof rawItem === 'string' ? { filename: rawItem } : (rawItem || {});
-
-  if (item.previewUrl) return getEncodedPhotoUrl(item.previewUrl);
-  if (item.thumbUrl) return getEncodedPhotoUrl(item.thumbUrl);
-
-  const cfg = config || {};
-  const baseUrl = item.baseUrl || cfg.baseUrl || '';
-  const imgUrl = item.url || (baseUrl + (item.filename || ''));
-
-  const previewBaseUrl = item.previewBaseUrl || cfg.previewBaseUrl || cfg.thumbBaseUrl;
-  if (previewBaseUrl) {
-    let fullPreviewBase = previewBaseUrl;
-    if (!previewBaseUrl.startsWith('http://') && !previewBaseUrl.startsWith('https://') && !previewBaseUrl.startsWith('/')) {
-      fullPreviewBase = baseUrl.endsWith('/') ? (baseUrl + previewBaseUrl) : (baseUrl + '/' + previewBaseUrl);
-    }
-    if (!fullPreviewBase.endsWith('/')) {
-      fullPreviewBase += '/';
-    }
-    return getEncodedPhotoUrl(fullPreviewBase + (item.filename || ''));
-  }
-
-  return getEncodedPhotoUrl(imgUrl);
+  const norm = normalizePhotoItem(rawItem, config);
+  return getEncodedPhotoUrl(norm.displayUrl);
 }
 
 function renderDownloadPhotoGrid(config) {
   const gridContainer = document.getElementById('download-photo-grid');
   if (!gridContainer) return;
 
-  const photos = config.photos || [];
+  const photos = (config && (config.photosList || config.photos)) || [];
 
   if (photos.length === 0) {
     gridContainer.innerHTML = `
       <div class="col-span-full py-16 text-center text-gray-400">
         <p class="text-lg font-medium">目前尚無照片資料</p>
-        <p class="text-xs text-gray-500 mt-2">請於 js/portfolio-data.js 中設定 clientGallery.photos 照片列表</p>
+        <p class="text-xs text-gray-500 mt-2">請於相簿設定中設定 photos 或 photosList 照片列表</p>
       </div>
     `;
     return;
   }
 
   gridContainer.innerHTML = photos.map((rawItem, index) => {
-    const item = typeof rawItem === 'string' ? { filename: rawItem } : rawItem;
-    let previewUrl = getGalleryPreviewUrl(rawItem, config);
+    const norm = normalizePhotoItem(rawItem, config);
+    let displayUrl = getEncodedPhotoUrl(norm.displayUrl);
     let numStr = String(index + 1).padStart(2, '0');
-    let title = item.title || numStr;
+    let title = norm.title || numStr;
 
     return `
       <div class="group relative bg-[#121318] border border-white/10 rounded-2xl overflow-hidden shadow-xl transition-all duration-300 hover:border-amber-400/50 hover:shadow-2xl">
         <div class="aspect-[3/2] w-full overflow-hidden bg-[#181920] relative cursor-pointer" onclick="openDownloadLightbox(${index})">
-          <img src="${previewUrl}" alt="${title}" loading="lazy" decoding="async" draggable="false" crossorigin="anonymous" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
+          <img src="${displayUrl}" alt="${title}" loading="lazy" decoding="async" draggable="false" crossorigin="anonymous" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
           
           <div class="photo-hover-overlay absolute inset-0 opacity-0 group-hover:opacity-100 flex flex-col justify-between p-4 pointer-events-none transition-all duration-300">
             <div class="flex items-center justify-between w-full">
@@ -2491,7 +2531,9 @@ async function downloadSinglePhoto(photoUrl, filename, btnEl = null) {
 }
 
 function openDownloadLightbox(index) {
-  if (!currentDownloadPhotos || !currentDownloadPhotos.length) return;
+  const activeCfg = currentActiveConfig || (getGalleriesList()[0] || {});
+  const photos = (activeCfg && (activeCfg.photosList || activeCfg.photos)) || currentDownloadPhotos || [];
+  if (!photos || !photos.length) return;
   currentDownloadPhotoIndex = index;
 
   const modal = document.getElementById('download-lightbox-modal');
@@ -2501,30 +2543,27 @@ function openDownloadLightbox(index) {
 
   if (!modal || !imgEl) return;
 
-  const rawPhoto = currentDownloadPhotos[index];
-  const photo = typeof rawPhoto === 'string' ? { filename: rawPhoto } : rawPhoto;
-  const activeCfg = currentActiveConfig || (getGalleriesList()[0] || {});
-  const baseUrl = photo.baseUrl || activeCfg.baseUrl || '';
-  const rawImgUrl = photo.url || (baseUrl + (photo.filename || ''));
-  const imgUrl = getEncodedPhotoUrl(rawImgUrl);
-  const previewUrl = getGalleryPreviewUrl(rawPhoto, activeCfg);
-  const filename = photo.filename || `photo_${index + 1}.jpg`;
+  const rawPhoto = photos[index];
+  const norm = normalizePhotoItem(rawPhoto, activeCfg);
+  const displayUrl = getEncodedPhotoUrl(norm.displayUrl);
+  const originalUrl = getEncodedPhotoUrl(norm.originalUrl);
+  const filename = norm.filename || `photo_${index + 1}.jpg`;
 
-  imgEl.src = previewUrl;
-  if (previewUrl !== imgUrl) {
+  imgEl.src = displayUrl;
+  if (displayUrl !== originalUrl) {
     const highResImg = new Image();
-    highResImg.src = imgUrl;
+    highResImg.src = originalUrl;
     highResImg.onload = () => {
       if (currentDownloadPhotoIndex === index) {
-        imgEl.src = imgUrl;
+        imgEl.src = originalUrl;
       }
     };
   }
 
-  imgEl.alt = photo.title || `${index + 1}`;
+  imgEl.alt = norm.title || `${index + 1}`;
 
   if (counterEl) {
-    counterEl.textContent = `${index + 1} / ${currentDownloadPhotos.length}`;
+    counterEl.textContent = `${index + 1} / ${photos.length}`;
   }
 
   if (downloadBtn) {
@@ -2532,7 +2571,7 @@ function openDownloadLightbox(index) {
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
       <span>Download</span>
     `;
-    downloadBtn.onclick = (e) => downloadSinglePhoto(imgUrl, filename, e ? (e.currentTarget || e.target) : downloadBtn);
+    downloadBtn.onclick = (e) => downloadSinglePhoto(originalUrl, filename, e ? (e.currentTarget || e.target) : downloadBtn);
   }
 
   modal.classList.remove('hidden');

@@ -627,7 +627,200 @@ const CLIENT_GALLERIES = [
     isDeleted: true,                               // 👈 標記為 true，客戶輸入此密碼後會提示「相簿已失效或已刪除」
     photos: []
   }
+```
+
+#### ⚡ 修改後的完整 Cloudflare Worker (`weipic-api`) 程式碼：
+
+在 Worker 驗證密碼成功回傳資料前，會將原本 `photos` 檔名陣列轉化為包含 `filename`、`originalUrl` (原始高畫質圖片) 與 `displayUrl` (Cloudflare Image Resizing 縮圖) 的 `photosList` 物件陣列：
+
+```javascript
+// Cloudflare Worker - Wei's Portfolio 私密相簿驗證 API
+const CLIENT_GALLERIES = [
+  {
+    id: "johnson50",
+    password: "johnson50",
+    clientName: "Wei",
+    albumTitle: "喬山50週年感恩慈善演唱會",
+    pageTitle: "喬山50週年感恩慈善演唱會 | Wei's Portfolio",
+    zipFilename: "2026_Johnson_50",
+    deliveryDate: "2026.08.07",
+    expiryDays: 14,
+    isDeleted: false,
+    zipUrl: "auto",
+    zipSize: "動態打包",
+    baseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/2026Johnson50/",
+    previewBaseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/2026Johnson50/",
+    photos: [
+      "1-IMG_0500.jpg", "2-IMG_0501.jpg", "3-IMG_0502.jpg", "4-IMG_0504.jpg", "5-IMG_0503.jpg",
+      "6-IMG_0362.jpg", "7-IMG_0324.jpg", "8-WEI07643.jpg", "9-IMG_0329.jpg", "10-IMG_0322.jpg",
+      "11-IMG_0321.jpg", "12-IMG_0320.jpg", "13-IMG_0327.jpg", "14-IMG_0326.jpg", "15-IMG_0325.jpg",
+      "16-IMG_0361.jpg", "17-IMG_0360.jpg", "18-IMG_0319.jpg", "19-IMG_0313.jpg", "20-IMG_0314.jpg",
+      "21-IMG_0318.jpg", "22-IMG_0496.jpg", "23-IMG_0490.jpg", "24-IMG_0497.jpg", "25-IMG_0498.jpg",
+      "26-IMG_0491.jpg", "27-IMG_0499.jpg", "28-IMG_0492.jpg", "29-IMG_0493.jpg", "30-IMG_0494.jpg",
+      "31-IMG_0495.jpg", "32-IMG_0317.jpg", "33-IMG_0312.jpg", "34-IMG_0316.jpg", "35-IMG_0310.jpg",
+      "36-IMG_0311.jpg", "37-IMG_0315.jpg", "38-IMG_0366.jpg", "39-IMG_0367.jpg", "40-IMG_0334.jpg",
+      "41-IMG_0333.jpg", "42-IMG_0332.jpg", "43-IMG_0331.jpg", "44-IMG_0330.jpg", "45-IMG_0339.jpg",
+      "46-IMG_0338.jpg", "47-IMG_0337.jpg", "48-IMG_0336.jpg", "49-IMG_0335.jpg", "50-IMG_0344.jpg",
+      "51-IMG_0343.jpg", "52-IMG_0342.jpg", "53-IMG_0341.jpg", "54-IMG_0340.jpg", "55-IMG_0349.jpg",
+      "56-IMG_0348.jpg", "57-IMG_0347.jpg", "58-IMG_0346.jpg", "59-IMG_0345.jpg", "60-WEI00356.jpg",
+      "61-WEI00604.jpg", "62-IMG_0505.jpg", "63-WEI00854.jpg", "64-WEI00880.jpg", "65-WEI00895.jpg",
+      "66-WEI00904.jpg", "67-WEI01021.jpg", "68-WEI01059.jpg", "69-WEI01079.jpg", "70-IMG_0368.jpg",
+      "71-IMG_0365.jpg"
+    ]
+  },
+  {
+    id: "2026WelcomeParty",
+    password: "2026WP",
+    clientName: "Wei",
+    albumTitle: "2026 Welcome Party",
+    pageTitle: "2026 Welcome Party | Wei's Portfolio",
+    zipFilename: "2026_Welcome_Party",
+    deliveryDate: "2026.08.07",
+    expiryDays: 14,
+    isDeleted: false,
+    zipUrl: "auto",
+    zipSize: "動態打包",
+    baseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/2026WelcomeParty/",
+    photos: [
+      "LINE_ALBUM_20260306 Welcome Party_260807_1.jpg", "LINE_ALBUM_20260306 Welcome Party_260807_2.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_3.jpg", "LINE_ALBUM_20260306 Welcome Party_260807_4.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_5.jpg", "LINE_ALBUM_20260306 Welcome Party_260807_6.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_7.jpg", "LINE_ALBUM_20260306 Welcome Party_260807_8.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_9.jpg", "LINE_ALBUM_20260306 Welcome Party_260807_10.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_11.jpg", "LINE_ALBUM_20260306 Welcome Party_260807_12.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_13.jpg", "LINE_ALBUM_20260306 Welcome Party_260807_14.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_15.jpg", "LINE_ALBUM_20260306 Welcome Party_260807_16.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_17.jpg", "LINE_ALBUM_20260306 Welcome Party_260807_18.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_19.jpg", "LINE_ALBUM_20260306 Welcome Party_260807_20.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_21.jpg", "LINE_ALBUM_20260306 Welcome Party_260807_22.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_23.jpg", "LINE_ALBUM_20260306 Welcome Party_260807_24.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_25.jpg", "LINE_ALBUM_20260306 Welcome Party_260807_26.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_27.jpg", "LINE_ALBUM_20260306 Welcome Party_260807_28.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_29.jpg", "LINE_ALBUM_20260306 Welcome Party_260807_30.jpg"
+    ]
+  },
+  {
+    id: "yeh_photo.notes",
+    password: "0807",
+    clientName: "Wei",
+    albumTitle: "yeh_photo.notes 調色",
+    pageTitle: "yeh_photo.notes 調色 | Wei's Portfolio",
+    zipFilename: "yeh_photo_notes",
+    deliveryDate: "2026.08.07",
+    expiryDays: 14,
+    isDeleted: false,
+    zipUrl: "auto",
+    zipSize: "動態打包",
+    baseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/20260807/",
+    photos: [
+      "DSC07148.jpeg", "DSC08889.jpeg", "DSC08967.jpeg", "DSC09278.jpeg",
+      "DSC09301.jpeg", "DSC09310.jpeg", "DSC09729.jpeg", "ODSC07148.JPG",
+      "ODSC08889.JPG", "ODSC08967.JPG", "ODSC09278.JPG", "ODSC09301.JPG",
+      "ODSC09310.JPG", "ODSC09729.JPG"
+    ]
+  },
+  {
+    id: "KumamotoCityGuide",
+    password: "Kumamoto",
+    clientName: "Wei",
+    albumTitle: "【ご提供】加藤神社_写真データ",
+    pageTitle: "【ご提供】加藤神社_写真データ｜Wei's Portfolio",
+    zipFilename: "KumamotoCityGuide",
+    deliveryDate: "2026.08.07",
+    expiryDays: 14,
+    isDeleted: false,
+    zipUrl: "auto",
+    zipSize: "動態打包",
+    baseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/KumamoCity/",
+    photos: [
+      "1-IMG_0843.jpg", "2-IMG_0839.jpg", "3-IMG_0838.jpg", "4-IMG_0847.jpg", "5-IMG_0840.jpg",
+      "6-IMG_0835.jpg", "7-IMG_0851.jpg", "8-IMG_0852.jpg", "9-IMG_0849.jpg", "10-IMG_0849.jpg"
+    ]
+  }
 ];
+
+export default {
+  async fetch(request, env, ctx) {
+    const corsHeaders = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    };
+
+    if (request.method === "OPTIONS") {
+      return new Response(null, { headers: corsHeaders });
+    }
+
+    if (request.method === "POST") {
+      try {
+        const body = await request.json();
+        const { albumId, password } = body || {};
+        const inputPass = (password || '').trim();
+
+        let gallery = null;
+        if (albumId) {
+          const target = CLIENT_GALLERIES.find(g => g.id.toLowerCase() === albumId.toLowerCase());
+          if (target && target.password === inputPass) {
+            gallery = target;
+          }
+        }
+
+        if (!gallery && !albumId) {
+          gallery = CLIENT_GALLERIES.find(g => g.password === inputPass);
+        }
+
+        if (gallery) {
+          const { password: _, ...safeGallery } = gallery;
+          const baseUrl = gallery.baseUrl || '';
+
+          // ⚡ 將 photos 轉換為包含物件的 photosList 陣列 (支援 Cloudflare Image Resizing)
+          const photosList = (gallery.photos || []).map(photo => {
+            const filename = typeof photo === 'string' ? photo : (photo.filename || photo.name || '');
+            const originalUrl = photo.originalUrl || (baseUrl.endsWith('/') ? (baseUrl + filename) : (baseUrl + '/' + filename));
+            
+            let origin = '';
+            try {
+              origin = new URL(originalUrl).origin;
+            } catch (e) {
+              origin = '';
+            }
+
+            // 格式：/cdn-cgi/image/width=800,quality=80,format=auto/ 加上 originalUrl
+            const displayUrl = photo.displayUrl || (origin 
+              ? `${origin}/cdn-cgi/image/width=800,quality=80,format=auto/${originalUrl}` 
+              : `/cdn-cgi/image/width=800,quality=80,format=auto/${originalUrl}`);
+
+            return {
+              filename: filename,
+              originalUrl: originalUrl,
+              displayUrl: displayUrl
+            };
+          });
+
+          safeGallery.photosList = photosList;
+
+          return new Response(JSON.stringify({ success: true, gallery: safeGallery }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" }
+          });
+        } else {
+          return new Response(JSON.stringify({ success: false, message: "密碼錯誤或存取失效" }), {
+            status: 401,
+            headers: { ...corsHeaders, "Content-Type": "application/json" }
+          });
+        }
+      } catch (e) {
+        return new Response(JSON.stringify({ success: false, message: "無效的請求" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+        });
+      }
+    }
+
+    return new Response(JSON.stringify({ message: "Wei's Portfolio API running" }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" }
+    });
+  }
+};
 ```
 
 4. **儲存並部署 (Save and Deploy)**：
