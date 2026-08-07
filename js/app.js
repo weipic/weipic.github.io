@@ -1594,13 +1594,12 @@ let currentDownloadPhotoIndex = 0;
 function initDownloadPage() {
   const passwordSection = document.getElementById('password-section');
   const deliverySection = document.getElementById('delivery-gallery-section');
+  const expiredSection = document.getElementById('expired-section');
   const passwordForm = document.getElementById('password-form');
   const passwordInput = document.getElementById('password-input');
   const passwordError = document.getElementById('password-error');
   const togglePassBtn = document.getElementById('toggle-password-btn');
   const lockBtn = document.getElementById('lock-gallery-btn');
-
-  if (!passwordSection || !deliverySection) return;
 
   const config = (window.PORTFOLIO_DATA && window.PORTFOLIO_DATA.clientGallery) || {
     password: "2026WelcomeParty",
@@ -1608,12 +1607,24 @@ function initDownloadPage() {
     albumTitle: "2026 精選寫真與活動紀錄全輯",
     deliveryDate: "2026.08.07",
     expiryDays: 14,
-    zipUrl: "https://pub-xxx.r2.dev/albums/2026-party/2026_Party_Full_Album.zip",
-    zipSize: "350 MB",
+    zipUrl: "auto",
+    zipSize: "動態打包",
     photos: []
   };
 
   currentDownloadPhotos = config.photos || [];
+
+  // Check if album is expired
+  const isExpired = checkAlbumIsExpired(config);
+  if (isExpired) {
+    if (passwordSection) passwordSection.classList.add('hidden');
+    if (deliverySection) deliverySection.classList.add('hidden');
+    if (expiredSection) expiredSection.classList.remove('hidden');
+    trackGAEvent('存取已過期相簿網址', { '相簿標題': config.albumTitle });
+    return;
+  }
+
+  if (!passwordSection || !deliverySection) return;
 
   // Toggle Password Show/Hide
   if (togglePassBtn && passwordInput) {
@@ -1685,6 +1696,29 @@ function initDownloadPage() {
   }
 }
 
+// Check if album is past its expiry period (14 days default or explicit isExpired flag)
+function checkAlbumIsExpired(config) {
+  if (!config) return false;
+  if (config.isExpired === true) return true;
+  if (config.isExpired === false) return false;
+
+  if (config.deliveryDate) {
+    try {
+      const parts = config.deliveryDate.split('.').map(p => parseInt(p, 10));
+      if (parts.length === 3 && !isNaN(parts[0]) && !isNaN(parts[1]) && !isNaN(parts[2])) {
+        const delivery = new Date(parts[0], parts[1] - 1, parts[2]);
+        const expiryDays = config.expiryDays || 14;
+        const expireTime = delivery.getTime() + (expiryDays * 24 * 60 * 60 * 1000);
+        const now = new Date().getTime();
+        return now > expireTime;
+      }
+    } catch (e) {
+      console.warn('Date parsing error:', e);
+    }
+  }
+  return false;
+}
+
 function unlockGalleryView(config) {
   const passwordSection = document.getElementById('password-section');
   const deliverySection = document.getElementById('delivery-gallery-section');
@@ -1703,7 +1737,16 @@ function unlockGalleryView(config) {
 
   if (clientNameEl) clientNameEl.textContent = config.clientName || 'Valued Client';
   if (albumTitleEl) albumTitleEl.textContent = config.albumTitle || '攝影作品輯';
-  if (zipSizeEl) zipSizeEl.textContent = config.zipSize ? `(${config.zipSize})` : '';
+  
+  // Hide (動態打包) or show explicit pre-built size if provided
+  if (zipSizeEl) {
+    if (config.zipSize && config.zipSize !== '動態打包' && config.zipSize !== 'auto') {
+      zipSizeEl.textContent = `(${config.zipSize})`;
+    } else {
+      zipSizeEl.textContent = '';
+    }
+  }
+
   if (photoCountEl) photoCountEl.textContent = (config.photos || []).length;
 
   if (zipBtnEl) {
@@ -1765,17 +1808,42 @@ async function downloadAllPhotosAsZip(config) {
       `;
     }
 
-    const fetchPromises = photos.map(async (rawPhoto, idx) => {
-      const photo = typeof rawPhoto === 'string' ? { filename: rawPhoto } : rawPhoto;
-      const imgUrl = photo.url || (baseUrl + (photo.filename || ''));
-      const defaultFilename = `photo_${String(idx + 1).padStart(3, '0')}.jpg`;
-      const filename = photo.filename || defaultFilename;
+    const CONCURRENCY_LIMIT = 5;
+    const queue = photos.map((p, i) => ({ photo: p, idx: i }));
 
-      try {
-        const resp = await fetch(imgUrl, { mode: 'cors' });
-        if (!resp.ok) throw new Error(`HTTP error! status: ${resp.status}`);
-        const blob = await resp.blob();
-        folder.file(filename, blob);
+    const downloadWorker = async () => {
+      while (queue.length > 0) {
+        const item = queue.shift();
+        if (!item) break;
+
+        const rawPhoto = item.photo;
+        const idx = item.idx;
+        const photo = typeof rawPhoto === 'string' ? { filename: rawPhoto } : rawPhoto;
+        const imgUrl = photo.url || (baseUrl + (photo.filename || ''));
+        const defaultFilename = `photo_${String(idx + 1).padStart(3, '0')}.jpg`;
+        const filename = photo.filename || defaultFilename;
+
+        let fetchedBlob = null;
+        let retries = 3;
+
+        while (retries > 0 && !fetchedBlob) {
+          try {
+            const resp = await fetch(imgUrl, { mode: 'cors' });
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            fetchedBlob = await resp.blob();
+          } catch (err) {
+            retries--;
+            if (retries > 0) {
+              await new Promise(r => setTimeout(r, 400));
+            } else {
+              console.warn(`Failed to download ${imgUrl} after 3 retries:`, err);
+            }
+          }
+        }
+
+        if (fetchedBlob) {
+          folder.file(filename, fetchedBlob);
+        }
 
         completedCount++;
         if (zipBtnEl) {
@@ -1787,12 +1855,11 @@ async function downloadAllPhotosAsZip(config) {
             <span>相片打包中 (${completedCount}/${totalCount})...</span>
           `;
         }
-      } catch (err) {
-        console.warn(`Could not fetch image ${imgUrl} for ZIP:`, err);
       }
-    });
+    };
 
-    await Promise.all(fetchPromises);
+    const workers = Array.from({ length: Math.min(CONCURRENCY_LIMIT, totalCount) }, () => downloadWorker());
+    await Promise.all(workers);
 
     if (zipBtnEl) {
       zipBtnEl.innerHTML = `
@@ -1880,7 +1947,7 @@ function renderDownloadPhotoGrid(config) {
             <div class="pointer-events-auto">
               <button type="button" onclick="event.stopPropagation(); downloadSinglePhoto('${imgUrl}', '${filename}')" class="w-full py-2.5 px-3 bg-amber-400 hover:bg-amber-300 text-black font-semibold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-lg hover:shadow-amber-400/20 active:scale-98">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                <span>下載單張 (Download)</span>
+                <span>Download</span>
               </button>
             </div>
           </div>
@@ -1935,13 +2002,17 @@ function openDownloadLightbox(index) {
   const filename = photo.filename || `photo_${index + 1}.jpg`;
 
   imgEl.src = imgUrl;
-  imgEl.alt = photo.title || `Photo #${index + 1}`;
+  imgEl.alt = photo.title || `${index + 1}`;
 
   if (counterEl) {
-    counterEl.textContent = `[ ${index + 1} / ${currentDownloadPhotos.length} ]`;
+    counterEl.textContent = `${index + 1} / ${currentDownloadPhotos.length}`;
   }
 
   if (downloadBtn) {
+    downloadBtn.innerHTML = `
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+      <span>Download</span>
+    `;
     downloadBtn.onclick = () => downloadSinglePhoto(imgUrl, filename);
   }
 

@@ -327,11 +327,11 @@
             <!-- Expiry Warning -->
             <p class="text-xs sm:text-sm text-amber-300/90 flex items-center gap-1.5 pt-1">
               <svg class="w-4 h-4 shrink-0 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-              <span>相簿檔案由 Cloudflare R2 託管，將於 <strong>14 天後</strong> 自動清理刪除，請務必及時下載備份。</span>
+              <span>相簿將於 14 天後自動清理刪除，請務必及時下載備份。</span>
             </p>
           </div>
 
-          <!-- Right Action Controls: Download All ZIP Button & Lock Gallery Button -->
+          <!-- Right Action Controls: Download All ZIP Button -->
           <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
             <a 
               id="download-zip-btn" 
@@ -342,18 +342,8 @@
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
               <span>一鍵下載全部 (.zip)</span>
-              <span id="zip-size-display" class="text-xs font-mono opacity-80 pl-1">(350 MB)</span>
+              <span id="zip-size-display" class="text-xs font-mono opacity-80 pl-1"></span>
             </a>
-
-            <button 
-              type="button" 
-              id="lock-gallery-btn" 
-              class="py-3.5 px-4 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 rounded-xl text-xs font-medium transition-colors flex items-center justify-center gap-1.5"
-              title="重新鎖定相簿"
-            >
-              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-              <span>重新鎖定</span>
-            </button>
           </div>
 
         </div>
@@ -377,6 +367,41 @@
 
     </section>
 
+    <!-- ========================================================================= -->
+    <!-- ⚠️ 4. 相簿已過期提示區塊 (Expired Album Warning Card - Hidden by default) -->
+    <!-- ========================================================================= -->
+    <section id="expired-section" class="w-full max-w-md my-auto pt-2 sm:pt-4 hidden">
+      <div class="glass-panel p-8 sm:p-10 rounded-3xl relative overflow-hidden text-center transition-all duration-300">
+        
+        <!-- Ambient Decorative Red Glow -->
+        <div class="absolute -top-24 -left-24 w-48 h-48 bg-red-500/15 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Clock / Expired Icon Badge -->
+        <div class="w-16 h-16 bg-red-500/10 border border-red-500/30 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl text-red-400">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+
+        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2 font-serif">
+          相簿已過下載期限
+        </h1>
+        <p class="text-xs sm:text-sm text-gray-400 leading-relaxed mb-8">
+          此相簿已超過 14 天保存期限並由 Cloudflare 伺服器自動清理刪除。如需重新發送檔案，請聯繫攝影師。
+        </p>
+
+        <a 
+          href="mailto:weipic2023@gmail.com" 
+          class="w-full py-3.5 px-6 bg-white/10 hover:bg-white/20 text-white font-semibold text-sm rounded-xl border border-white/15 transition-all flex items-center justify-center gap-2"
+        >
+          <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="2.5 5.3 19 12.4"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          <span>聯繫攝影師 (Email)</span>
+        </a>
+
+      </div>
+    </section>
+
   </main>
 
   <!-- ========================================================================= -->
@@ -387,7 +412,7 @@
     <!-- Top Header Bar inside Lightbox -->
     <div class="w-full max-w-7xl flex items-center justify-between z-20">
       <span id="download-lightbox-counter" class="text-xs font-mono text-gray-400 bg-white/10 px-3 py-1 rounded-full border border-white/10">
-        [ 1 / 1 ]
+        1 / 1
       </span>
       <button 
         type="button" 
@@ -433,7 +458,7 @@
         class="py-3 px-8 bg-amber-400 hover:bg-amber-300 text-black font-semibold text-sm rounded-xl btn-gold-glow transition-all flex items-center justify-center gap-2 shadow-xl"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-        <span>下載此張高畫質照片 (Download High-Res)</span>
+        <span>Download</span>
       </button>
     </div>
 
