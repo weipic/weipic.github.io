@@ -547,6 +547,19 @@ git push
 - **解壓縮效果**：網站內建的 JSZip 打包機制已設定為將照片直接放置於 ZIP 壓縮檔的根目錄。
 - **成果**：客戶下載 `.zip` 檔並解壓縮後，電腦只會生成**單一資料夾**並直接存放照片，完全**不會出現「資料夾裡面再一層資料夾」**的雙重嵌套狀況！
 
+#### ⚡ C. 網頁輕量縮圖與原圖高畫質下載分離機制 (網頁極速載入)
+- **原理說明**：
+  - **`previewBaseUrl` (網頁展示用)**：用於網頁牆面相片與燈箱預覽。可設定壓縮過的 WebP/JPG 輕量縮圖資料夾（例如 200~400KB）。
+  - **`baseUrl` (下載專用)**：用於單張點擊「Download」或「一鍵打包 ZIP」。會永遠抓取原始無損/高畫質的大圖（例如 10~20MB）。
+- **設定方式**：
+  在 `js/portfolio-data.js` 的相簿設定中加上 `previewBaseUrl`：
+  ```javascript
+  baseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/2026Johnson50/",
+  // 可填寫相對路徑 "thumbs/" 或完整的 R2 縮圖資料夾網址：
+  previewBaseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/2026Johnson50/thumbs/",
+  ```
+- **好處**：當相簿照片數量多達數百張時，網頁載入依然秒開流暢不卡頓，而客戶下載到的檔案依然是 100% 原始大小高畫質照片！
+
 ---
 
 ### 👥 3. 如何新增與管理多個接案客戶 (ID 編號多案子清單)
@@ -577,8 +590,9 @@ clientGalleries: [
     expiryDays: 14,                                // 9. 保存天數 (預設 14 天)
     isDeleted: false,                              // 10. 狀態 (false 為正常，true 為下架刪除)
     zipUrl: "auto",                                // 11. 自動動態打包
-    baseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/2026WelcomeParty/", // 12. R2 圖片網址
-    photos: [                                      // 13. 照片清單
+    baseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/2026WelcomeParty/", // 12. R2 原圖高畫質網址 (下載用)
+    previewBaseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/2026WelcomeParty/thumbs/", // ⚡ 13. 網頁輕量縮圖網址 (網頁載入極速顯示)
+    photos: [                                      // 14. 照片清單
       "1-IMG_0500.jpg",
       "2-IMG_0501.jpg"
     ]

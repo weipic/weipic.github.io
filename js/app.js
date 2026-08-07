@@ -2240,12 +2240,36 @@ function downloadSinglePhotoByIndex(index, btnEl = null) {
   downloadSinglePhoto(imgUrl, filename, btnEl);
 }
 
+function getGalleryPreviewUrl(rawItem, config) {
+  const item = typeof rawItem === 'string' ? { filename: rawItem } : (rawItem || {});
+
+  if (item.previewUrl) return getEncodedPhotoUrl(item.previewUrl);
+  if (item.thumbUrl) return getEncodedPhotoUrl(item.thumbUrl);
+
+  const cfg = config || {};
+  const baseUrl = item.baseUrl || cfg.baseUrl || '';
+  const imgUrl = item.url || (baseUrl + (item.filename || ''));
+
+  const previewBaseUrl = item.previewBaseUrl || cfg.previewBaseUrl || cfg.thumbBaseUrl;
+  if (previewBaseUrl) {
+    let fullPreviewBase = previewBaseUrl;
+    if (!previewBaseUrl.startsWith('http://') && !previewBaseUrl.startsWith('https://') && !previewBaseUrl.startsWith('/')) {
+      fullPreviewBase = baseUrl.endsWith('/') ? (baseUrl + previewBaseUrl) : (baseUrl + '/' + previewBaseUrl);
+    }
+    if (!fullPreviewBase.endsWith('/')) {
+      fullPreviewBase += '/';
+    }
+    return getEncodedPhotoUrl(fullPreviewBase + (item.filename || ''));
+  }
+
+  return getEncodedPhotoUrl(imgUrl);
+}
+
 function renderDownloadPhotoGrid(config) {
   const gridContainer = document.getElementById('download-photo-grid');
   if (!gridContainer) return;
 
   const photos = config.photos || [];
-  const baseUrl = config.baseUrl || '';
 
   if (photos.length === 0) {
     gridContainer.innerHTML = `
@@ -2259,15 +2283,14 @@ function renderDownloadPhotoGrid(config) {
 
   gridContainer.innerHTML = photos.map((rawItem, index) => {
     const item = typeof rawItem === 'string' ? { filename: rawItem } : rawItem;
-    let imgUrl = item.url || (baseUrl + (item.filename || ''));
-    let previewUrl = item.previewUrl || getEncodedPhotoUrl(imgUrl);
+    let previewUrl = getGalleryPreviewUrl(rawItem, config);
     let numStr = String(index + 1).padStart(2, '0');
     let title = item.title || numStr;
 
     return `
       <div class="group relative bg-[#121318] border border-white/10 rounded-2xl overflow-hidden shadow-xl transition-all duration-300 hover:border-amber-400/50 hover:shadow-2xl">
         <div class="aspect-[3/2] w-full overflow-hidden bg-[#181920] relative cursor-pointer" onclick="openDownloadLightbox(${index})">
-          <img src="${previewUrl}" alt="${title}" loading="lazy" draggable="false" crossorigin="anonymous" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
+          <img src="${previewUrl}" alt="${title}" loading="lazy" decoding="async" draggable="false" crossorigin="anonymous" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
           
           <div class="photo-hover-overlay absolute inset-0 opacity-0 group-hover:opacity-100 flex flex-col justify-between p-4 pointer-events-none transition-all duration-300">
             <div class="flex items-center justify-between w-full">
@@ -2417,9 +2440,20 @@ function openDownloadLightbox(index) {
   const baseUrl = photo.baseUrl || activeCfg.baseUrl || '';
   const rawImgUrl = photo.url || (baseUrl + (photo.filename || ''));
   const imgUrl = getEncodedPhotoUrl(rawImgUrl);
+  const previewUrl = getGalleryPreviewUrl(rawPhoto, activeCfg);
   const filename = photo.filename || `photo_${index + 1}.jpg`;
 
-  imgEl.src = imgUrl;
+  imgEl.src = previewUrl;
+  if (previewUrl !== imgUrl) {
+    const highResImg = new Image();
+    highResImg.src = imgUrl;
+    highResImg.onload = () => {
+      if (currentDownloadPhotoIndex === index) {
+        imgEl.src = imgUrl;
+      }
+    };
+  }
+
   imgEl.alt = photo.title || `${index + 1}`;
 
   if (counterEl) {

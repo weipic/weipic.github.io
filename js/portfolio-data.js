@@ -2069,8 +2069,14 @@ window.PORTFOLIO_DATA = {
       zipUrl: "auto",
       zipSize: "動態打包",
 
-      // 7. Cloudflare R2 單張照片下載與預覽網址 (末端記得加上斜線 /)
+      // 7. Cloudflare R2 原圖下載與網頁預覽網址 (末端記得加上斜線 /)
+      // 💡 原圖網址 (單張下載 & 打包 ZIP 一律使用原圖高畫質下載)
       baseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/2026Johnson50/",
+
+      // ⚡ 網頁縮圖/輕量化預覽網址 (選填 previewBaseUrl)：
+      // 可填寫壓縮後的縮圖資料夾 (例如 "thumbs/" 或 "https://.../thumbs/")，網頁展示會大幅提升載入速度，
+      // 而客戶點擊「Download」或「下載全部 (.zip)」時依然會下載 baseUrl 的原圖高畫質檔案！
+      // previewBaseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/2026Johnson50/thumbs/",
 
       // 8. 照片檔名清單 (共 72 張高畫質照片)
       photos: [
