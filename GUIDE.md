@@ -515,13 +515,115 @@ git push
 
 ### 📌 1. 頁面功能與隱私保護機制
 - **未列入主選單**：首頁與各分類頁面的導覽列均不包含此頁面連結，保持交圖獨立隱私。
-- **密碼驗證鎖定**：預設進入畫面會顯示簡潔奢華的密碼驗證區塊，輸入正確密碼（預設：`2026WelcomeParty`）後，透過 JavaScript 平滑顯示相片牆。
+- **密碼優先驗證與多案子管理 (Password-First Verification)**：
+  - 開啟下載頁面時**一律優先顯示密碼輸入框**，不會直接暴露任何案子內容或提前顯示已刪除警示。
+  - 客戶輸入不同密碼會有不同效果：有效案子解鎖相簿、已下架案子顯示「相簿已刪除 / 已失效」、輸入錯誤密碼提示重試。
+- **單層解壓縮與 Zip 檔名自訂**：
+  - **解壓縮單層資料夾**：點擊一鍵下載成 ZIP 後，解壓縮只會產生一個資料夾直接包含所有照片，不會出現資料夾裡面再一層資料夾的情況。
+  - **自訂 Zip 檔名**：可透過 `zipFilename` 自訂下載檔名，預設自動根據相簿標題 `albumTitle` 命名。
 - **Session 紀錄與重新鎖定**：驗證成功後於當次瀏覽器 Session 記錄解鎖狀態，重新整理無須重複輸入密碼；右上方設有「重新鎖定」按鈕可隨時登出鎖定。
 - **社群分享卡片 (Open Graph) 自訂**：開啟 `download.html` 前幾行，可直接修改 `<meta property="og:title">`、`<meta property="og:description">` 與 `<meta property="og:image">`，傳送給客戶時聊天室會顯示專屬縮圖與標題說明。
 
 ---
 
-### ☁️ 2. 如何上傳單張照片至 Cloudflare R2（無需手動壓縮 ZIP）
+### 📦 2. 如何修改一鍵打包 ZIP 檔名稱與解壓縮結構
+
+#### 💡 A. 如何修改 ZIP 檔名 (ZIP Filename)
+一鍵打包下載的 `.zip` 檔名有以下兩種修改方式：
+
+1. **預設自動命名**：若未特別設定 `zipFilename`，系統會自動使用 `albumTitle` (相簿標題) 作為 ZIP 檔名（並自動將空格轉為底線 `_`）。
+   - 例如：`albumTitle: "2026 Welcome Party"` ➔ 下載檔名即為 `2026_Welcome_Party.zip`。
+2. **手動指定 ZIP 檔名 (`zipFilename`)**：在 `js/portfolio-data.js` 的相簿設定中新增 `zipFilename` 屬性即可指定任意檔名。
+   - 例如：
+     ```javascript
+     clientGallery: {
+       albumTitle: "2026 品牌寫真與活動紀錄全輯",
+       zipFilename: "Wei_2026_WelcomeParty", // 👈 下載時會自動命名為 Wei_2026_WelcomeParty.zip
+       // ...
+     }
+     ```
+
+#### 📂 B. 打包解壓縮結構說明 (單一資料夾不嵌套)
+- **解壓縮效果**：網站內建的 JSZip 打包機制已設定為將照片直接放置於 ZIP 壓縮檔的根目錄。
+- **成果**：客戶下載 `.zip` 檔並解壓縮後，電腦只會生成**單一資料夾**並直接存放照片，完全**不會出現「資料夾裡面再一層資料夾」**的雙重嵌套狀況！
+
+---
+
+### 👥 3. 如何新增與管理多個接案客戶 (ID 編號多案子清單)
+
+與首頁作品分類一樣，客戶交圖專區支援用 **`id` 編號** 來劃分多個案子。您只需在 `js/portfolio-data.js` 的 `clientGalleries` 陣列中**向下滑動並複製結構在最下方持續新增**即可：
+
+```javascript
+// 🌟 在 js/portfolio-data.js 中維護多案子清單 (使用 id 區分)：
+clientGalleries: [
+
+  // 🟢 案子 1：進行中/可存取的案子
+  {
+    id: "case-2026-wp",                            // 1. 獨一無二的案子 ID (可用於網址指定 ?id=case-2026-wp)
+    password: "2026WP",                            // 2. 客戶專屬存取密碼
+    clientName: "Wei",                             // 3. 客戶名稱
+    albumTitle: "2026 Welcome Party",              // 4. 相簿標題 (帶入 ?id= 參數時，輸入密碼頁面標頭會自動變更為此標題)
+
+    // 🌐 5. 瀏覽器頁籤分頁標頭 (Browser Tab Title，未填寫時自動顯示：「相簿標題 - 客戶交圖專區 | Wei's Portfolio」)
+    pageTitle: "2026 Welcome Party 專屬寫真相片全輯 | Wei's Portfolio",
+
+    // 💬 6. 社群分享預覽卡片 (LINE, FB, iMessage 貼上連結時顯示的自訂標題、敘述與縮圖網址)
+    ogTitle: "【2026 Welcome Party】Wei's Portfolio 客戶精選相片全輯",
+    ogDescription: "歡迎存取專屬精選寫真全輯。請輸入專屬密碼解鎖高畫質下載與單張預覽。",
+    ogImage: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/2026WelcomeParty/1-IMG_0500.jpg",
+
+    zipFilename: "2026_Welcome_Party",             // 7. 自訂 ZIP 下載檔名
+    deliveryDate: "2026.08.07",                    // 8. 交圖日期 (YYYY.MM.DD)
+    expiryDays: 14,                                // 9. 保存天數 (預設 14 天)
+    isDeleted: false,                              // 10. 狀態 (false 為正常，true 為下架刪除)
+    zipUrl: "auto",                                // 11. 自動動態打包
+    baseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/2026WelcomeParty/", // 12. R2 圖片網址
+    photos: [                                      // 13. 照片清單
+      "1-IMG_0500.jpg",
+      "2-IMG_0501.jpg"
+    ]
+  },
+
+  // 🟡 案子 2：另一個進行中的客戶案子 (複製上方程式碼在下方新增)
+  {
+    id: "wedding-chen-2026",
+    password: "Wedding1010",
+    clientName: "陳先生 & 林小姐",
+    albumTitle: "美式戶外婚禮全輯",
+    zipFilename: "Chen_Lin_Wedding",
+    deliveryDate: "2026.08.01",
+    expiryDays: 30,
+    isDeleted: false,
+    zipUrl: "auto",
+    baseUrl: "https://pub-xxx.r2.dev/Wedding1010/",
+    photos: ["wedding_001.jpg", "wedding_002.jpg"]
+  },
+
+  // 🔴 案子 3：已結案 / 已下架刪除的案子
+  {
+    id: "portrait-chang-2025",
+    password: "OLD2025",
+    clientName: "張小姐",
+    albumTitle: "2025 個人時尚寫真輯",
+    isDeleted: true,                               // 👈 標記為 true，客戶輸入此密碼後會提示「相簿已失效或已刪除」
+    photos: []
+  }
+
+  // ➕ 提示：未來新增第 4、5 個案子，只需在最下方加上逗號 `,` 並複製上述結構貼上即可！
+]
+```
+
+#### 🎯 乾淨案子專屬網址與密碼驗證機制 (Clean URL Routing)：
+1. **極簡直覺的案子專屬網址**：可以直接將網址設為 `weipic.github.io/案子ID` 傳送給客戶！
+   - 例如：`weipic.github.io/case-2026-wp` 或 `weipic.github.io/wedding-chen-2026`
+   - **完全不會轉址或顯示 `download?id=`**：網址列會一直保持極簡乾淨的 `weipic.github.io/case-2026-wp`！
+2. **自動載入該案子標題**：點進網址後，密碼卡片標頭會自動顯示該案子的相簿標題（如 `2026 Welcome Party`），輸入對應密碼解鎖全輯。
+3. **無效案子 ID 提示**：若存取的 `id` 不存在，會顯示「404 - 找不到此頁面」並提供返回首頁按鈕。
+4. **通用下載網址**：若直接提供 `weipic.github.io/download`，輸入任意有效密碼亦可自動對應至該案子解鎖。
+
+---
+
+### ☁️ 4. 如何上傳單張照片至 Cloudflare R2（無需手動壓縮 ZIP）
 1. **登入 Cloudflare Dashboard**：前往 [Cloudflare Dashboard](https://dash.cloudflare.com/) 並點擊左側選單 **R2 Object Storage**。
 2. **建立 Storage Bucket**：點選 **Create bucket**，輸入 Bucket 名稱（例如 `weipic-deliveries`），地區選擇 `Automatic` 後點擊 **Create bucket**。
 3. **僅需上傳單張照片**：
@@ -530,7 +632,7 @@ git push
 
 ---
 
-### 🔗 3. 如何將 Cloudflare R2 串接到下載網址
+### 🔗 5. 如何將 Cloudflare R2 串接到下載網址
 1. **開啟 Bucket 公開存取權限**：
    - 在 Cloudflare R2 後台點選您的 Bucket -> 切換至 **Settings (設定)** 標籤頁。
    - 找到 **Public access (公開存取)** 區塊。
@@ -551,41 +653,7 @@ git push
 
 ---
 
-### 🛠️ 4. 如何在程式碼中貼上 Cloudflare R2 網址與設定密碼
-開啟 `js/portfolio-data.js`，找到最下方的 `clientGallery` 設定物件進行修改：
-
-```javascript
-clientGallery: {
-  // 1. 專屬存取密碼 (客戶輸入此密碼才能解鎖相簿)
-  password: "2026WelcomeParty",
-
-  // 2. 客戶名稱與相簿標題
-  clientName: "Wei & Clients",
-  albumTitle: "2026 品牌寫真與活動紀錄全輯",
-  deliveryDate: "2026.08.07",
-  expiryDays: 14,
-
-  // 3. 一鍵下載全輯 (.zip) 網址：
-  // 💡 設為 "auto"，網站會在客戶點擊下載時「自動在瀏覽器端」把下方照片即時打包成 .zip！
-  zipUrl: "auto",
-  zipSize: "自動即時打包",
-
-  // 4. Cloudflare R2 基礎目錄網址 (Base URL)
-  // 貼上您於 Cloudflare R2 取得的公開網址 (網址末端記得加上斜線 /)
-  baseUrl: "https://pub-xxx.r2.dev/albums/2026-party/",
-
-  // 5. 照片項目列表 (只需要填寫單張照片檔名 filename)
-  photos: [
-    { id: 1, title: "Party Highlights 01", filename: "photo_001.jpg" },
-    { id: 2, title: "Party Highlights 02", filename: "photo_002.jpg" },
-    { id: 3, title: "Party Highlights 03", filename: "photo_003.jpg" }
-  ]
-}
-```
-
----
-
-### ⏳ 5. 如何設定 Cloudflare R2 自動刪除規則 (14 天生命週期規則 Lifecycle Rule)
+### ⏳ 6. 如何設定 Cloudflare R2 自動刪除規則 (14 天生命週期規則 Lifecycle Rule)
 為了避免舊相簿佔用雲端空間與產生費用，請在 Cloudflare 後台設定 14 天自動清理刪除：
 1. 進入 Cloudflare R2 Dashboard -> 點擊您的 Bucket (例如 `weipic-deliveries`)。
 2. 切換至 **Settings (設定)** 標籤頁。

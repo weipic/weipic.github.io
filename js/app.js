@@ -1610,40 +1610,148 @@ function initProtectImages() {
 let currentDownloadPhotos = [];
 let currentDownloadPhotoIndex = 0;
 
+function getGalleriesList() {
+  const data = window.PORTFOLIO_DATA || {};
+  let list = [];
+  if (Array.isArray(data.clientGalleries)) {
+    list = data.clientGalleries;
+  } else if (data.clientGalleries && typeof data.clientGalleries === 'object') {
+    list = Object.values(data.clientGalleries);
+  } else if (Array.isArray(data.clientGallery)) {
+    list = data.clientGallery;
+  } else if (data.clientGallery && typeof data.clientGallery === 'object') {
+    list = [data.clientGallery];
+  } else {
+    list = [{
+      password: "2026WelcomeParty",
+      clientName: "Wei & Clients",
+      albumTitle: "2026 精選寫真與活動紀錄全輯",
+      deliveryDate: "2026.08.07",
+      expiryDays: 14,
+      zipUrl: "auto",
+      zipSize: "動態打包",
+      photos: []
+    }];
+  }
+  return list;
+}
+
+function updateOpenGraphMetaTags(gallery) {
+  if (!gallery) return;
+
+  const tabTitle = gallery.pageTitle || gallery.tabTitle || (gallery.albumTitle ? `${gallery.albumTitle} - 客戶交圖專區 | Wei's Portfolio` : "【客戶專屬交圖】Wei's Portfolio 相片全輯下載");
+  document.title = tabTitle;
+
+  const title = gallery.ogTitle || (gallery.albumTitle ? `【${gallery.albumTitle}】相片全輯與線上交圖` : "【客戶專屬交圖】Wei's Portfolio 相片全輯下載");
+  const description = gallery.ogDescription || `歡迎存取 ${gallery.clientName || '貴賓'} 的 ${gallery.albumTitle || '相片全輯'}。請輸入專屬密碼進行高畫質相片全輯下載與單張預覽。`;
+  
+  let image = gallery.ogImage || gallery.ogCover;
+  if (!image && gallery.baseUrl && gallery.photos && gallery.photos.length > 0) {
+    const firstPhoto = typeof gallery.photos[0] === 'string' ? gallery.photos[0] : (gallery.photos[0].filename || '');
+    image = gallery.baseUrl + firstPhoto;
+  }
+  if (!image) {
+    image = "https://weipic.github.io/assets/images/og_cover.jpg";
+  }
+
+  setMetaTagContent('property', 'og:title', title);
+  setMetaTagContent('name', 'twitter:title', title);
+  setMetaTagContent('name', 'title', title);
+
+  setMetaTagContent('property', 'og:description', description);
+  setMetaTagContent('name', 'twitter:description', description);
+  setMetaTagContent('name', 'description', description);
+
+  setMetaTagContent('property', 'og:image', image);
+  setMetaTagContent('name', 'twitter:image', image);
+}
+
+function setMetaTagContent(attrName, attrValue, content) {
+  let element = document.querySelector(`meta[${attrName}="${attrValue}"]`);
+  if (!element) {
+    element = document.createElement('meta');
+    element.setAttribute(attrName, attrValue);
+    document.head.appendChild(element);
+  }
+  element.setAttribute('content', content);
+}
+
+function getAlbumIdFromUrl() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const paramId = urlParams.get('id') || urlParams.get('album');
+  if (paramId) return paramId.trim();
+
+  const path = window.location.pathname || '';
+  const segments = path.split('/').filter(Boolean);
+  if (segments.length > 0) {
+    let lastSegment = segments[segments.length - 1];
+    if (lastSegment.toLowerCase().endsWith('.html')) {
+      lastSegment = lastSegment.slice(0, -5);
+    }
+    const systemPages = ['index', 'commercial', 'portrait', 'concert', 'event', 'sports', 'graduation', 'landscape', 'contact', 'download', '404'];
+    if (!systemPages.includes(lastSegment.toLowerCase())) {
+      return lastSegment.trim();
+    }
+  }
+
+  return null;
+}
+
+function findGalleryByPassword(pass) {
+  const list = getGalleriesList();
+  const trimmed = (pass || '').trim();
+  if (!trimmed) return null;
+
+  const targetId = getAlbumIdFromUrl();
+  if (targetId) {
+    const matchedById = list.find(g => String(g.id || '').trim().toLowerCase() === targetId.toLowerCase());
+    if (matchedById && (matchedById.password || '').trim() === trimmed) {
+      return matchedById;
+    }
+  }
+
+  return list.find(g => (g.password || '').trim() === trimmed) || null;
+}
+
 function initDownloadPage() {
   const passwordSection = document.getElementById('password-section');
   const deliverySection = document.getElementById('delivery-gallery-section');
   const expiredSection = document.getElementById('expired-section');
+  const error404Section = document.getElementById('notfound-section');
   const passwordForm = document.getElementById('password-form');
   const passwordInput = document.getElementById('password-input');
   const passwordError = document.getElementById('password-error');
   const togglePassBtn = document.getElementById('toggle-password-btn');
   const lockBtn = document.getElementById('lock-gallery-btn');
+  const expiredReenterBtn = document.getElementById('expired-reenter-btn');
+  const passwordHeaderTitle = document.getElementById('password-header-title');
 
-  const config = (window.PORTFOLIO_DATA && window.PORTFOLIO_DATA.clientGallery) || {
-    password: "2026WelcomeParty",
-    clientName: "Wei & Clients",
-    albumTitle: "2026 精選寫真與活動紀錄全輯",
-    deliveryDate: "2026.08.07",
-    expiryDays: 14,
-    zipUrl: "auto",
-    zipSize: "動態打包",
-    photos: []
-  };
+  if (!passwordSection || !deliverySection) return;
 
-  currentDownloadPhotos = config.photos || [];
+  const targetId = getAlbumIdFromUrl();
+  const galleries = getGalleriesList();
 
-  // Check if album is expired
-  const isExpired = checkAlbumIsExpired(config);
-  if (isExpired) {
-    if (passwordSection) passwordSection.classList.add('hidden');
-    if (deliverySection) deliverySection.classList.add('hidden');
-    if (expiredSection) expiredSection.classList.remove('hidden');
-    trackGAEvent('存取已過期相簿網址', { '相簿標題': config.albumTitle });
+  let targetGallery = null;
+  if (targetId) {
+    targetGallery = galleries.find(g => String(g.id || '').trim().toLowerCase() === targetId.toLowerCase());
+  }
+
+  // Handle invalid case ID on custom route or 404 page
+  const is404Page = window.location.pathname.includes('404.html');
+  if (targetId && !targetGallery && error404Section && is404Page) {
+    passwordSection.classList.add('hidden');
+    deliverySection.classList.add('hidden');
+    if (expiredSection) expiredSection.classList.add('hidden');
+    error404Section.classList.remove('hidden');
     return;
   }
 
-  if (!passwordSection || !deliverySection) return;
+  if (targetGallery) {
+    if (passwordHeaderTitle && targetGallery.albumTitle) {
+      passwordHeaderTitle.textContent = targetGallery.albumTitle;
+    }
+    updateOpenGraphMetaTags(targetGallery);
+  }
 
   // Toggle Password Show/Hide
   if (togglePassBtn && passwordInput) {
@@ -1657,37 +1765,73 @@ function initDownloadPage() {
     });
   }
 
-  // Check if session is already unlocked
-  const isUnlocked = sessionStorage.getItem('wei_gallery_unlocked') === 'true';
-  if (isUnlocked) {
-    unlockGalleryView(config);
-  } else {
-    passwordSection.classList.remove('hidden');
-    deliverySection.classList.add('hidden');
+  // Check if session is already unlocked with a valid password
+  const savedPass = sessionStorage.getItem('wei_gallery_unlocked_pass');
+  let activeConfig = null;
+  if (savedPass) {
+    activeConfig = findGalleryByPassword(savedPass);
   }
 
-  // Handle Password Submit
+  // If no saved password, check legacy unlock flag fallback
+  if (!activeConfig && sessionStorage.getItem('wei_gallery_unlocked') === 'true') {
+    if (targetGallery) {
+      activeConfig = targetGallery;
+    } else {
+      const list = getGalleriesList();
+      if (list.length > 0) activeConfig = list[0];
+    }
+  }
+
+  if (activeConfig && !checkAlbumIsExpired(activeConfig)) {
+    currentDownloadPhotos = activeConfig.photos || [];
+    unlockGalleryView(activeConfig);
+  } else {
+    sessionStorage.removeItem('wei_gallery_unlocked_pass');
+    sessionStorage.removeItem('wei_gallery_unlocked');
+    passwordSection.classList.remove('hidden');
+    deliverySection.classList.add('hidden');
+    if (expiredSection) expiredSection.classList.add('hidden');
+  }
+
+  // Handle Password Submit (Verify password first, then check if active or expired/deleted)
   if (passwordForm) {
     passwordForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const enteredPass = (passwordInput.value || '').trim();
-      const expectedPass = config.password || "2026WelcomeParty";
+      const matchedGallery = findGalleryByPassword(enteredPass);
 
-      if (enteredPass === expectedPass) {
-        sessionStorage.setItem('wei_gallery_unlocked', 'true');
-        if (passwordError) passwordError.classList.add('hidden');
-        passwordInput.classList.remove('border-red-500');
-        
-        // Track GA4 event
-        trackGAEvent('解鎖私密相簿', { '相簿標題': config.albumTitle });
+      if (matchedGallery) {
+        const isExpired = checkAlbumIsExpired(matchedGallery);
 
-        // Smooth transition
-        passwordSection.classList.add('transition-all', 'duration-500', 'opacity-0', 'scale-95');
-        setTimeout(() => {
-          unlockGalleryView(config);
-        }, 300);
+        if (isExpired) {
+          // Password is correct, but album is expired or marked as deleted
+          passwordSection.classList.add('hidden');
+          deliverySection.classList.add('hidden');
+          if (expiredSection) {
+            const titleEl = expiredSection.querySelector('h1');
+            const descEl = expiredSection.querySelector('p');
+            if (titleEl) titleEl.textContent = `${matchedGallery.albumTitle || '相簿'} 已失效或已刪除`;
+            if (descEl) descEl.textContent = `此相簿保存期限已過或已下架清理。如需重新存取或開庫，請聯繫攝影師。`;
+            expiredSection.classList.remove('hidden');
+          }
+          trackGAEvent('存取已過期或刪除相簿', { '相簿標題': matchedGallery.albumTitle });
+        } else {
+          // Password correct & album active
+          sessionStorage.setItem('wei_gallery_unlocked_pass', enteredPass);
+          sessionStorage.setItem('wei_gallery_unlocked', 'true');
+          if (passwordError) passwordError.classList.add('hidden');
+          passwordInput.classList.remove('border-red-500');
+          
+          currentDownloadPhotos = matchedGallery.photos || [];
+          trackGAEvent('解鎖私密相簿', { '相簿標題': matchedGallery.albumTitle });
+
+          passwordSection.classList.add('transition-all', 'duration-500', 'opacity-0', 'scale-95');
+          setTimeout(() => {
+            unlockGalleryView(matchedGallery);
+          }, 300);
+        }
       } else {
-        // Shake error animation
+        // Incorrect password shake animation
         passwordSection.classList.remove('animate-shake');
         void passwordSection.offsetWidth; // trigger reflow
         passwordSection.classList.add('animate-shake');
@@ -1704,7 +1848,24 @@ function initDownloadPage() {
   // Lock Gallery Button
   if (lockBtn) {
     lockBtn.addEventListener('click', () => {
+      sessionStorage.removeItem('wei_gallery_unlocked_pass');
       sessionStorage.removeItem('wei_gallery_unlocked');
+      deliverySection.classList.add('hidden');
+      if (expiredSection) expiredSection.classList.add('hidden');
+      passwordSection.classList.remove('hidden', 'opacity-0', 'scale-95');
+      if (passwordInput) {
+        passwordInput.value = '';
+        passwordInput.focus();
+      }
+    });
+  }
+
+  // Re-enter Password Button from Expired Screen
+  if (expiredReenterBtn) {
+    expiredReenterBtn.addEventListener('click', () => {
+      sessionStorage.removeItem('wei_gallery_unlocked_pass');
+      sessionStorage.removeItem('wei_gallery_unlocked');
+      if (expiredSection) expiredSection.classList.add('hidden');
       deliverySection.classList.add('hidden');
       passwordSection.classList.remove('hidden', 'opacity-0', 'scale-95');
       if (passwordInput) {
@@ -1715,11 +1876,11 @@ function initDownloadPage() {
   }
 }
 
-// Check if album is past its expiry period (14 days default or explicit isExpired flag)
+// Check if album is past its expiry period (14 days default or explicit isExpired / isDeleted flag)
 function checkAlbumIsExpired(config) {
   if (!config) return false;
-  if (config.isExpired === true) return true;
-  if (config.isExpired === false) return false;
+  if (config.isDeleted === true || config.isExpired === true) return true;
+  if (config.isDeleted === false || config.isExpired === false) return false;
 
   if (config.deliveryDate) {
     try {
@@ -1738,6 +1899,14 @@ function checkAlbumIsExpired(config) {
   return false;
 }
 
+function getZipDownloadFilename(config) {
+  let rawName = config.zipFilename || config.albumTitle || 'Album_Photos';
+  if (rawName.toLowerCase().endsWith('.zip')) {
+    rawName = rawName.slice(0, -4);
+  }
+  return `${rawName.replace(/[^\w\u4e00-\u9fa5\-]/g, '_')}.zip`;
+}
+
 function unlockGalleryView(config) {
   const passwordSection = document.getElementById('password-section');
   const deliverySection = document.getElementById('delivery-gallery-section');
@@ -1746,6 +1915,10 @@ function unlockGalleryView(config) {
   if (passwordSection) passwordSection.classList.add('hidden');
   deliverySection.classList.remove('hidden');
   deliverySection.classList.add('opacity-100');
+
+  if (config) {
+    updateOpenGraphMetaTags(config);
+  }
 
   // Fill Header Meta Info
   const clientNameEl = document.getElementById('client-name-display');
@@ -1768,11 +1941,13 @@ function unlockGalleryView(config) {
 
   if (photoCountEl) photoCountEl.textContent = (config.photos || []).length;
 
+  const zipDownloadName = getZipDownloadFilename(config);
+
   if (zipBtnEl) {
     const hasPrebuiltZip = config.zipUrl && config.zipUrl !== 'auto' && !config.zipUrl.includes('pub-xxx.r2.dev') && config.zipUrl.endsWith('.zip');
     if (hasPrebuiltZip) {
       zipBtnEl.setAttribute('href', config.zipUrl);
-      zipBtnEl.setAttribute('download', `${(config.albumTitle || 'album').replace(/\s+/g, '_')}.zip`);
+      zipBtnEl.setAttribute('download', zipDownloadName);
       zipBtnEl.onclick = null;
     } else {
       zipBtnEl.setAttribute('href', 'javascript:void(0)');
@@ -1811,8 +1986,7 @@ async function downloadAllPhotosAsZip(config) {
   try {
     const zip = new JSZip();
     const baseUrl = config.baseUrl || '';
-    const albumName = (config.albumTitle || 'Album_Photos').replace(/[^\w\u4e00-\u9fa5]/g, '_');
-    const folder = zip.folder(albumName);
+    const zipDownloadName = getZipDownloadFilename(config);
 
     let completedCount = 0;
     const totalCount = photos.length;
@@ -1862,7 +2036,8 @@ async function downloadAllPhotosAsZip(config) {
         }
 
         if (fetchedBuffer) {
-          folder.file(filename, fetchedBuffer);
+          // 💡 直接放置於 ZIP 根目錄，避免解壓縮後出現「雙重資料夾」夾中資料夾的情況
+          zip.file(filename, fetchedBuffer);
           addedCount++;
         }
 
@@ -1911,7 +2086,7 @@ async function downloadAllPhotosAsZip(config) {
     const blobUrl = URL.createObjectURL(content);
     const link = document.createElement('a');
     link.href = blobUrl;
-    link.download = `${albumName}.zip`;
+    link.download = zipDownloadName;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -1964,9 +2139,6 @@ function renderDownloadPhotoGrid(config) {
               <span class="text-[11px] font-mono tracking-wider bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10 text-gray-300">
                 ${numStr}
               </span>
-              <button type="button" onclick="event.stopPropagation(); openDownloadLightbox(${index})" class="pointer-events-auto p-2 rounded-full bg-white/10 hover:bg-amber-400 hover:text-black text-white transition-all backdrop-blur-md" title="預覽大圖 / Preview">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-              </button>
             </div>
 
             <div class="pointer-events-auto">

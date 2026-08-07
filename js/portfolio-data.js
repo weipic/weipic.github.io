@@ -2039,28 +2039,46 @@ window.PORTFOLIO_DATA = {
 
   // ------------------------------------------------------------------
   // 📸 客戶私密交圖專區設定 (Private Client Delivery Gallery Config)
+  // 💡 支援多案子 ID 清單 (clientGalleries 陣列)：可以在下方複製結構並不斷新增新案子！
   // ------------------------------------------------------------------
-  clientGallery: {
-    // 專屬存取密碼 (預設為 2026WP)
-    password: "2026WP",
+  clientGalleries: [
+    {
+      // 1. 獨一無二的案子 ID (可用於網址特定指定 ?id=case-2026-wp)
+      id: "johnson50",
 
-    // 客戶與相簿資訊
-    clientName: "Wei",
-    albumTitle: "2026 Welcome Party",
-    deliveryDate: "2026.08.07",
-    expiryDays: 14,
+      // 2. 專屬存取密碼 
+      password: "johnson50",
 
-    // Cloudflare R2 打包整包下載 (.zip) 網址
-    // 💡 設為 "auto" 時，網站會在客戶點擊下載時「自動在瀏覽器端」將所有單張相片打包成 .zip 供客戶下載！
-    //    您只需上傳單張照片至 Cloudflare R2，不需手動壓縮或上傳 .zip 檔案。
-    zipUrl: "auto",
-    zipSize: "動態打包",
+      // 3. 客戶與相簿資訊
+      clientName: "Wei",
+      albumTitle: "喬山50週年感恩慈善演唱會",
+      
+      // 🌐 4. 瀏覽器頁籤分頁標頭 (Browser Tab Title，未填寫時自動顯示：「相簿標題 - 客戶交圖專區 | Wei's Portfolio」)
+      pageTitle: "喬山50週年感恩慈善演唱會 | Wei's Portfolio",
 
-    // Cloudflare R2 單張照片下載與預覽網址 (末端記得加上斜線 /)
-    baseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/2026WelcomeParty/",
+      // 💬 5. 社群分享預覽卡片 (LINE, FB, iMessage 貼上連結時顯示的自訂標題、敘述與縮圖網址)
+      ogTitle: "【喬山50週年感恩慈善演唱會】Wei's Portfolio",
+      ogDescription: "請輸入密碼解鎖高畫質下載與單張預覽",
+      ogImage: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/2026Johnson50/1-IMG_0500.jpg",
 
-    // 照片檔名清單 (共 72 張高畫質照片)
-    photos: [
+      // 5. 📦 ZIP 下載檔名自訂 (未填寫則自動取 albumTitle 進行命名，下載後解壓縮為單層資料夾)
+      zipFilename: "2026_Johnson_50",
+
+      // 6. 存取與期限 (isDeleted: true 表示已下架/已刪除，客戶輸入密碼後會提示已刪除)
+      deliveryDate: "2026.08.07",
+      expiryDays: 14,
+      isDeleted: false,
+
+      // 6. Cloudflare R2 打包整包下載 (.zip) 網址
+      // 💡 設為 "auto" 時，網站會在客戶點擊下載時「自動在瀏覽器端」將所有單張相片打包成 .zip 供客戶下載！
+      zipUrl: "auto",
+      zipSize: "動態打包",
+
+      // 7. Cloudflare R2 單張照片下載與預覽網址 (末端記得加上斜線 /)
+      baseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/2026Johnson50/",
+
+      // 8. 照片檔名清單 (共 72 張高畫質照片)
+      photos: [
       "1-IMG_0500.jpg",
       "2-IMG_0501.jpg",
       "3-IMG_0502.jpg",
@@ -2134,6 +2152,99 @@ window.PORTFOLIO_DATA = {
       "71-IMG_0368.jpg",
       "72-IMG_0365.jpg"
     ]
-  }
+  },
+  {
+      id: "2026WelcomeParty",
+
+      password: "2026WP",
+
+      clientName: "Wei",
+      albumTitle: "2026 Welcome Party",
+
+      pageTitle: "2026 Welcome Party | Wei's Portfolio",
+
+      ogTitle: "【2026 Welcome Party】Wei's Portfolio",
+      ogDescription: "請輸入密碼解鎖高畫質下載與單張預覽",
+      ogImage: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/2026WelcomeParty/LINE_ALBUM_20260306 Welcome Party_260807_1.jpg",
+
+      zipFilename: "2026_Welcome_Party",
+
+      deliveryDate: "2026.08.07",
+      expiryDays: 14,
+      isDeleted: false,
+
+      zipUrl: "auto",
+      zipSize: "動態打包",
+
+      baseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/2026WelcomeParty/",
+
+      photos: [
+      "LINE_ALBUM_20260306 Welcome Party_260807_1.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_2.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_3.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_4.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_5.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_6.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_7.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_8.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_9.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_10.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_11.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_12.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_13.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_14.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_15.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_16.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_17.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_18.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_19.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_20.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_21.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_22.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_23.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_24.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_25.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_26.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_27.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_28.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_29.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_30.jpg",
+    ]
+  },
+  {
+      id: "yeh_photo.notes",
+
+      password: "20260807",
+
+      clientName: "Wei",
+      albumTitle: "yeh_photo.notes 調色",
+
+      pageTitle: "yeh_photo.notes 調色 | Wei's Portfolio",
+
+      ogTitle: "【yeh_photo.notes 調色】Wei's Portfolio",
+      ogDescription: "請輸入密碼解鎖高畫質下載與單張預覽",
+      ogImage: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/20260807/.jpg",
+
+      zipFilename: "2026_Welcome_Party",
+
+      deliveryDate: "2026.08.07",
+      expiryDays: 14,
+      isDeleted: false,
+
+      zipUrl: "auto",
+      zipSize: "動態打包",
+
+      baseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/20260807/",
+
+      photos: [
+      "LINE_ALBUM_20260306 Welcome Party_260807_1.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_2.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_3.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_4.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_5.jpg",
+      "LINE_ALBUM_20260306 Welcome Party_260807_6.jpg",
+    ]
+  },
+]
 };
 
