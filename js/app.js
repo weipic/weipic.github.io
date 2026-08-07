@@ -2158,15 +2158,14 @@ async function downloadAllPhotosAsZip(config) {
 
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     if (isMobile) {
-      setTimeout(() => {
-        window.open(blobUrl, '_blank');
-      }, 150);
+      // Direct navigation trigger on mobile to prevent pop-up blocker from suppressing the download
+      window.location.href = blobUrl;
     }
 
     setTimeout(() => {
       if (link.parentNode) link.parentNode.removeChild(link);
       URL.revokeObjectURL(blobUrl);
-    }, 10000);
+    }, 15000);
 
     trackGAEvent('一鍵動態打包下載全輯ZIP', { '相簿標題': config.albumTitle, '相片張數': totalCount });
   } catch (err) {
@@ -2260,8 +2259,21 @@ async function downloadSinglePhoto(photoUrl, filename, btnEl = null) {
     `;
   }
 
+  const resetBtn = () => {
+    if (btnEl) {
+      btnEl.disabled = false;
+      btnEl.classList.remove('opacity-75', 'cursor-wait');
+      btnEl.innerHTML = originalHtml;
+    }
+  };
+
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+  // Synchronously prepare a window popup placeholder to bypass pop-up blockers if fetch fails or fallback is needed
+  let popupWindow = null;
+
   let fetchedBlob = null;
-  let retries = 5;
+  let retries = 3;
 
   while (retries > 0 && !fetchedBlob) {
     try {
@@ -2271,20 +2283,42 @@ async function downloadSinglePhoto(photoUrl, filename, btnEl = null) {
     } catch (err) {
       retries--;
       if (retries > 0) {
-        await new Promise(r => setTimeout(r, 400));
+        await new Promise(r => setTimeout(r, 300));
       } else {
-        console.error(`Failed to fetch photo ${cleanUrl} after 5 retries:`, err);
+        console.error(`Failed to fetch photo ${cleanUrl} after retries:`, err);
       }
     }
   }
 
-  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-
   if (fetchedBlob) {
+    const safeFilename = filename || photoUrl.split('/').pop() || 'photo.jpg';
+    const mimeType = fetchedBlob.type || 'image/jpeg';
+
+    // 📱 Mobile Web Share API support (iOS 15+ & Android native share to Photos/Files)
+    if (isMobile && navigator.canShare) {
+      try {
+        const file = new File([fetchedBlob], safeFilename, { type: mimeType });
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: safeFilename
+          });
+          resetBtn();
+          return;
+        }
+      } catch (shareErr) {
+        if (shareErr.name !== 'AbortError') {
+          console.warn('Web Share API error:', shareErr);
+        } else {
+          // User cancelled share dialog
+          resetBtn();
+          return;
+        }
+      }
+    }
+
     try {
       const blobUrl = URL.createObjectURL(fetchedBlob);
-      const safeFilename = filename || photoUrl.split('/').pop() || 'photo.jpg';
-
       const a = document.createElement('a');
       a.href = blobUrl;
       a.download = safeFilename;
@@ -2294,29 +2328,26 @@ async function downloadSinglePhoto(photoUrl, filename, btnEl = null) {
       a.click();
 
       if (isMobile) {
-        setTimeout(() => {
-          window.open(blobUrl, '_blank');
-        }, 100);
+        // Mobile browser fallback if a.click() doesn't prompt save
+        window.location.href = blobUrl;
       }
 
       setTimeout(() => {
         if (a.parentNode) a.parentNode.removeChild(a);
         URL.revokeObjectURL(blobUrl);
-      }, 8000);
+      }, 10000);
     } catch (err) {
       console.error('Blob URL download trigger error:', err);
       window.open(cleanUrl, '_blank');
     }
   } else {
-    console.warn('Single photo fetch failed, opening direct image URL.');
-    window.open(cleanUrl, '_blank');
+    console.warn('Single photo fetch failed (likely CORS or Network), navigating directly to image URL.');
+    // Direct open fallback
+    const windowTarget = isMobile ? '_self' : '_blank';
+    window.open(cleanUrl, windowTarget);
   }
 
-  if (btnEl) {
-    btnEl.disabled = false;
-    btnEl.classList.remove('opacity-75', 'cursor-wait');
-    btnEl.innerHTML = originalHtml;
-  }
+  resetBtn();
 }
 
 function openDownloadLightbox(index) {

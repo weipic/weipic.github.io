@@ -2056,11 +2056,6 @@ window.PORTFOLIO_DATA = {
       // 🌐 4. 瀏覽器頁籤分頁標頭 (Browser Tab Title，未填寫時自動顯示：「相簿標題 - 客戶交圖專區 | Wei's Portfolio」)
       pageTitle: "喬山50週年感恩慈善演唱會 | Wei's Portfolio",
 
-      // 💬 5. 社群分享預覽卡片 (LINE, FB, iMessage 貼上連結時顯示的自訂標題、敘述與縮圖網址)
-      ogTitle: "【喬山50週年感恩慈善演唱會】Wei's Portfolio",
-      ogDescription: "請輸入密碼解鎖高畫質下載與單張預覽",
-      ogImage: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/2026Johnson50/1-IMG_0500.jpg",
-
       // 5. 📦 ZIP 下載檔名自訂 (未填寫則自動取 albumTitle 進行命名，下載後解壓縮為單層資料夾)
       zipFilename: "2026_Johnson_50",
 
@@ -2163,10 +2158,6 @@ window.PORTFOLIO_DATA = {
 
       pageTitle: "2026 Welcome Party | Wei's Portfolio",
 
-      ogTitle: "【2026 Welcome Party】Wei's Portfolio",
-      ogDescription: "請輸入密碼解鎖高畫質下載與單張預覽",
-      ogImage: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/2026WelcomeParty/LINE_ALBUM_20260306%20Welcome%20Party_260807_1.jpg",
-
       zipFilename: "2026_Welcome_Party",
 
       deliveryDate: "2026.08.07",
@@ -2220,10 +2211,6 @@ window.PORTFOLIO_DATA = {
       albumTitle: "yeh_photo.notes 調色",
 
       pageTitle: "yeh_photo.notes 調色 | Wei's Portfolio",
-
-      ogTitle: "【yeh_photo.notes 調色】Wei's Portfolio",
-      ogDescription: "請輸入密碼解鎖高畫質下載與單張預覽",
-      ogImage: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/2026WelcomeParty/LINE_ALBUM_20260306%20Welcome%20Party_260807_1.jpg",
 
       zipFilename: "yeh_photo_notes",
 
