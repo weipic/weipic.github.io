@@ -2259,7 +2259,7 @@ window.PORTFOLIO_DATA = {
       zipUrl: "auto",
       zipSize: "動態打包",
 
-      baseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/KumamotoCity/",
+      baseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/KumamoCity/",
 
       photos: [
         "1-IMG_0843.jpg",
