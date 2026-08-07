@@ -1785,11 +1785,37 @@ function findGalleryByPassword(pass) {
       if (matchesPassword(matchedById, trimmed)) {
         return matchedById;
       }
-      return null;
     }
+    return null;
   }
 
   return list.find(g => matchesPassword(g, trimmed)) || null;
+}
+
+function getAlbumTitleForId(targetId, targetGallery) {
+  if (targetGallery && targetGallery.albumTitle) {
+    return targetGallery.albumTitle;
+  }
+
+  const metaOgTitle = document.querySelector('meta[property="og:title"]')?.getAttribute('content');
+  if (metaOgTitle && !metaOgTitle.includes('客戶專屬交圖')) {
+    let cleaned = metaOgTitle.replace(/[\｜\|]\s*Wei'?s\s*Portfolio.*/i, '').trim();
+    cleaned = cleaned.replace(/^【\s*|\s*】$/g, '').trim();
+    if (cleaned && cleaned !== "Wei's Portfolio") return cleaned;
+  }
+
+  const pageTitle = document.title;
+  if (pageTitle && !pageTitle.includes('客戶專屬交圖')) {
+    let cleaned = pageTitle.replace(/[\｜\|]\s*Wei'?s\s*Portfolio.*/i, '').trim();
+    cleaned = cleaned.replace(/^【\s*|\s*】$/g, '').trim();
+    if (cleaned && cleaned !== "Wei's Portfolio") return cleaned;
+  }
+
+  if (targetId) {
+    return decodeURIComponent(targetId);
+  }
+
+  return "客戶交圖專區";
 }
 
 function initDownloadPage() {
@@ -1829,12 +1855,16 @@ function initDownloadPage() {
     return;
   }
 
+  if (passwordHeaderTitle) {
+    const displayTitle = getAlbumTitleForId(targetId, targetGallery);
+    if (displayTitle) {
+      passwordHeaderTitle.textContent = displayTitle;
+    }
+  }
+
   if (targetGallery) {
     if (targetGallery.id) {
       sessionStorage.setItem('wei_last_album_id', targetGallery.id);
-    }
-    if (passwordHeaderTitle && targetGallery.albumTitle) {
-      passwordHeaderTitle.textContent = targetGallery.albumTitle;
     }
     updateOpenGraphMetaTags(targetGallery);
   }
@@ -1885,8 +1915,9 @@ function initDownloadPage() {
         // Try local list first if available, otherwise call Cloudflare Worker API
         matchedGallery = findGalleryByPassword(enteredPass);
         if (!matchedGallery) {
-          matchedGallery = await verifyPasswordWithWorker(targetId, enteredPass);
-          if (!matchedGallery && targetId) {
+          if (targetId) {
+            matchedGallery = await verifyPasswordWithWorker(targetId, enteredPass);
+          } else {
             matchedGallery = await verifyPasswordWithWorker(null, enteredPass);
           }
         }
