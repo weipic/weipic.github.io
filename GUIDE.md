@@ -613,13 +613,20 @@ clientGalleries: [
 ]
 ```
 
-#### 🎯 乾淨案子專屬網址與密碼驗證機制 (Clean URL Routing)：
-1. **極簡直覺的案子專屬網址**：可以直接將網址設為 `weipic.github.io/案子ID` 傳送給客戶！
-   - 例如：`weipic.github.io/case-2026-wp` 或 `weipic.github.io/wedding-chen-2026`
-   - **完全不會轉址或顯示 `download?id=`**：網址列會一直保持極簡乾淨的 `weipic.github.io/case-2026-wp`！
-2. **自動載入該案子標題**：點進網址後，密碼卡片標頭會自動顯示該案子的相簿標題（如 `2026 Welcome Party`），輸入對應密碼解鎖全輯。
-3. **無效案子 ID 提示**：若存取的 `id` 不存在，會顯示「404 - 找不到此頁面」並提供返回首頁按鈕。
-4. **通用下載網址**：若直接提供 `weipic.github.io/download`，輸入任意有效密碼亦可自動對應至該案子解鎖。
+#### 🎯 案子專屬 HTML 頁面與 LINE / FB 自訂縮圖設定 (Custom HTML & Social Preview Cards)：
+1. **極簡直覺的案子專屬網址**：建立檔名為 `案子ID.html` 的檔案，傳送給客戶時網址即為：
+   - `https://weipic.github.io/2026WelcomeParty`
+   - `https://weipic.github.io/johnson50`
+   - 網址列會一直保持極簡乾淨的 `weipic.github.io/2026WelcomeParty`，**輸入密碼後絕不帶有 `?`**。
+2. **LINE / FB / Messenger 自訂縮圖與標題文字**：
+   - 直接開啟該案子的 HTML 檔案（如 `2026WelcomeParty.html`），在 `<head>` 中修改：
+     - `<meta property="og:title" content="【2026 Welcome Party】Wei's Portfolio" />`
+     - `<meta property="og:description" content="請輸入密碼解鎖高畫質下載與單張預覽" />`
+     - `<meta property="og:image" content="縮圖網址..." />`
+   - LINE / FB 貼上連結時即可完美呈現該案子的專屬縮圖與描述！
+3. **相簿資料與密碼設定**：
+   - 頁面會自動載入 `portfolio-data.js` 中對應 `id` 的專屬密碼與照片檔名清單（`portfolio-data.js` 中無需再放 `ogTitle`/`ogImage`，純粹處理密碼與相片載入）。
+4. **燈箱預覽高清大圖**：點擊照片牆縮圖即可開啟全螢幕高解析度燈箱預覽與單張下載。
 
 ---
 

@@ -43,14 +43,15 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Determine current page and render appropriate section
+  const passwordSection = document.getElementById('password-section');
   const currentPage = getCurrentPageName();
   
-  if (currentPage === 'index' || currentPage === '') {
+  if (passwordSection || currentPage === 'download' || currentPage === '404') {
+    initDownloadPage();
+  } else if (currentPage === 'index' || currentPage === '') {
     renderHomePage();
   } else if (currentPage === 'contact') {
     renderContactPage();
-  } else if (currentPage === 'download') {
-    initDownloadPage();
   } else {
     // Render specific category gallery page
     renderCategoryPage(currentPage);
@@ -1676,6 +1677,29 @@ function setMetaTagContent(attrName, attrValue, content) {
   element.setAttribute('content', content);
 }
 
+function normalizeSlug(str) {
+  return (str || '').toString().toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g, '');
+}
+
+function findGalleryByIdOrSlug(targetStr) {
+  if (!targetStr) return null;
+  const list = getGalleriesList();
+  const targetNorm = normalizeSlug(targetStr);
+  if (!targetNorm) return null;
+
+  return list.find(g => {
+    const idNorm = normalizeSlug(g.id);
+    const passNorm = normalizeSlug(g.password);
+    const zipNorm = normalizeSlug(g.zipFilename);
+    const titleNorm = normalizeSlug(g.albumTitle);
+
+    return (idNorm && (idNorm === targetNorm || idNorm.includes(targetNorm) || targetNorm.includes(idNorm))) ||
+           (passNorm && passNorm === targetNorm) ||
+           (zipNorm && zipNorm === targetNorm) ||
+           (titleNorm && titleNorm === targetNorm);
+  }) || null;
+}
+
 function getAlbumIdFromUrl() {
   const urlParams = new URLSearchParams(window.location.search);
   const paramId = urlParams.get('id') || urlParams.get('album');
@@ -1690,7 +1714,7 @@ function getAlbumIdFromUrl() {
     }
     const systemPages = ['index', 'commercial', 'portrait', 'concert', 'event', 'sports', 'graduation', 'landscape', 'contact', 'download', '404'];
     if (!systemPages.includes(lastSegment.toLowerCase())) {
-      return lastSegment.trim();
+      return decodeURIComponent(lastSegment.trim());
     }
   }
 
@@ -1704,7 +1728,7 @@ function findGalleryByPassword(pass) {
 
   const targetId = getAlbumIdFromUrl();
   if (targetId) {
-    const matchedById = list.find(g => String(g.id || '').trim().toLowerCase() === targetId.toLowerCase());
+    const matchedById = findGalleryByIdOrSlug(targetId);
     if (matchedById && (matchedById.password || '').trim() === trimmed) {
       return matchedById;
     }
@@ -1733,11 +1757,11 @@ function initDownloadPage() {
 
   let targetGallery = null;
   if (targetId) {
-    targetGallery = galleries.find(g => String(g.id || '').trim().toLowerCase() === targetId.toLowerCase());
+    targetGallery = findGalleryByIdOrSlug(targetId);
   }
 
   // Handle invalid case ID on custom route or 404 page
-  const is404Page = window.location.pathname.includes('404.html');
+  const is404Page = window.location.pathname.includes('404.html') || window.location.pathname.includes('404');
   if (targetId && !targetGallery && error404Section && is404Page) {
     passwordSection.classList.add('hidden');
     deliverySection.classList.add('hidden');
@@ -1783,6 +1807,7 @@ function initDownloadPage() {
   }
 
   if (activeConfig && !checkAlbumIsExpired(activeConfig)) {
+    currentActiveConfig = activeConfig;
     currentDownloadPhotos = activeConfig.photos || [];
     unlockGalleryView(activeConfig);
   } else {
@@ -1822,6 +1847,7 @@ function initDownloadPage() {
           if (passwordError) passwordError.classList.add('hidden');
           passwordInput.classList.remove('border-red-500');
           
+          currentActiveConfig = matchedGallery;
           currentDownloadPhotos = matchedGallery.photos || [];
           trackGAEvent('解鎖私密相簿', { '相簿標題': matchedGallery.albumTitle });
 
@@ -2231,7 +2257,8 @@ function openDownloadLightbox(index) {
 
   const rawPhoto = currentDownloadPhotos[index];
   const photo = typeof rawPhoto === 'string' ? { filename: rawPhoto } : rawPhoto;
-  const baseUrl = (window.PORTFOLIO_DATA && window.PORTFOLIO_DATA.clientGallery && window.PORTFOLIO_DATA.clientGallery.baseUrl) || '';
+  const activeCfg = currentActiveConfig || (getGalleriesList()[0] || {});
+  const baseUrl = photo.baseUrl || activeCfg.baseUrl || '';
   const imgUrl = photo.url || (baseUrl + (photo.filename || ''));
   const filename = photo.filename || `photo_${index + 1}.jpg`;
 
