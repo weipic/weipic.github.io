@@ -1403,7 +1403,7 @@ function initMobileTouchHover() {
       const touch = e.changedTouches ? e.changedTouches[0] : null;
       const target = touch ? document.elementFromPoint(touch.clientX, touch.clientY) : null;
       
-      if (target && target.closest('button[onclick*="downloadSinglePhoto"]')) {
+      if (target && (target.closest('button[onclick*="downloadSinglePhoto"]') || target.closest('button[onclick*="downloadSinglePhotoByIndex"]') || target.closest('#download-lightbox-dl-btn'))) {
         clearActiveCard();
         return;
       }
@@ -2031,6 +2031,16 @@ async function downloadAllPhotosAsZip(config) {
     const queue = photos.map((p, i) => ({ photo: p, idx: i }));
     let addedCount = 0;
 
+// Safe URL encoder helper to handle spaces and special characters without double-encoding
+function getEncodedPhotoUrl(rawUrl) {
+  if (!rawUrl) return '';
+  try {
+    return encodeURI(decodeURI(rawUrl));
+  } catch (e) {
+    return encodeURI(rawUrl);
+  }
+}
+
     const downloadWorker = async () => {
       while (queue.length > 0) {
         const item = queue.shift();
@@ -2039,7 +2049,8 @@ async function downloadAllPhotosAsZip(config) {
         const rawPhoto = item.photo;
         const idx = item.idx;
         const photo = typeof rawPhoto === 'string' ? { filename: rawPhoto } : rawPhoto;
-        const imgUrl = photo.url || (baseUrl + (photo.filename || ''));
+        const rawImgUrl = photo.url || (baseUrl + (photo.filename || ''));
+        const imgUrl = getEncodedPhotoUrl(rawImgUrl);
         const defaultFilename = `photo_${String(idx + 1).padStart(3, '0')}.jpg`;
         const filename = photo.filename || defaultFilename;
 
@@ -2113,10 +2124,21 @@ async function downloadAllPhotosAsZip(config) {
     const link = document.createElement('a');
     link.href = blobUrl;
     link.download = zipDownloadName;
+    link.target = '_blank';
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
-    setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    if (isMobile) {
+      setTimeout(() => {
+        window.open(blobUrl, '_blank');
+      }, 150);
+    }
+
+    setTimeout(() => {
+      if (link.parentNode) link.parentNode.removeChild(link);
+      URL.revokeObjectURL(blobUrl);
+    }, 10000);
 
     trackGAEvent('一鍵動態打包下載全輯ZIP', { '相簿標題': config.albumTitle, '相片張數': totalCount });
   } catch (err) {
@@ -2128,6 +2150,18 @@ async function downloadAllPhotosAsZip(config) {
       zipBtnEl.innerHTML = originalBtnText;
     }
   }
+}
+
+function downloadSinglePhotoByIndex(index, btnEl = null) {
+  const photos = currentDownloadPhotos || [];
+  const rawPhoto = photos[index];
+  if (!rawPhoto) return;
+  const photo = typeof rawPhoto === 'string' ? { filename: rawPhoto } : rawPhoto;
+  const activeCfg = currentActiveConfig || (getGalleriesList()[0] || {});
+  const baseUrl = photo.baseUrl || activeCfg.baseUrl || '';
+  const imgUrl = photo.url || (baseUrl + (photo.filename || ''));
+  const filename = photo.filename || `photo_${index + 1}.jpg`;
+  downloadSinglePhoto(imgUrl, filename, btnEl);
 }
 
 function renderDownloadPhotoGrid(config) {
@@ -2150,8 +2184,7 @@ function renderDownloadPhotoGrid(config) {
   gridContainer.innerHTML = photos.map((rawItem, index) => {
     const item = typeof rawItem === 'string' ? { filename: rawItem } : rawItem;
     let imgUrl = item.url || (baseUrl + (item.filename || ''));
-    let previewUrl = item.previewUrl || imgUrl;
-    let filename = item.filename || `photo_${String(index + 1).padStart(3, '0')}.jpg`;
+    let previewUrl = item.previewUrl || getEncodedPhotoUrl(imgUrl);
     let numStr = String(index + 1).padStart(2, '0');
     let title = item.title || numStr;
 
@@ -2168,7 +2201,7 @@ function renderDownloadPhotoGrid(config) {
             </div>
 
             <div class="pointer-events-auto">
-              <button type="button" onclick="event.stopPropagation(); downloadSinglePhoto('${imgUrl}', '${filename}', this)" class="w-full py-2.5 px-3 bg-amber-400 hover:bg-amber-300 text-black font-semibold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-lg hover:shadow-amber-400/20 active:scale-98">
+              <button type="button" onclick="event.stopPropagation(); downloadSinglePhotoByIndex(${index}, this)" class="w-full py-2.5 px-3 bg-amber-400 hover:bg-amber-300 text-black font-semibold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-lg hover:shadow-amber-400/20 active:scale-98">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                 <span>Download</span>
               </button>
@@ -2183,6 +2216,8 @@ function renderDownloadPhotoGrid(config) {
 async function downloadSinglePhoto(photoUrl, filename, btnEl = null) {
   trackGAEvent('下載單張照片', { '照片網址': photoUrl });
   
+  const cleanUrl = getEncodedPhotoUrl(photoUrl);
+
   let originalHtml = '';
   if (btnEl) {
     originalHtml = btnEl.innerHTML;
@@ -2202,7 +2237,7 @@ async function downloadSinglePhoto(photoUrl, filename, btnEl = null) {
 
   while (retries > 0 && !fetchedBlob) {
     try {
-      const resp = await fetch(photoUrl, { mode: 'cors', cache: 'force-cache' });
+      const resp = await fetch(cleanUrl, { mode: 'cors', cache: 'force-cache' });
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       fetchedBlob = await resp.blob();
     } catch (err) {
@@ -2210,31 +2245,43 @@ async function downloadSinglePhoto(photoUrl, filename, btnEl = null) {
       if (retries > 0) {
         await new Promise(r => setTimeout(r, 400));
       } else {
-        console.error(`Failed to fetch photo ${photoUrl} after 5 retries:`, err);
+        console.error(`Failed to fetch photo ${cleanUrl} after 5 retries:`, err);
       }
     }
   }
 
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
   if (fetchedBlob) {
     try {
       const blobUrl = URL.createObjectURL(fetchedBlob);
+      const safeFilename = filename || photoUrl.split('/').pop() || 'photo.jpg';
+
       const a = document.createElement('a');
       a.href = blobUrl;
-      a.download = filename || photoUrl.split('/').pop() || 'photo.jpg';
+      a.download = safeFilename;
+      a.target = '_blank';
       a.style.display = 'none';
       document.body.appendChild(a);
       a.click();
+
+      if (isMobile) {
+        setTimeout(() => {
+          window.open(blobUrl, '_blank');
+        }, 100);
+      }
+
       setTimeout(() => {
         if (a.parentNode) a.parentNode.removeChild(a);
         URL.revokeObjectURL(blobUrl);
-      }, 1000);
+      }, 8000);
     } catch (err) {
       console.error('Blob URL download trigger error:', err);
-      alert('圖片下載觸發失敗，請於預覽燈箱中長按圖片儲存。');
+      window.open(cleanUrl, '_blank');
     }
   } else {
-    console.warn('Single photo fetch failed after retries.');
-    alert('照片下載失敗，請檢查網路連線後再試，或於預覽燈箱中長按圖片儲存。');
+    console.warn('Single photo fetch failed, opening direct image URL.');
+    window.open(cleanUrl, '_blank');
   }
 
   if (btnEl) {
@@ -2259,7 +2306,8 @@ function openDownloadLightbox(index) {
   const photo = typeof rawPhoto === 'string' ? { filename: rawPhoto } : rawPhoto;
   const activeCfg = currentActiveConfig || (getGalleriesList()[0] || {});
   const baseUrl = photo.baseUrl || activeCfg.baseUrl || '';
-  const imgUrl = photo.url || (baseUrl + (photo.filename || ''));
+  const rawImgUrl = photo.url || (baseUrl + (photo.filename || ''));
+  const imgUrl = getEncodedPhotoUrl(rawImgUrl);
   const filename = photo.filename || `photo_${index + 1}.jpg`;
 
   imgEl.src = imgUrl;
