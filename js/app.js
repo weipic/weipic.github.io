@@ -1766,16 +1766,23 @@ function findGalleryByPassword(pass) {
   const trimmed = (pass || '').trim();
   if (!trimmed) return null;
 
-  const targetId = getAlbumIdFromUrl();
+  const urlId = getAlbumIdFromUrl();
+  const sessionLastId = sessionStorage.getItem('wei_last_album_id');
+  const targetId = urlId || sessionLastId;
+
   if (targetId) {
     const matchedById = findGalleryByIdOrSlug(targetId);
     if (matchedById) {
       if (matchesPassword(matchedById, trimmed)) {
         return matchedById;
       }
-      // When on a dedicated album page, typing a password for this album must verify against this album
+      // When on a dedicated album page (e.g. johnson50.html), typing a password for this album must verify against this album
       // and not fallback to unlocking a completely different album!
-      return null;
+      const path = window.location.pathname || '';
+      const isGenericDownload = path.endsWith('download.html') || path.endsWith('download') || path.endsWith('/') || path === '';
+      if (!isGenericDownload && urlId) {
+        return null;
+      }
     }
   }
 
@@ -1797,7 +1804,11 @@ function initDownloadPage() {
 
   if (!passwordSection || !deliverySection) return;
 
-  const targetId = getAlbumIdFromUrl();
+  let targetId = getAlbumIdFromUrl();
+  if (!targetId) {
+    targetId = sessionStorage.getItem('wei_last_album_id');
+  }
+
   const galleries = getGalleriesList();
 
   let targetGallery = null;
@@ -1816,6 +1827,9 @@ function initDownloadPage() {
   }
 
   if (targetGallery) {
+    if (targetGallery.id) {
+      sessionStorage.setItem('wei_last_album_id', targetGallery.id);
+    }
     if (passwordHeaderTitle && targetGallery.albumTitle) {
       passwordHeaderTitle.textContent = targetGallery.albumTitle;
     }
@@ -1850,6 +1864,26 @@ function initDownloadPage() {
       const matchedGallery = findGalleryByPassword(enteredPass);
 
       if (matchedGallery) {
+        if (matchedGallery.id) {
+          sessionStorage.setItem('wei_last_album_id', matchedGallery.id);
+        }
+        if (passwordHeaderTitle && matchedGallery.albumTitle) {
+          passwordHeaderTitle.textContent = matchedGallery.albumTitle;
+        }
+        updateOpenGraphMetaTags(matchedGallery);
+
+        if (window.history && window.history.replaceState && matchedGallery.id) {
+          try {
+            const url = new URL(window.location.href);
+            if (url.searchParams.get('id') !== matchedGallery.id) {
+              url.searchParams.set('id', matchedGallery.id);
+              window.history.replaceState(null, '', url.pathname + url.search + url.hash);
+            }
+          } catch (err) {
+            console.warn('replaceState error:', err);
+          }
+        }
+
         const isExpired = checkAlbumIsExpired(matchedGallery);
 
         if (isExpired) {
@@ -1907,6 +1941,14 @@ function initDownloadPage() {
         passwordInput.value = '';
         passwordInput.focus();
       }
+      const activeId = (currentActiveConfig && currentActiveConfig.id) || sessionStorage.getItem('wei_last_album_id') || getAlbumIdFromUrl();
+      if (activeId) {
+        const g = findGalleryByIdOrSlug(activeId);
+        if (g && g.albumTitle && passwordHeaderTitle) {
+          passwordHeaderTitle.textContent = g.albumTitle;
+          updateOpenGraphMetaTags(g);
+        }
+      }
     });
   }
 
@@ -1921,6 +1963,14 @@ function initDownloadPage() {
       if (passwordInput) {
         passwordInput.value = '';
         passwordInput.focus();
+      }
+      const activeId = (currentActiveConfig && currentActiveConfig.id) || sessionStorage.getItem('wei_last_album_id') || getAlbumIdFromUrl();
+      if (activeId) {
+        const g = findGalleryByIdOrSlug(activeId);
+        if (g && g.albumTitle && passwordHeaderTitle) {
+          passwordHeaderTitle.textContent = g.albumTitle;
+          updateOpenGraphMetaTags(g);
+        }
       }
     });
   }
@@ -1965,6 +2015,13 @@ function unlockGalleryView(config) {
   if (config) {
     currentActiveConfig = config;
     currentDownloadPhotos = config.photos || [];
+    if (config.id) {
+      sessionStorage.setItem('wei_last_album_id', config.id);
+    }
+    const passwordHeaderTitle = document.getElementById('password-header-title');
+    if (passwordHeaderTitle && config.albumTitle) {
+      passwordHeaderTitle.textContent = config.albumTitle;
+    }
   }
 
   if (passwordSection) passwordSection.classList.add('hidden');
