@@ -2205,7 +2205,7 @@ window.PORTFOLIO_DATA = {
   {
       id: "yeh_photo.notes",
 
-      password: "yeh_photo.notes",
+      password: "0807",
 
       clientName: "Wei",
       albumTitle: "yeh_photo.notes 調色",
@@ -2221,15 +2221,23 @@ window.PORTFOLIO_DATA = {
       zipUrl: "auto",
       zipSize: "動態打包",
 
-      baseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/2026WelcomeParty/",
+      baseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/20260807/",
 
       photos: [
-      "LINE_ALBUM_20260306 Welcome Party_260807_1.jpg",
-      "LINE_ALBUM_20260306 Welcome Party_260807_2.jpg",
-      "LINE_ALBUM_20260306 Welcome Party_260807_3.jpg",
-      "LINE_ALBUM_20260306 Welcome Party_260807_4.jpg",
-      "LINE_ALBUM_20260306 Welcome Party_260807_5.jpg",
-      "LINE_ALBUM_20260306 Welcome Party_260807_6.jpg",
+      "DSC07148.jpeg",
+      "DSC08889.jpeg",
+      "DSC08967.jpeg",
+      "DSC09278.jpeg",
+      "DSC09301.jpeg",
+      "DSC09310.jpeg",
+      "DSC09729.jpeg",
+      "ODSC07148.JPG",
+      "ODSC08889.JPG",
+      "ODSC08967.JPG",
+      "ODSC09278.JPG",
+      "ODSC09301.JPG",
+      "ODSC09310.JPG",
+      "ODSC09729.JPG",
     ]
   },
 ]
