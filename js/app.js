@@ -1542,6 +1542,10 @@ function initLanguageSelector() {
 function initProtectImages() {
   // 1. Prevent right-click context menu (Desktop right-click & Mobile long-press)
   document.addEventListener('contextmenu', (e) => {
+    // Exempt client download gallery and lightbox modal on download page
+    if (e.target.closest('#download-photo-grid') || e.target.closest('#download-lightbox-modal')) {
+      return;
+    }
     if (e.target.tagName === 'IMG' || e.target.closest('img') || e.target.closest('.image-hover-zoom') || e.target.closest('#lightbox-modal')) {
       e.preventDefault();
       return false;
@@ -1550,6 +1554,9 @@ function initProtectImages() {
 
   // 2. Prevent dragging images to save or open in new tab
   document.addEventListener('dragstart', (e) => {
+    if (e.target.closest('#download-photo-grid') || e.target.closest('#download-lightbox-modal')) {
+      return;
+    }
     if (e.target.tagName === 'IMG' || e.target.closest('img') || e.target.closest('.image-hover-zoom') || e.target.closest('#lightbox-modal')) {
       e.preventDefault();
       return false;
@@ -1808,8 +1815,9 @@ async function downloadAllPhotosAsZip(config) {
       `;
     }
 
-    const CONCURRENCY_LIMIT = 5;
+    const CONCURRENCY_LIMIT = 3;
     const queue = photos.map((p, i) => ({ photo: p, idx: i }));
+    let addedCount = 0;
 
     const downloadWorker = async () => {
       while (queue.length > 0) {
@@ -1823,26 +1831,27 @@ async function downloadAllPhotosAsZip(config) {
         const defaultFilename = `photo_${String(idx + 1).padStart(3, '0')}.jpg`;
         const filename = photo.filename || defaultFilename;
 
-        let fetchedBlob = null;
-        let retries = 3;
+        let fetchedBuffer = null;
+        let retries = 5;
 
-        while (retries > 0 && !fetchedBlob) {
+        while (retries > 0 && !fetchedBuffer) {
           try {
-            const resp = await fetch(imgUrl, { mode: 'cors' });
+            const resp = await fetch(imgUrl, { mode: 'cors', cache: 'force-cache' });
             if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-            fetchedBlob = await resp.blob();
+            fetchedBuffer = await resp.arrayBuffer();
           } catch (err) {
             retries--;
             if (retries > 0) {
-              await new Promise(r => setTimeout(r, 400));
+              await new Promise(r => setTimeout(r, 600 * (6 - retries)));
             } else {
-              console.warn(`Failed to download ${imgUrl} after 3 retries:`, err);
+              console.error(`Failed to download ${imgUrl} after 5 retries:`, err);
             }
           }
         }
 
-        if (fetchedBlob) {
-          folder.file(filename, fetchedBlob);
+        if (fetchedBuffer) {
+          folder.file(filename, fetchedBuffer);
+          addedCount++;
         }
 
         completedCount++;
@@ -1852,7 +1861,7 @@ async function downloadAllPhotosAsZip(config) {
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            <span>相片打包中 (${completedCount}/${totalCount})...</span>
+            <span>相片打包中 (${addedCount}/${totalCount})...</span>
           `;
         }
       }
@@ -1860,6 +1869,10 @@ async function downloadAllPhotosAsZip(config) {
 
     const workers = Array.from({ length: Math.min(CONCURRENCY_LIMIT, totalCount) }, () => downloadWorker());
     await Promise.all(workers);
+
+    if (addedCount < totalCount) {
+      console.warn(`Only ${addedCount} out of ${totalCount} photos were packed.`);
+    }
 
     if (zipBtnEl) {
       zipBtnEl.innerHTML = `
@@ -1871,7 +1884,7 @@ async function downloadAllPhotosAsZip(config) {
       `;
     }
 
-    const content = await zip.generateAsync({ type: 'blob' }, (metadata) => {
+    const content = await zip.generateAsync({ type: 'blob', compression: 'STORE' }, (metadata) => {
       if (zipBtnEl) {
         zipBtnEl.innerHTML = `
           <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -1930,7 +1943,7 @@ function renderDownloadPhotoGrid(config) {
     let title = item.title || numStr;
 
     return `
-      <div class="group relative bg-[#121318] border border-white/10 rounded-2xl overflow-hidden shadow-xl transition-all duration-300 hover:border-amber-400/50 hover:shadow-2xl">
+      <div class="group relative bg-[#121318] border border-white/10 rounded-2xl overflow-hidden shadow-xl transition-all duration-300 hover:border-amber-400/50 hover:shadow-2xl flex flex-col justify-between">
         <div class="aspect-[3/2] w-full overflow-hidden bg-[#181920] relative cursor-pointer" onclick="openDownloadLightbox(${index})">
           <img src="${previewUrl}" alt="${title}" loading="lazy" draggable="false" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
           
@@ -1944,43 +1957,89 @@ function renderDownloadPhotoGrid(config) {
               </button>
             </div>
 
-            <div class="pointer-events-auto">
-              <button type="button" onclick="event.stopPropagation(); downloadSinglePhoto('${imgUrl}', '${filename}')" class="w-full py-2.5 px-3 bg-amber-400 hover:bg-amber-300 text-black font-semibold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-lg hover:shadow-amber-400/20 active:scale-98">
+            <div class="pointer-events-auto hidden sm:block">
+              <button type="button" onclick="event.stopPropagation(); downloadSinglePhoto('${imgUrl}', '${filename}', this)" class="w-full py-2.5 px-3 bg-amber-400 hover:bg-amber-300 text-black font-semibold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-lg hover:shadow-amber-400/20 active:scale-98">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                 <span>Download</span>
               </button>
             </div>
           </div>
         </div>
+
+        <!-- Mobile Card Footer (Direct single photo download on mobile screen) -->
+        <div class="p-3 sm:hidden border-t border-white/10 flex items-center justify-between bg-[#15161d]">
+          <span class="text-[11px] font-mono text-gray-400 truncate max-w-[55%]">${numStr}. ${filename}</span>
+          <button type="button" onclick="event.stopPropagation(); downloadSinglePhoto('${imgUrl}', '${filename}', this)" class="py-1.5 px-3 bg-amber-400 hover:bg-amber-300 text-black font-semibold text-xs rounded-lg flex items-center gap-1 transition-all active:scale-95">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            <span>下載</span>
+          </button>
+        </div>
       </div>
     `;
   }).join('');
 }
 
-async function downloadSinglePhoto(photoUrl, filename) {
+async function downloadSinglePhoto(photoUrl, filename, btnEl = null) {
   trackGAEvent('下載單張照片', { '照片網址': photoUrl });
-  try {
-    const response = await fetch(photoUrl, { mode: 'cors' });
-    if (!response.ok) throw new Error('CORS or Network Error');
-    const blob = await response.blob();
-    const blobUrl = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = blobUrl;
-    a.download = filename || photoUrl.split('/').pop() || 'photo.jpg';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
-  } catch (err) {
-    console.warn('Silent blob download failed, falling back to direct link open:', err);
-    const a = document.createElement('a');
-    a.href = photoUrl;
-    a.download = filename || photoUrl.split('/').pop() || 'photo.jpg';
-    a.target = '_blank';
-    a.rel = 'noopener noreferrer';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+  
+  let originalHtml = '';
+  if (btnEl) {
+    originalHtml = btnEl.innerHTML;
+    btnEl.disabled = true;
+    btnEl.classList.add('opacity-75', 'cursor-wait');
+    btnEl.innerHTML = `
+      <svg class="w-4 h-4 animate-spin inline-block" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <span>下載中...</span>
+    `;
+  }
+
+  let fetchedBlob = null;
+  let retries = 5;
+
+  while (retries > 0 && !fetchedBlob) {
+    try {
+      const resp = await fetch(photoUrl, { mode: 'cors', cache: 'force-cache' });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      fetchedBlob = await resp.blob();
+    } catch (err) {
+      retries--;
+      if (retries > 0) {
+        await new Promise(r => setTimeout(r, 400));
+      } else {
+        console.error(`Failed to fetch photo ${photoUrl} after 5 retries:`, err);
+      }
+    }
+  }
+
+  if (fetchedBlob) {
+    try {
+      const blobUrl = URL.createObjectURL(fetchedBlob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename || photoUrl.split('/').pop() || 'photo.jpg';
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        if (a.parentNode) a.parentNode.removeChild(a);
+        URL.revokeObjectURL(blobUrl);
+      }, 1000);
+    } catch (err) {
+      console.error('Blob URL download trigger error:', err);
+      alert('圖片下載觸發失敗，請於預覽燈箱中長按圖片儲存。');
+    }
+  } else {
+    console.warn('Single photo fetch failed after retries.');
+    alert('照片下載失敗，請檢查網路連線後再試，或於預覽燈箱中長按圖片儲存。');
+  }
+
+  if (btnEl) {
+    btnEl.disabled = false;
+    btnEl.classList.remove('opacity-75', 'cursor-wait');
+    btnEl.innerHTML = originalHtml;
   }
 }
 
@@ -2013,7 +2072,7 @@ function openDownloadLightbox(index) {
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
       <span>Download</span>
     `;
-    downloadBtn.onclick = () => downloadSinglePhoto(imgUrl, filename);
+    downloadBtn.onclick = (e) => downloadSinglePhoto(imgUrl, filename, e ? (e.currentTarget || e.target) : downloadBtn);
   }
 
   modal.classList.remove('hidden');
