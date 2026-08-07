@@ -2035,5 +2035,105 @@ window.PORTFOLIO_DATA = {
         description: "漫步幽靜步道，看黃綠色的微光在樹林間點亮夜的微光"
       }
     ]
+  },
+
+  // ------------------------------------------------------------------
+  // 📸 客戶私密交圖專區設定 (Private Client Delivery Gallery Config)
+  // ------------------------------------------------------------------
+  clientGallery: {
+    // 專屬存取密碼 (預設為 2026WP)
+    password: "2026WP",
+
+    // 客戶與相簿資訊
+    clientName: "Wei",
+    albumTitle: "2026 Welcome Party",
+    deliveryDate: "2026.08.07",
+    expiryDays: 14,
+
+    // Cloudflare R2 打包整包下載 (.zip) 網址
+    // 💡 設為 "auto" 時，網站會在客戶點擊下載時「自動在瀏覽器端」將所有單張相片打包成 .zip 供客戶下載！
+    //    您只需上傳單張照片至 Cloudflare R2，不需手動壓縮或上傳 .zip 檔案。
+    zipUrl: "auto",
+    zipSize: "動態打包",
+
+    // Cloudflare R2 單張照片下載與預覽網址 (末端記得加上斜線 /)
+    baseUrl: "https://pub-7b4ddc6a348b47569b6fac5f850d7792.r2.dev/weipic-deliveries/2026WelcomeParty/",
+
+    // 照片檔名清單 (共 72 張高畫質照片)
+    photos: [
+      "1-IMG_0500.jpg",
+      "2-IMG_0501.jpg",
+      "3-IMG_0502.jpg",
+      "4-IMG_0504.jpg",
+      "5-IMG_0503.jpg",
+      "6-IMG_0362.jpg",
+      "7-IMG_0324.jpg",
+      "8-WEI07643.jpg",
+      "9-IMG_0329.jpg",
+      "10-IMG_0322.jpg",
+      "11-IMG_0328.jpg",
+      "12-IMG_0321.jpg",
+      "13-IMG_0320.jpg",
+      "14-IMG_0327.jpg",
+      "15-IMG_0326.jpg",
+      "16-IMG_0325.jpg",
+      "17-IMG_0361.jpg",
+      "18-IMG_0360.jpg",
+      "19-IMG_0319.jpg",
+      "20-IMG_0313.jpg",
+      "21-IMG_0314.jpg",
+      "22-IMG_0318.jpg",
+      "23-IMG_0496.jpg",
+      "24-IMG_0490.jpg",
+      "25-IMG_0497.jpg",
+      "26-IMG_0498.jpg",
+      "27-IMG_0491.jpg",
+      "28-IMG_0499.jpg",
+      "29-IMG_0492.jpg",
+      "30-IMG_0493.jpg",
+      "31-IMG_0494.jpg",
+      "32-IMG_0495.jpg",
+      "33-IMG_0317.jpg",
+      "34-IMG_0312.jpg",
+      "35-IMG_0316.jpg",
+      "36-IMG_0310.jpg",
+      "37-IMG_0311.jpg",
+      "38-IMG_0315.jpg",
+      "39-IMG_0366.jpg",
+      "40-IMG_0367.jpg",
+      "41-IMG_0334.jpg",
+      "42-IMG_0333.jpg",
+      "43-IMG_0332.jpg",
+      "44-IMG_0331.jpg",
+      "45-IMG_0330.jpg",
+      "46-IMG_0339.jpg",
+      "47-IMG_0338.jpg",
+      "48-IMG_0337.jpg",
+      "49-IMG_0336.jpg",
+      "50-IMG_0335.jpg",
+      "51-IMG_0344.jpg",
+      "52-IMG_0343.jpg",
+      "53-IMG_0342.jpg",
+      "54-IMG_0341.jpg",
+      "55-IMG_0340.jpg",
+      "56-IMG_0349.jpg",
+      "57-IMG_0348.jpg",
+      "58-IMG_0347.jpg",
+      "59-IMG_0346.jpg",
+      "60-IMG_0345.jpg",
+      "61-WEI00356.jpg",
+      "62-WEI00604.jpg",
+      "63-IMG_0505.jpg",
+      "64-WEI00854.jpg",
+      "65-WEI00880.jpg",
+      "66-WEI00895.jpg",
+      "67-WEI00904.jpg",
+      "68-WEI01021.jpg",
+      "69-WEI01059.jpg",
+      "70-WEI01079.jpg",
+      "71-IMG_0368.jpg",
+      "72-IMG_0365.jpg"
+    ]
   }
 };
+

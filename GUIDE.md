@@ -38,7 +38,8 @@ photography-portfolio/
 ├── sports.html              <-- 運動攝影專頁
 ├── graduation.html          <-- 畢業攝影專頁
 ├── landscape.html           <-- 風景攝影專頁
-└── contact.html             <-- 預約與聯絡專頁 (FormSubmit 線上表單)
+├── contact.html             <-- 預約與聯絡專頁 (FormSubmit 線上表單)
+└── download.html            <-- 🔒 私密客戶交圖與相片下載專頁 (Cloudflare R2 串接)
 ```
 
 ---
@@ -505,3 +506,94 @@ git push
    - 切換至 **Console (主控台)** 標籤頁。
    - Console 會明確標示錯誤發生的**檔案名稱與行號**（例如 `portfolio-data.js:89 Uncaught SyntaxError: Unexpected identifier`）。
    - 依照行號回到 `js/portfolio-data.js` 補上逗號 `,` 或修復引號即可恢復正常！
+
+---
+
+## 🔒 18. 私密客戶交圖與 Cloudflare R2 下載頁面指引 (Private Client Gallery & Cloudflare R2 Guide)
+
+本作品集新增獨立的「私密客戶交圖與相片下載專區 (`download.html`)」，網址為 `weipic.github.io/download`（此頁面不會出現在網站選單中，僅供取得直接網址與密碼的客戶存取）。
+
+### 📌 1. 頁面功能與隱私保護機制
+- **未列入主選單**：首頁與各分類頁面的導覽列均不包含此頁面連結，保持交圖獨立隱私。
+- **密碼驗證鎖定**：預設進入畫面會顯示簡潔奢華的密碼驗證區塊，輸入正確密碼（預設：`2026WelcomeParty`）後，透過 JavaScript 平滑顯示相片牆。
+- **Session 紀錄與重新鎖定**：驗證成功後於當次瀏覽器 Session 記錄解鎖狀態，重新整理無須重複輸入密碼；右上方設有「重新鎖定」按鈕可隨時登出鎖定。
+- **社群分享卡片 (Open Graph) 自訂**：開啟 `download.html` 前幾行，可直接修改 `<meta property="og:title">`、`<meta property="og:description">` 與 `<meta property="og:image">`，傳送給客戶時聊天室會顯示專屬縮圖與標題說明。
+
+---
+
+### ☁️ 2. 如何上傳單張照片至 Cloudflare R2（無需手動壓縮 ZIP）
+1. **登入 Cloudflare Dashboard**：前往 [Cloudflare Dashboard](https://dash.cloudflare.com/) 並點擊左側選單 **R2 Object Storage**。
+2. **建立 Storage Bucket**：點選 **Create bucket**，輸入 Bucket 名稱（例如 `weipic-deliveries`），地區選擇 `Automatic` 後點擊 **Create bucket**。
+3. **僅需上傳單張照片**：
+   - 點進 Bucket，將整理好的所有單張高畫質照片（如 `photo_001.jpg`, `photo_002.jpg` ...）直接拖曳上傳至 Bucket 中。
+   - 💡 **完全不需要在電腦壓縮或上傳 `.zip` 檔**！網站已內建 JSZip 動態打包技術，客戶點擊「一鍵下載全部 (.zip)」時會自動在瀏覽器端將所有照片即時壓縮下載。
+
+---
+
+### 🔗 3. 如何將 Cloudflare R2 串接到下載網址
+1. **開啟 Bucket 公開存取權限**：
+   - 在 Cloudflare R2 後台點選您的 Bucket -> 切換至 **Settings (設定)** 標籤頁。
+   - 找到 **Public access (公開存取)** 區塊。
+   - **方式 A (免費公用網址)**：點擊 `R2.dev subdomain` 旁的 **Allow Access**，點擊提示視窗框中的 **Allow**，系統會生成專屬的存取網址（如 `https://pub-xxx.r2.dev`）。
+   - **方式 B (自訂子網域 - 推薦)**：點擊 **Connect Custom Domain**，輸入您於 Cloudflare 管理的自訂子網域（如 `gallery.weipic.com` 或 `dl.weipic.com`），Cloudflare 將自動綁定 DNS 與 SSL 憑證。
+2. **設定 CORS 跨域下載標題 (確保自動打包與單張下載不被擋下)**：
+   - 在 Bucket **Settings** 頁面找到 **CORS Policy**，點擊 **Edit CORS Policy** 貼上以下內容：
+     ```json
+     [
+       {
+         "AllowedOrigins": ["https://weipic.github.io", "http://localhost:8080", "*"],
+         "AllowedMethods": ["GET", "HEAD"],
+         "AllowedHeaders": ["*"],
+         "ExposeHeaders": ["Content-Disposition", "Content-Length"]
+       }
+     ]
+     ```
+
+---
+
+### 🛠️ 4. 如何在程式碼中貼上 Cloudflare R2 網址與設定密碼
+開啟 `js/portfolio-data.js`，找到最下方的 `clientGallery` 設定物件進行修改：
+
+```javascript
+clientGallery: {
+  // 1. 專屬存取密碼 (客戶輸入此密碼才能解鎖相簿)
+  password: "2026WelcomeParty",
+
+  // 2. 客戶名稱與相簿標題
+  clientName: "Wei & Clients",
+  albumTitle: "2026 品牌寫真與活動紀錄全輯",
+  deliveryDate: "2026.08.07",
+  expiryDays: 14,
+
+  // 3. 一鍵下載全輯 (.zip) 網址：
+  // 💡 設為 "auto"，網站會在客戶點擊下載時「自動在瀏覽器端」把下方照片即時打包成 .zip！
+  zipUrl: "auto",
+  zipSize: "自動即時打包",
+
+  // 4. Cloudflare R2 基礎目錄網址 (Base URL)
+  // 貼上您於 Cloudflare R2 取得的公開網址 (網址末端記得加上斜線 /)
+  baseUrl: "https://pub-xxx.r2.dev/albums/2026-party/",
+
+  // 5. 照片項目列表 (只需要填寫單張照片檔名 filename)
+  photos: [
+    { id: 1, title: "Party Highlights 01", filename: "photo_001.jpg" },
+    { id: 2, title: "Party Highlights 02", filename: "photo_002.jpg" },
+    { id: 3, title: "Party Highlights 03", filename: "photo_003.jpg" }
+  ]
+}
+```
+
+---
+
+### ⏳ 5. 如何設定 Cloudflare R2 自動刪除規則 (14 天生命週期規則 Lifecycle Rule)
+為了避免舊相簿佔用雲端空間與產生費用，請在 Cloudflare 後台設定 14 天自動清理刪除：
+1. 進入 Cloudflare R2 Dashboard -> 點擊您的 Bucket (例如 `weipic-deliveries`)。
+2. 切換至 **Settings (設定)** 標籤頁。
+3. 向上滑動找到 **Lifecycle Rules (生命週期規則)** 區塊，點擊 **Add rule (新增規則)**。
+4. 設定規則參數：
+   - **Rule name (規則名稱)**：輸入 `Delete-After-14-Days`
+   - **Rule Scope (適用範圍)**：選擇 `Apply to all objects`（套用到所有物件）
+   - **Lifecycle Actions (生命週期動作)**：勾選 **Delete object (刪除物件)**
+   - **After (天數)**：輸入 `14` 天
+5. 點擊 **Save rule (儲存規則)** 即可！上傳至該 Bucket 的檔案將於滿 14 天後由 Cloudflare 伺服器自動安全刪除清理。
+

@@ -49,6 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
     renderHomePage();
   } else if (currentPage === 'contact') {
     renderContactPage();
+  } else if (currentPage === 'download') {
+    initDownloadPage();
   } else {
     // Render specific category gallery page
     renderCategoryPage(currentPage);
@@ -1582,4 +1584,398 @@ function initProtectImages() {
 
   observer.observe(document.body || document.documentElement, { childList: true, subtree: true });
 }
+
+// ====================================================================
+// 🔒 客戶私密交圖與相片下載頁面 (Private Client Download Page Logic)
+// ====================================================================
+let currentDownloadPhotos = [];
+let currentDownloadPhotoIndex = 0;
+
+function initDownloadPage() {
+  const passwordSection = document.getElementById('password-section');
+  const deliverySection = document.getElementById('delivery-gallery-section');
+  const passwordForm = document.getElementById('password-form');
+  const passwordInput = document.getElementById('password-input');
+  const passwordError = document.getElementById('password-error');
+  const togglePassBtn = document.getElementById('toggle-password-btn');
+  const lockBtn = document.getElementById('lock-gallery-btn');
+
+  if (!passwordSection || !deliverySection) return;
+
+  const config = (window.PORTFOLIO_DATA && window.PORTFOLIO_DATA.clientGallery) || {
+    password: "2026WelcomeParty",
+    clientName: "Wei & Clients",
+    albumTitle: "2026 精選寫真與活動紀錄全輯",
+    deliveryDate: "2026.08.07",
+    expiryDays: 14,
+    zipUrl: "https://pub-xxx.r2.dev/albums/2026-party/2026_Party_Full_Album.zip",
+    zipSize: "350 MB",
+    photos: []
+  };
+
+  currentDownloadPhotos = config.photos || [];
+
+  // Toggle Password Show/Hide
+  if (togglePassBtn && passwordInput) {
+    togglePassBtn.addEventListener('click', () => {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      const eyeIcon = togglePassBtn.querySelector('svg');
+      if (eyeIcon) {
+        eyeIcon.style.opacity = type === 'text' ? '1' : '0.6';
+      }
+    });
+  }
+
+  // Check if session is already unlocked
+  const isUnlocked = sessionStorage.getItem('wei_gallery_unlocked') === 'true';
+  if (isUnlocked) {
+    unlockGalleryView(config);
+  } else {
+    passwordSection.classList.remove('hidden');
+    deliverySection.classList.add('hidden');
+  }
+
+  // Handle Password Submit
+  if (passwordForm) {
+    passwordForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const enteredPass = (passwordInput.value || '').trim();
+      const expectedPass = config.password || "2026WelcomeParty";
+
+      if (enteredPass === expectedPass) {
+        sessionStorage.setItem('wei_gallery_unlocked', 'true');
+        if (passwordError) passwordError.classList.add('hidden');
+        passwordInput.classList.remove('border-red-500');
+        
+        // Track GA4 event
+        trackGAEvent('解鎖私密相簿', { '相簿標題': config.albumTitle });
+
+        // Smooth transition
+        passwordSection.classList.add('transition-all', 'duration-500', 'opacity-0', 'scale-95');
+        setTimeout(() => {
+          unlockGalleryView(config);
+        }, 300);
+      } else {
+        // Shake error animation
+        passwordSection.classList.remove('animate-shake');
+        void passwordSection.offsetWidth; // trigger reflow
+        passwordSection.classList.add('animate-shake');
+        
+        if (passwordError) passwordError.classList.remove('hidden');
+        passwordInput.classList.add('border-red-500');
+        passwordInput.focus();
+        
+        trackGAEvent('解鎖密碼錯誤', { '嘗試長度': enteredPass.length });
+      }
+    });
+  }
+
+  // Lock Gallery Button
+  if (lockBtn) {
+    lockBtn.addEventListener('click', () => {
+      sessionStorage.removeItem('wei_gallery_unlocked');
+      deliverySection.classList.add('hidden');
+      passwordSection.classList.remove('hidden', 'opacity-0', 'scale-95');
+      if (passwordInput) {
+        passwordInput.value = '';
+        passwordInput.focus();
+      }
+    });
+  }
+}
+
+function unlockGalleryView(config) {
+  const passwordSection = document.getElementById('password-section');
+  const deliverySection = document.getElementById('delivery-gallery-section');
+  if (!deliverySection) return;
+
+  if (passwordSection) passwordSection.classList.add('hidden');
+  deliverySection.classList.remove('hidden');
+  deliverySection.classList.add('opacity-100');
+
+  // Fill Header Meta Info
+  const clientNameEl = document.getElementById('client-name-display');
+  const albumTitleEl = document.getElementById('album-title-display');
+  const zipBtnEl = document.getElementById('download-zip-btn');
+  const zipSizeEl = document.getElementById('zip-size-display');
+  const photoCountEl = document.getElementById('photo-count-display');
+
+  if (clientNameEl) clientNameEl.textContent = config.clientName || 'Valued Client';
+  if (albumTitleEl) albumTitleEl.textContent = config.albumTitle || '攝影作品輯';
+  if (zipSizeEl) zipSizeEl.textContent = config.zipSize ? `(${config.zipSize})` : '';
+  if (photoCountEl) photoCountEl.textContent = (config.photos || []).length;
+
+  if (zipBtnEl) {
+    const hasPrebuiltZip = config.zipUrl && config.zipUrl !== 'auto' && !config.zipUrl.includes('pub-xxx.r2.dev') && config.zipUrl.endsWith('.zip');
+    if (hasPrebuiltZip) {
+      zipBtnEl.setAttribute('href', config.zipUrl);
+      zipBtnEl.setAttribute('download', `${(config.albumTitle || 'album').replace(/\s+/g, '_')}.zip`);
+      zipBtnEl.onclick = null;
+    } else {
+      zipBtnEl.setAttribute('href', 'javascript:void(0)');
+      zipBtnEl.removeAttribute('download');
+      zipBtnEl.onclick = (e) => {
+        e.preventDefault();
+        downloadAllPhotosAsZip(config);
+      };
+    }
+  }
+
+  renderDownloadPhotoGrid(config);
+}
+
+let isZippingInProcess = false;
+
+async function downloadAllPhotosAsZip(config) {
+  if (isZippingInProcess) return;
+  const zipBtnEl = document.getElementById('download-zip-btn');
+  const photos = config.photos || [];
+
+  if (!photos.length) {
+    alert('相簿中目前尚無可下載的照片！');
+    return;
+  }
+
+  if (typeof JSZip === 'undefined') {
+    console.error('JSZip is not loaded');
+    alert('動態壓縮元件載入中，請稍後再試。');
+    return;
+  }
+
+  isZippingInProcess = true;
+  const originalBtnText = zipBtnEl ? zipBtnEl.innerHTML : '';
+
+  try {
+    const zip = new JSZip();
+    const baseUrl = config.baseUrl || '';
+    const albumName = (config.albumTitle || 'Album_Photos').replace(/[^\w\u4e00-\u9fa5]/g, '_');
+    const folder = zip.folder(albumName);
+
+    let completedCount = 0;
+    const totalCount = photos.length;
+
+    if (zipBtnEl) {
+      zipBtnEl.innerHTML = `
+        <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span>相片讀取中 (0/${totalCount})...</span>
+      `;
+    }
+
+    const fetchPromises = photos.map(async (photo, idx) => {
+      const imgUrl = photo.url || (baseUrl + (photo.filename || ''));
+      const defaultFilename = `photo_${String(idx + 1).padStart(3, '0')}.jpg`;
+      const filename = photo.filename || defaultFilename;
+
+      try {
+        const resp = await fetch(imgUrl, { mode: 'cors' });
+        if (!resp.ok) throw new Error(`HTTP error! status: ${resp.status}`);
+        const blob = await resp.blob();
+        folder.file(filename, blob);
+
+        completedCount++;
+        if (zipBtnEl) {
+          zipBtnEl.innerHTML = `
+            <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span>相片打包中 (${completedCount}/${totalCount})...</span>
+          `;
+        }
+      } catch (err) {
+        console.warn(`Could not fetch image ${imgUrl} for ZIP:`, err);
+      }
+    });
+
+    await Promise.all(fetchPromises);
+
+    if (zipBtnEl) {
+      zipBtnEl.innerHTML = `
+        <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span>壓縮檔生成中...</span>
+      `;
+    }
+
+    const content = await zip.generateAsync({ type: 'blob' }, (metadata) => {
+      if (zipBtnEl) {
+        zipBtnEl.innerHTML = `
+          <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span>生成 ZIP (${Math.round(metadata.percent)}%)...</span>
+        `;
+      }
+    });
+
+    const blobUrl = URL.createObjectURL(content);
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = `${albumName}.zip`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+
+    trackGAEvent('一鍵動態打包下載全輯ZIP', { '相簿標題': config.albumTitle, '相片張數': totalCount });
+  } catch (err) {
+    console.error('ZIP generation error:', err);
+    alert('自動打包 ZIP 失敗，請重試或點擊單張下載。');
+  } finally {
+    isZippingInProcess = false;
+    if (zipBtnEl && originalBtnText) {
+      zipBtnEl.innerHTML = originalBtnText;
+    }
+  }
+}
+
+function renderDownloadPhotoGrid(config) {
+  const gridContainer = document.getElementById('download-photo-grid');
+  if (!gridContainer) return;
+
+  const photos = config.photos || [];
+  const baseUrl = config.baseUrl || '';
+
+  if (photos.length === 0) {
+    gridContainer.innerHTML = `
+      <div class="col-span-full py-16 text-center text-gray-400">
+        <p class="text-lg font-medium">目前尚無照片資料</p>
+        <p class="text-xs text-gray-500 mt-2">請於 js/portfolio-data.js 中設定 clientGallery.photos 照片列表</p>
+      </div>
+    `;
+    return;
+  }
+
+  gridContainer.innerHTML = photos.map((rawItem, index) => {
+    const item = typeof rawItem === 'string' ? { filename: rawItem } : rawItem;
+    let imgUrl = item.url || (baseUrl + (item.filename || ''));
+    let previewUrl = item.previewUrl || imgUrl;
+    let filename = item.filename || `photo_${String(index + 1).padStart(3, '0')}.jpg`;
+    let numStr = String(index + 1).padStart(2, '0');
+    let title = item.title || numStr;
+
+    return `
+      <div class="group relative bg-[#121318] border border-white/10 rounded-2xl overflow-hidden shadow-xl transition-all duration-300 hover:border-amber-400/50 hover:shadow-2xl">
+        <div class="aspect-[3/2] w-full overflow-hidden bg-[#181920] relative cursor-pointer" onclick="openDownloadLightbox(${index})">
+          <img src="${previewUrl}" alt="${title}" loading="lazy" draggable="false" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
+          
+          <div class="photo-hover-overlay absolute inset-0 opacity-0 group-hover:opacity-100 flex flex-col justify-between p-4 pointer-events-none transition-all duration-300">
+            <div class="flex items-center justify-between w-full">
+              <span class="text-[11px] font-mono tracking-wider bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/10 text-gray-300">
+                ${numStr}
+              </span>
+              <button type="button" onclick="event.stopPropagation(); openDownloadLightbox(${index})" class="pointer-events-auto p-2 rounded-full bg-white/10 hover:bg-amber-400 hover:text-black text-white transition-all backdrop-blur-md" title="預覽大圖 / Preview">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+              </button>
+            </div>
+
+            <div class="pointer-events-auto">
+              <button type="button" onclick="event.stopPropagation(); downloadSinglePhoto('${imgUrl}', '${filename}')" class="w-full py-2.5 px-3 bg-amber-400 hover:bg-amber-300 text-black font-semibold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-lg hover:shadow-amber-400/20 active:scale-98">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                <span>下載單張 (Download)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function downloadSinglePhoto(photoUrl, filename) {
+  trackGAEvent('下載單張照片', { '照片網址': photoUrl });
+  try {
+    const response = await fetch(photoUrl, { mode: 'cors' });
+    if (!response.ok) throw new Error('CORS or Network Error');
+    const blob = await response.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = filename || photoUrl.split('/').pop() || 'photo.jpg';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+  } catch (err) {
+    console.warn('Silent blob download failed, falling back to direct link open:', err);
+    const a = document.createElement('a');
+    a.href = photoUrl;
+    a.download = filename || photoUrl.split('/').pop() || 'photo.jpg';
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+}
+
+function openDownloadLightbox(index) {
+  if (!currentDownloadPhotos || !currentDownloadPhotos.length) return;
+  currentDownloadPhotoIndex = index;
+
+  const modal = document.getElementById('download-lightbox-modal');
+  const imgEl = document.getElementById('download-lightbox-img');
+  const counterEl = document.getElementById('download-lightbox-counter');
+  const downloadBtn = document.getElementById('download-lightbox-dl-btn');
+
+  if (!modal || !imgEl) return;
+
+  const rawPhoto = currentDownloadPhotos[index];
+  const photo = typeof rawPhoto === 'string' ? { filename: rawPhoto } : rawPhoto;
+  const baseUrl = (window.PORTFOLIO_DATA && window.PORTFOLIO_DATA.clientGallery && window.PORTFOLIO_DATA.clientGallery.baseUrl) || '';
+  const imgUrl = photo.url || (baseUrl + (photo.filename || ''));
+  const filename = photo.filename || `photo_${index + 1}.jpg`;
+
+  imgEl.src = imgUrl;
+  imgEl.alt = photo.title || `Photo #${index + 1}`;
+
+  if (counterEl) {
+    counterEl.textContent = `[ ${index + 1} / ${currentDownloadPhotos.length} ]`;
+  }
+
+  if (downloadBtn) {
+    downloadBtn.onclick = () => downloadSinglePhoto(imgUrl, filename);
+  }
+
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+
+  document.removeEventListener('keydown', handleDownloadLightboxKeys);
+  document.addEventListener('keydown', handleDownloadLightboxKeys);
+}
+
+function closeDownloadLightbox() {
+  const modal = document.getElementById('download-lightbox-modal');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+  document.removeEventListener('keydown', handleDownloadLightboxKeys);
+}
+
+function handleDownloadLightboxKeys(e) {
+  if (e.key === 'Escape') {
+    closeDownloadLightbox();
+  } else if (e.key === 'ArrowLeft') {
+    navigateDownloadLightbox(-1);
+  } else if (e.key === 'ArrowRight') {
+    navigateDownloadLightbox(1);
+  }
+}
+
+function navigateDownloadLightbox(dir) {
+  if (!currentDownloadPhotos || !currentDownloadPhotos.length) return;
+  let newIndex = currentDownloadPhotoIndex + dir;
+  if (newIndex < 0) newIndex = currentDownloadPhotos.length - 1;
+  if (newIndex >= currentDownloadPhotos.length) newIndex = 0;
+  openDownloadLightbox(newIndex);
+}
+
 
