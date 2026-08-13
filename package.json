@@ -1,0 +1,14 @@
+{
+  "name": "weipic-photography-portfolio",
+  "private": true,
+  "scripts": {
+    "build:vendor": "mkdir -p js/vendor && cp node_modules/jszip/dist/jszip.min.js js/vendor/jszip.min.js",
+    "build:css": "tailwindcss -c tailwind.config.js -i css/tailwind.input.css -o css/tailwind.generated.css --minify",
+    "audit": "node scripts/audit.mjs",
+    "check": "npm run build:css && npm run audit"
+  },
+  "devDependencies": {
+    "jszip": "3.10.1",
+    "tailwindcss": "3.4.17"
+  }
+}

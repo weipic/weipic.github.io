@@ -1,0 +1,2 @@
+# GitHub Pages / Jekyll configuration for clean URLs (removing .html extensions)
+permalink: /:basename/

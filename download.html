@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+<meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://translate.google.com https://translate.googleapis.com https://*.googleapis.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://translate.googleapis.com https://www.gstatic.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://weipic-api.weipic2023.workers.dev https://www.google-analytics.com https://translate.google.com https://www.google.com https://www.gstatic.com https://fonts.gstatic.com https://*.googleusercontent.com; connect-src 'self' https://weipic-api.weipic2023.workers.dev https://www.google-analytics.com https://region1.google-analytics.com https://formsubmit.co https://translate.google.com https://translate.googleapis.com https://translate-pa.googleapis.com https://*.googleapis.com https://*.googleusercontent.com https://play.google.com; frame-src https:; object-src 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co; upgrade-insecure-requests" />
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/images/favicon.png" />
+  <link rel="apple-touch-icon" href="assets/images/favicon.png" />
+
+  <!-- ========================================================================================= -->
+  <!-- 📸 專屬客戶交圖與相片下載頁面 (PRIVATE CLIENT DELIVERY & DOWNLOAD PAGE) -->
+  <!-- 💡 提示：您可以依據不同客戶/專案，直接修改下方的 title, og:title, og:description, og:image 網址 -->
+  <!--    當透過 LINE, WeChat, Messenger, iMessage 分享此網址時，會顯示您設定的標題與預覽縮圖 -->
+  <!-- ========================================================================================= -->
+  <title>客戶交圖專區</title>
+  <meta name="title" content="客戶交圖專區" />
+  <meta name="description" content="請輸入密碼解鎖高畫質下載與單張預覽" />
+
+  <!-- Open Graph / Facebook / LINE / iMessage 網址分享預覽卡片 -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Wei's Portfolio" />
+  <meta property="og:url" content="https://weipic.github.io/download" />
+  <meta property="og:title" content="客戶交圖專區" />
+  <meta property="og:description" content="請輸入密碼解鎖高畫質下載與單張預覽" />
+  <meta property="og:image" content="https://weipic.github.io/assets/images/download_cover.jpg" />
+  <meta property="og:image:secure_url" content="https://weipic.github.io/assets/images/download_cover.jpg" />
+  <meta property="og:image:type" content="image/jpeg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://weipic.github.io/download" />
+  <meta name="twitter:title" content="客戶交圖專區" />
+  <meta name="twitter:description" content="請輸入密碼解鎖高畫質下載與單張預覽" />
+  <meta name="twitter:image" content="https://weipic.github.io/assets/images/download_cover.jpg" />
+  <!-- JSZip Client-side ZIP Generation Library -->
+  <script src="js/vendor/jszip.min.js"></script>
+  <link rel="stylesheet" href="css/tailwind.generated.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="bg-[#0a0a0c] text-[#f5f5f7] min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-black overflow-x-hidden w-full max-w-full">
+
+  <!-- Page Loading Screen -->
+  <style>
+    .loading-screen {
+      position: fixed; inset: 0; z-index: 999999;
+      background-color: #0a0a0c; display: flex;
+      align-items: center; justify-content: center;
+      pointer-events: auto; user-select: none; -webkit-user-select: none;
+      touch-action: none; contain: strict; isolation: isolate;
+      will-change: transform, opacity, visibility;
+      -webkit-backface-visibility: hidden; backface-visibility: hidden;
+      -webkit-transform: translate3d(0,0,0); transform: translate3d(0,0,0);
+      animation: loadingScreenExit 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .loading-screen-glow {
+      position: absolute; width: 380px; height: 380px;
+      background: radial-gradient(circle, rgba(218, 165, 32, 0.14) 0%, rgba(10, 10, 12, 0) 70%);
+      filter: blur(50px); -webkit-filter: blur(50px); pointer-events: none;
+      will-change: transform, opacity; -webkit-transform: translate3d(0,0,0); transform: translate3d(0,0,0);
+    }
+    .loader-logo-wrapper {
+      position: relative; width: 280px; max-width: 75vw;
+      display: flex; align-items: center; justify-content: center;
+      filter: drop-shadow(0 0 22px rgba(218, 165, 32, 0.15));
+      -webkit-filter: drop-shadow(0 0 22px rgba(218, 165, 32, 0.15));
+      will-change: transform, opacity; -webkit-transform: translate3d(0,0,0); transform: translate3d(0,0,0);
+    }
+    .loader-svg {
+      width: 100%; height: auto; display: block; overflow: visible;
+      shape-rendering: geometricPrecision; text-rendering: geometricPrecision;
+    }
+    .loader-camera-frame {
+      fill: #ffffff; fill-opacity: 0; stroke: #ffffff; stroke-width: 2.2;
+      stroke-linecap: round; stroke-linejoin: round;
+      stroke-dasharray: 1610; stroke-dashoffset: 1610;
+      will-change: stroke-dashoffset, fill-opacity, stroke-opacity;
+      -webkit-transform: translate3d(0,0,0); transform: translate3d(0,0,0);
+      animation: cameraFrameDraw 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    .loader-aperture-blades {
+      fill: #ffffff; transform-origin: 115px 137px; opacity: 0;
+      -webkit-transform: scale(0) rotate(-35deg) translate3d(0,0,0);
+      transform: scale(0) rotate(-35deg) translate3d(0,0,0);
+      will-change: transform, opacity;
+      animation: apertureScaleFade 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+    .loader-text-wei {
+      fill: #ffffff; opacity: 0;
+      -webkit-transform: translate3d(0, 8px, 0); transform: translate3d(0, 8px, 0);
+      will-change: transform, opacity;
+      animation: weiTextFadeIn 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    .loader-text-pictures {
+      fill: #ffffff; opacity: 0;
+      -webkit-transform: translate3d(0, 8px, 0); transform: translate3d(0, 8px, 0);
+      will-change: transform, opacity;
+      animation: picturesTextFadeIn 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+  </style>
+  <div id="loading-screen" class="loading-screen" aria-hidden="true">
+    <script>
+      (function() {
+        try {
+          var navEntries = performance.getEntriesByType && performance.getEntriesByType('navigation');
+          var isReload = navEntries && navEntries.length > 0 && navEntries[0].type === 'reload';
+          var hasLoaded = sessionStorage.getItem('wei_portfolio_loaded');
+          if (hasLoaded && !isReload) {
+            document.getElementById('loading-screen').style.display = 'none';
+          } else {
+            sessionStorage.setItem('wei_portfolio_loaded', 'true');
+          }
+        } catch(e) {}
+      })();
+    </script>
+    <div class="loading-screen-glow"></div>
+    <div class="loader-logo-wrapper">
+      <svg class="loader-svg" viewBox="0 0 495 210" xmlns="http://www.w3.org/2000/svg" aria-label="Wei's Portfolio Loading Logo">
+        <path class="loader-camera-frame" d="M 26.75,209.15122 C 17.444991,207.91708 7.5154237,200.89589 3.3806924,192.62679 C -0.20060759,185.46451 -0.04990301,188.79757 0.10817471,120.25 L 0.25,58.75 L 1.4192211,55.25 C 5.2709917,43.719934 14.149155,34.74919 25.75,30.665501 L 29.75,29.257434999999997 L 52.111915,29.003718 L 74.473831,28.75 L 75.611915,27.611616 c 1.042298,-1.042571 1.160386,-1.715891 1.403057,-8.0 C 77.319291,11.731094 78.015398,9.5882602 81.498693,5.8093306 C 86.71738,0.14772462 87.617934,0.0 116.91336,0.0 C 143.22997,0.0 143.0,-0.02644647 143.0,3.0 C 143.0,6.0276519 143.24411,5.9997136 116.76375,6.0027885 C 84.03827,6.0065885 83.633037,6.1834897 82.981828,20.75 C 82.356118,34.746147 81.859838,34.986272 53.5,35.014776 C 21.488399,35.046951 11.67839,39.957669 6.9877223,58.298005 C 5.5966476,63.737055 5.4291576,180.39452 6.8057618,185.03425 c 1.9218275,6.47735 7.0414482,12.75636 12.7140352,15.59324 c 6.138933,3.07011 -12.0652452,2.85433 241.605203,2.86383 c 231.20252,0.009 231.8779,0.0116 232.875,1.00868 c 1.59331,1.59331 1.26552,3.31577 -0.84213,4.42515 c -1.0365,0.54557 -462.313213,0.76915 -466.40787,0.22607 z" />
+        <path class="loader-aperture-blades" d="M 103.36818,191.95615999999998 C 92.680533,190.39148 77.713346,184.47995 71.350156,179.31013 L 69.950312,178.17281999999997 L 104.03988,157.71140999999997 c 18.74926,-11.25378 34.28748,-20.53709 34.52937,-20.62958 c 0.25059,-0.0958 0.38407,10.98188 0.31027,25.75 L 138.75,188.75 L 134.75,189.89628 c -8.1767,2.3432 -22.86225,3.30715 -31.38182,2.05988 z M 143.5,146.02969 v -40.47032 L 150.13854,109.40468999999999 c 3.65119,2.11492 13.74769,7.98822 22.43665,13.05177 L 188.37331000000003,131.66291999999999 L 187.67750000000004,134.64555 c -4.23935,18.17251 -15.95804,34.94036 -31.76494,45.45132 c -4.14258,2.75465 -10.9232,6.40313 -11.90008,6.40313 c -0.34575,0.0 -0.51248,-13.16631 -0.51248,-40.47031 z M 60.306807,169.91346 C 50.471106,159.89738 44.047613,148.16069 40.65136,134.0 c -1.341076,-5.59162 -2.246363,-23.95215 -1.252658,-25.4057 c 0.341651,-0.49975 4.896088,1.9265 19.14978,10.20152 c 10.285835,5.97147 25.901518,14.99845 34.701518,20.05996 c 8.8,5.06151 16.16061,9.36143 16.3569,9.55538 c 0.33355,0.32957 -42.039653,26.13598 -43.529652,26.51073 c -0.375881,0.0945 -2.97258,-2.15926 -5.770441,-5.00843 z M 62.191787,115.6735 L 40.133575,102.8786 L 40.576326,100.8143 C 43.757682,85.981448 53.21968,70.184357 64.899295,60.206368 C 70.652986,55.290944 82.353161,48.0 84.487518,48.0 C 84.83325,48.0 85.0,61.096445 85.0,88.25 c 0.0,22.1375 -0.16875,40.24289 -0.375,40.2342 c -0.20625,-0.009 -10.301196,-5.77351 -22.433213,-12.8107 z M 169.5,115.45934 C 159.1875,109.41984 143.60953,100.37704 134.88229,95.364219 C 126.15506,90.351399 119.01138,86.1375 119.00746,86.0 c -0.01,-0.348117 43.72193,-26.0 44.32533,-26.0 c 3.0786,0.0 15.90695,17.49529 20.30006,27.685199 c 4.511,10.463355 7.72104,32.401861 5.56366,38.023911 c -0.42834,1.11623 0.82249,1.76715 -19.69651,-10.24977 z M 89.5,71.737625 V 45.975249 L 90.875,45.442425 c 13.23756,-5.129666 35.8233,-4.414903 51.02467,1.61476 c 7.02948,2.788261 16.89595,8.508698 16.71792,9.692815 C 158.5542,57.171664 90.372091,97.5 89.722589,97.5 C 89.600165,97.5 89.5,85.906931 89.5,71.737625 z" />
+        <path class="loader-text-wei" d="M 242.07130999999998,110.07131 C 241.40673,109.40673 238.47733,98.351348 231.77042,71.196313 C 226.6157,50.325841 221.49494,29.600846 220.39094,25.14077 C 217.46935,13.337703 217.64722,13.0 226.78571,13.0 c 8.33889,0.0 6.65049,-3.6616535 15.96621,34.625968 c 4.39894,18.079675 8.11811,32.872563 8.26481,32.873084 c 0.27339,0.000972 3.92146,-13.796537 12.48023,-47.201967 C 269.0799,11.506518 268.25643,13.0 274.68834,13.0 c 6.67767,0.0 5.33763,-3.1050906 15.10718,35.005685 c 5.45443,21.277602 8.58889,32.672626 8.83327,32.112509 c 0.20833,-0.477507 3.86457,-15.08477 8.12498,-32.460586 c 4.2604,-17.375815 7.95396,-32.138879 8.20791,-32.806808 C 316.26519,11.422286 331.0,12.426807 331.0,15.944187 c 0.0,2.949015 -6.722,31.537572 -13.00607,55.314595 c -2.25181,8.52017 -5.41631,20.665338 -7.03222,26.989263 C 307.42598,112.08527 308.46869,111.0 298.70983,111.0 c -10.30513,0.0 -8.51613,2.97017 -15.9615,-26.5 c -8.30689,-32.880276 -8.01543,-31.787163 -8.32804,-31.23435 c -0.15065,0.266392 -3.38125,12.952508 -7.17911,28.191367 c -4.8136,19.314443 -7.18328,27.985083 -7.8232,28.625003 c -1.39386,1.39386 -15.95108,1.38488 -17.34667,-0.0107 z M 343.44343,110.05481 L 342.25,109.08852 L 342.11748,62.070739 L 341.98496,15.052959000000001 L 343.08676,14.026475000000001 c 1.55164,-1.445569 64.28425,-1.636839 65.47702,-0.199638 c 1.1993,1.445072 0.96127,13.552641 -0.28434,14.463459 C 407.4726,28.880281 403.19207,29.0 382.90444,29.0 H 358.5 v 11.0 v 11.0 h 21.25 c 25.6913,0.0 24.33652,-0.590036 23.63797,10.294799 C 402.99109,67.479107 404.96165,67.0 379.92251,67.0 H 358.5 v 13.736747 v 13.736746 L 384.04054,94.611747 c 24.62055,0.133273 25.5661,0.173214 26.25,1.108818 c 1.00676,1.377284 1.0067,12.681725 -8e-05,14.058875 c -1.11189,1.52094 -64.98371,1.78407 -66.84703,0.27538 z M 425.14466,109.87499 c -1.02145,-1.11603 -1.03112,-1.4992 -1.21216,-48.042528 L 423.75,14.914934000000002 L 424.93039,13.957462000000003 c 1.98783,-1.612424 12.15835,-1.41419 13.84234,0.269801 L 440.0,15.454545 v 46.047558 c 0.0,48.896357 0.0273,48.304817 -2.2724,49.187307 c -2.38013,0.91334 -11.5445,0.32019 -12.58294,-0.81441 z" />
+        <path class="loader-text-pictures" d="M 293.71677999999997,175.06993 c -16.38733,-2.92384 -18.42451,-26.46867 -2.75271,-31.81466 c 8.93296,-3.04723 23.38383,3.35324 17.04376,7.5489 L 306.01566,152.12252 L 304.54976000000005,150.55327 c -5.2917,-5.66478 -15.12279,-3.28328 -17.83638,4.32071 c -3.91749,10.97752 8.86402,20.17359 17.50009,12.59102 L 306.03803000000005,165.86300999999997 L 307.8239300000001,166.80650999999997 c 6.08122,3.21273 -5.24161,9.84521 -14.10715,8.26342 z M 325.82298,174.96134 c -5.88043,-1.42608 -6.79786,-3.72725 -6.812,-17.08634 L 319.0,147.5 h -2.75 h -2.75 v -2.5 v -2.5 h 2.75 h 2.75 v -3.5 v -3.5 h 2.75 h 2.75 v 3.5 v 3.5 h 4.75 h 4.75 v 2.5 v 2.5 h -4.78753 h -4.78753 L 324.58747,157.375 c 0.21191,12.87527 1.4298,14.77197 7.98211,12.43103 c 1.77822,-0.63531 3.43042,0.88374 3.43042,3.15396 c 0.0,1.45357 -6.86719,2.80402 -10.17702,2.00135 z M 354.75,175.1558 C 345.22629,173.85737 343.0,169.68965 343.0,153.15925 V 142.5 h 3.0 h 3.0 v 10.64406 C 349.0,167.43543 350.27548,170.0 357.38326,170.0 c 8.18908,0.0 9.78067,-2.63515 10.11674,-16.75 L 367.75,142.75 L 370.625,142.60005 L 373.5,142.45010000000002 V 158.72505 V 175.0 H 370.75 H 368.0 v -2.34355 v -2.34354 L 366.625,171.62965000000003 c -2.60174,2.4915 -7.90769,4.06704 -11.875,3.52615 z M 420.49392,175.0166 C 401.15284,171.59015 402.895,143.44395 422.5,142.6064 c 9.56386,-0.40858 16.5,6.23389 16.5,15.8014 V 160.5 h -13.06542 h -13.06542 L 413.16069,162.29648 c 1.12957,6.96077 11.84091,10.3103 18.53142,5.79493 L 433.95361,166.56513999999999 L 435.53843,168.37016 L 437.12325,170.17517 L 435.43662,171.57945 c -3.36107,2.79844 -9.96871,4.31834 -14.9427,3.43715 z M 433.18936,155.125 c -2.50612,-10.45178 -17.22158,-10.47304 -20.21683,-0.0292 L 412.56981,156.5 h 10.47462 h 10.47462 z M 454.5,175.20092 c -10.57985,-1.79921 -11.84568,-2.58309 -10.0032,-6.19464 L 445.4936,167.05239 L 448.13652,168.26236 c 7.51672,3.44127 16.36348,2.24596 16.36348,-2.21092 c 0.0,-2.44726 -1.7254,-3.43066 -8.32949,-4.74745 c -10.11802,-2.01743 -13.33492,-5.12284 -11.67863,-11.27385 c 1.79818,-6.67792 12.90953,-9.7397 22.12626,-6.09699 L 469.48629,145.06672 L 468.43168,147.15836000000002 c -0.58003,1.1504 -1.12392,2.16986 -1.20864,2.26547 c -0.0847,0.0956 -1.45723,-0.31375 -3.05003,-0.90969 C 457.75343,146.11226 450.0,147.66931 450.0,151.36036 c 0.0,2.92078 1.94549,4.0493 9.70686,5.63063 c 17.14949,3.49411 12.10015,21.15315 -5.20686,18.20993 z M 222.61963,153.625 L 222.75,132.25 L 230.75,132.10232 c 19.04521,-0.35157 26.22958,3.64223 26.24512,14.58967 C 257.01033,157.41074 250.55882,162.0 235.47539,162.0 H 229.0 v 6.5 v 6.5 h -3.25537 h -3.25537 z M 245.24896999999999,155.78266 c 5.35261,-2.23647 7.33868,-7.94143 4.62603,-13.2882 c -1.91668,-3.77785 -4.46512,-4.7068 -13.48449,-4.91532 L 229.0,137.40828 v 9.8693 v 9.8693 L 236.13079,156.87996 c 5.00349,-0.18729 7.72368,-0.51465 9.11818,-1.0973 z M 266.0,158.75 V 142.5 h 3.0 h 3.0 V 158.75 V 175.0 h -3.0 h -3.0 z M 384.61807,158.875 L 384.75,142.75 h 2.75 h 2.75 L 390.40518,145.19317 c 0.14731,2.3193 0.19284,2.38939 0.89805,1.38256 c 1.25444,-1.79096 4.94694,-3.6222 7.92319,-3.92937 L 402.0,142.3601 V 145.18005 V 148.0 h -2.01606 c -7.28287,0.0 -9.47695,4.13654 -9.48115,17.875 L 390.5,175.0 h -3.00693 h -3.00692 z M 267.44725,135.94294 C 263.58726,134.52633 264.82319,129.0 269.0,129.0 c 4.31228,0.0 5.39497,5.56728 1.35647,6.97511 c -0.82813,0.28869 -1.52837,0.50713 -1.55608,0.48542 c -0.0277,-0.0217 -0.63663,-0.25463 -1.35314,-0.51759 z" />
+      </svg>
+    </div>
+  </div>
+
+  <!-- Header Navigation Bar (Website standard navbar; unlisted download page) -->
+  <header class="header-glass py-5 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <a href="index.html" class="flex items-center gap-3 group text-decoration-none">
+        <img src="assets/images/logo.svg" alt="Wei's Portfolio Logo" draggable="false" class="h-9 sm:h-10 w-auto object-contain transition-opacity duration-300 group-hover:opacity-85" />
+      </a>
+
+      <!-- Desktop Navigation Menu -->
+      <nav class="hidden md:flex items-center gap-6">
+        <a href="index.html" class="nav-link">關於我與經歷</a>
+        
+        <!-- Category Dropdown -->
+        <div class="relative group py-2">
+          <a href="index.html#categories-section" class="nav-link flex items-center gap-1 cursor-pointer">
+            攝影作品
+            <svg class="w-3.5 h-3.5 text-gray-400 group-hover:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </a>
+          <div class="absolute left-0 top-full hidden group-hover:block w-56 bg-[#121318] border border-white/10 rounded-xl shadow-2xl p-2 z-50 backdrop-blur-xl">
+            <a href="commercial.html" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">商業攝影</a>
+            <a href="portrait.html" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">人像攝影</a>
+            <a href="concert.html" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">演唱會攝影</a>
+            <a href="event.html" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">活動攝影</a>
+            <a href="sports.html" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">運動攝影</a>
+            <a href="graduation.html" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">畢業攝影</a>
+            <a href="landscape.html" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">風景攝影</a>
+          </div>
+        </div>
+
+        <a href="contact.html" class="nav-link">預約與聯絡</a>
+
+        <!-- Header Social & Language Buttons -->
+        <div class="flex items-center gap-2.5 ml-2 border-l border-white/15 pl-4">
+          <a href="https://www.instagram.com/wei.pictures/" target="_blank" rel="noopener noreferrer" class="header-social-btn" aria-label="Instagram">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+          </a>
+          <a href="mailto:weipic2023@gmail.com" class="header-social-btn" aria-label="Email">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="2.5 5.3 19 12.4">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+          </a>
+          <!-- Globe Language Selector -->
+          <div class="relative lang-dropdown-container">
+            <button type="button" class="header-social-btn" id="lang-btn" aria-label="Language Selector" title="切換語言 / Select Language">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="9" stroke-width="1.8"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3.6 9h16.8M3.6 15h16.8M12 3a17 17 0 000 18M12 3a17 17 0 010 18"/>
+              </svg>
+            </button>
+            <div id="lang-dropdown-menu" class="lang-dropdown-menu absolute right-0 top-full mt-2 w-36 bg-[#121318] border border-white/10 rounded-xl shadow-2xl p-1.5 z-50 backdrop-blur-xl">
+              <button type="button" onclick="setLanguage('zh-TW')" data-lang="zh-TW" class="lang-opt-btn w-full text-left px-3 py-1.5 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors flex items-center justify-between">
+                <span>繁體中文</span>
+                <span class="text-[10px] font-mono text-gray-500">ZH</span>
+              </button>
+              <button type="button" onclick="setLanguage('en')" data-lang="en" class="lang-opt-btn w-full text-left px-3 py-1.5 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors flex items-center justify-between">
+                <span>English</span>
+                <span class="text-[10px] font-mono text-gray-500">EN</span>
+              </button>
+              <button type="button" onclick="setLanguage('ja')" data-lang="ja" class="lang-opt-btn w-full text-left px-3 py-1.5 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors flex items-center justify-between">
+                <span>日本語</span>
+                <span class="text-[10px] font-mono text-gray-500">JP</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Mobile Hamburger Button -->
+      <button id="mobile-menu-btn" class="md:hidden text-white p-2 focus:outline-none" aria-label="Toggle Navigation">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+
+    <!-- Mobile Drawer Navigation -->
+    <div id="mobile-menu" class="hidden md:hidden bg-[#121318] border-b border-white/10 px-6 py-6 space-y-4">
+      <a href="index.html" class="block text-sm text-white font-semibold">關於我與合作經歷</a>
+      <div class="border-t border-white/10 pt-2 space-y-2">
+        <p class="text-xs text-gray-500 font-mono uppercase tracking-wider">攝影分類專頁</p>
+        <a href="commercial.html" class="block text-sm text-gray-300 hover:text-amber-400">商業攝影</a>
+        <a href="portrait.html" class="block text-sm text-gray-300 hover:text-amber-400">人像攝影</a>
+        <a href="concert.html" class="block text-sm text-gray-300 hover:text-amber-400">演唱會攝影</a>
+        <a href="event.html" class="block text-sm text-gray-300 hover:text-amber-400">活動攝影</a>
+        <a href="sports.html" class="block text-sm text-gray-300 hover:text-amber-400">運動攝影</a>
+        <a href="graduation.html" class="block text-sm text-gray-300 hover:text-amber-400">畢業攝影</a>
+        <a href="landscape.html" class="block text-sm text-gray-300 hover:text-amber-400">風景攝影</a>
+      </div>
+      <a href="contact.html" class="block text-sm text-gray-300 hover:text-amber-400 pt-2 border-t border-white/10">預約與聯絡 Contact</a>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="flex-grow flex flex-col justify-center items-center pt-28 sm:pt-36 pb-16 sm:pb-20 px-4 sm:px-6 relative z-10">
+
+    <!-- ========================================================================= -->
+    <!-- 🔒 1. 密碼驗證區塊 (Password Verification Card - Displayed by default) -->
+    <!-- ========================================================================= -->
+    <section id="password-section" class="w-full max-w-md my-auto pt-2 sm:pt-4">
+      <div class="glass-panel p-8 sm:p-10 rounded-3xl relative overflow-hidden text-center transition-all duration-300">
+        
+        <!-- Ambient Decorative Glow -->
+        <div class="absolute -top-24 -left-24 w-48 h-48 bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Lock Icon Badge -->
+        <div class="w-16 h-16 bg-white/5 border border-amber-400/30 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl text-amber-400">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" stroke-width="1.8"/>
+            <path d="M7 11V7a5 5 0 0110 0v4" stroke-width="1.8"/>
+          </svg>
+        </div>
+
+        <h1 id="password-header-title" class="text-2xl font-bold tracking-tight text-white mb-2 font-serif">
+          客戶交圖專區
+        </h1>
+        <p class="text-xs sm:text-sm text-gray-400 mb-8">
+          請輸入專屬存取密碼
+        </p>
+
+        <!-- Password Entry Form -->
+        <form id="password-form" action="javascript:void(0)" onsubmit="event.preventDefault()" class="space-y-5">
+          <div class="relative">
+            <input 
+              type="password" 
+              id="password-input" 
+              placeholder="請輸入密碼" 
+              required
+              autocomplete="current-password"
+              class="w-full px-4 py-3.5 bg-[#0a0a0c]/80 border border-white/15 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-all pr-11"
+            />
+            <button 
+              type="button" 
+              id="toggle-password-btn" 
+              class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors p-1"
+              aria-label="Toggle Password Visibility"
+            >
+              <svg class="w-4 h-4 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Error Alert Text -->
+          <div id="password-error" class="hidden text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg py-2 px-3 text-left flex items-center gap-2">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>密碼不正確，請重新輸入</span>
+          </div>
+
+          <button 
+            type="submit" 
+            class="w-full py-3.5 px-6 bg-amber-400 hover:bg-amber-300 text-black font-semibold text-sm rounded-xl btn-gold-glow transition-all flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <span>解鎖存取相簿</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </button>
+        </form>
+
+        <p class="text-[11px] text-gray-500 mt-6">
+          遺失密碼或存取有疑慮？請聯繫 <a href="mailto:weipic2023@gmail.com" class="text-amber-400 hover:underline">weipic2023@gmail.com</a>
+        </p>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 🖼️ 2. 相片展示與下載區塊 (Unlocked Delivery Section - Hidden by default) -->
+    <!-- ========================================================================= -->
+    <section id="delivery-gallery-section" class="w-full max-w-7xl mx-auto space-y-8 hidden">
+
+      <!-- Header Album Info Banner -->
+      <div class="glass-panel p-6 sm:p-8 rounded-3xl relative overflow-hidden">
+        <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+          
+          <!-- Left Album Info -->
+          <div class="space-y-2">
+            <div class="flex flex-wrap items-center gap-2.5">
+              <span id="client-name-display" class="text-xs font-semibold uppercase tracking-wider text-amber-400 bg-amber-400/10 border border-amber-400/30 px-3 py-1 rounded-full">
+                Client Gallery
+              </span>
+              <span class="text-xs text-gray-400 bg-white/5 px-3 py-1 rounded-full border border-white/10 flex items-center gap-1">
+                <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span> Cloudflare R2 雲端儲存</span>
+              </span>
+            </div>
+            
+            <h1 id="album-title-display" class="text-2xl sm:text-4xl font-bold text-white font-serif tracking-tight pt-1">
+              2026 精選寫真與活動紀錄全輯
+            </h1>
+            
+            <!-- Expiry Warning -->
+            <p class="text-xs sm:text-sm text-amber-300/90 flex items-center gap-1.5 pt-1" role="status" aria-live="polite">
+              <svg class="w-4 h-4 shrink-0 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+              <span id="album-expiry-countdown">相簿將於 14 天後自動刪除，請務必及時下載備份。</span>
+            </p>
+          </div>
+
+          <!-- Right Action Controls: Download All ZIP Button -->
+          <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+            <a 
+              id="download-zip-btn" 
+              href="#" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              class="flex-1 sm:flex-none py-3.5 px-6 bg-amber-400 hover:bg-amber-300 text-black font-semibold text-sm rounded-xl btn-gold-glow transition-all flex items-center justify-center gap-2 shadow-lg"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              <span>一鍵下載全部 (.zip)</span>
+              <span id="zip-size-display" class="text-xs font-mono opacity-80 pl-1"></span>
+            </a>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Section Title & Photo Counter Bar -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4 px-2">
+        <div class="flex items-center gap-3">
+          <h2 class="text-lg font-semibold text-white tracking-wide">相片預覽與單張下載</h2>
+          <span class="text-xs text-gray-400 bg-white/5 px-2.5 py-0.5 rounded-full border border-white/10 font-mono">
+            <span id="photo-count-display">0</span> Photos
+          </span>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <button id="toggle-photo-selection-btn" type="button" class="opacity-100 py-2 px-3 text-xs font-medium text-gray-200 bg-white/5 hover:bg-white/10 border border-white/15 rounded-lg transition-all duration-300">
+            選擇照片
+          </button>
+          <div id="photo-selection-actions" class="hidden opacity-0 translate-y-1 flex-wrap items-center gap-2 transition-all duration-300" aria-hidden="true">
+            <button id="select-all-photos-btn" type="button" class="py-2 px-3 text-xs font-medium text-gray-200 bg-white/5 hover:bg-white/10 border border-white/15 rounded-lg transition-colors">
+              全選
+            </button>
+            <button id="clear-photo-selection-btn" type="button" class="py-2 px-3 text-xs font-medium text-gray-300 bg-white/5 hover:bg-white/10 border border-white/15 rounded-lg transition-colors">
+              取消選取
+            </button>
+            <button id="download-selected-zip-btn" type="button" disabled class="inline-flex min-w-max shrink-0 items-center justify-center gap-2 whitespace-nowrap py-2 px-3 text-xs font-semibold text-black bg-amber-400 hover:bg-amber-300 rounded-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+              下載已選取（0）
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Responsive Photo Wall Grid (CSS Grid) -->
+      <div id="download-photo-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+        <!-- Photo Cards will be dynamically injected via JavaScript -->
+      </div>
+
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- ⚠️ 4. 相簿已過期提示區塊 (Expired Album Warning Card - Hidden by default) -->
+    <!-- ========================================================================= -->
+    <section id="expired-section" class="w-full max-w-md my-auto pt-2 sm:pt-4 hidden">
+      <div class="glass-panel p-8 sm:p-10 rounded-3xl relative overflow-hidden text-center transition-all duration-300">
+        
+        <!-- Ambient Decorative Red Glow -->
+        <div class="absolute -top-24 -left-24 w-48 h-48 bg-red-500/15 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Clock / Expired Icon Badge -->
+        <div class="w-16 h-16 bg-red-500/10 border border-red-500/30 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl text-red-400">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+
+        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2 font-serif">
+          已過下載期限或已被下架
+        </h1>
+        <p class="text-xs sm:text-sm text-gray-400 leading-relaxed mb-8">
+          此相簿已超過 14 天保存期限並由 Cloudflare 伺服器自動刪除。如需重新發送檔案，請聯繫攝影師。
+        </p>
+
+        <a 
+          href="mailto:weipic2023@gmail.com" 
+          class="w-full py-3.5 px-6 bg-white/10 hover:bg-white/20 text-white font-semibold text-sm rounded-xl border border-white/15 transition-all flex items-center justify-center gap-2"
+        >
+          <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="2.5 5.3 19 12.4"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          <span>聯繫攝影師 (Email)</span>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- ❓ 5. 找不到頁面 / 案子編號無效卡片 (404 Card - Hidden by default) -->
+    <!-- ========================================================================= -->
+    <section id="notfound-section" class="w-full max-w-md my-auto pt-2 sm:pt-4 hidden">
+      <div class="glass-panel p-8 sm:p-10 rounded-3xl relative overflow-hidden text-center transition-all duration-300">
+        
+        <!-- Ambient Decorative Glow -->
+        <div class="absolute -top-24 -left-24 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-white/5 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- 404 Warning Icon Badge -->
+        <div class="w-16 h-16 bg-white/5 border border-white/20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl text-amber-400">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+        </div>
+
+        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2 font-serif">
+          找不到此頁面
+        </h1>
+        <p class="text-xs sm:text-sm text-gray-400 leading-relaxed mb-8">
+          您存取的相簿編號不存在或網址拼寫有誤。請確認您的存取連結或返回首頁。
+        </p>
+
+        <a 
+          href="index.html" 
+          class="w-full py-3.5 px-6 bg-amber-400 hover:bg-amber-300 text-black font-semibold text-sm rounded-xl btn-gold-glow transition-all flex items-center justify-center gap-2 cursor-pointer"
+        >
+          <span>返回首頁</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+        </a>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- 🔍 3. 燈箱全螢幕預覽 Modal (Download Lightbox Modal) -->
+  <!-- ========================================================================= -->
+  <div id="download-lightbox-modal" class="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-2xl hidden flex-col items-center justify-between p-4 sm:p-6 transition-all duration-300">
+    
+    <!-- Top Header Bar inside Lightbox -->
+    <div class="w-full max-w-7xl flex items-center justify-between z-20">
+      <span id="download-lightbox-counter" class="text-xs font-mono text-gray-400 bg-white/10 px-3 py-1 rounded-full border border-white/10">
+        1 / 1
+      </span>
+      <button 
+        type="button" 
+        onclick="closeDownloadLightbox()" 
+        class="text-gray-400 hover:text-white p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors backdrop-blur-md"
+        aria-label="Close Lightbox"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <!-- Center High-Res Image Box -->
+    <div id="download-lightbox-stage" class="relative flex-grow flex items-center justify-center w-full max-h-[82vh] my-auto overflow-hidden touch-pan-y">
+      <!-- Prev Button -->
+      <button 
+        type="button" 
+        onclick="navigateDownloadLightbox(-1)" 
+        class="absolute left-2 sm:left-4 z-20 text-white p-3 rounded-full bg-black/50 hover:bg-amber-400 hover:text-black border border-white/10 transition-all backdrop-blur-md"
+        aria-label="Previous Photo"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      </button>
+
+      <!-- Lightbox Image -->
+      <img id="download-lightbox-img" src="" alt="High Res Preview" class="max-w-full max-h-[78vh] object-contain rounded-lg shadow-2xl transition-all duration-300 select-none" />
+
+      <!-- Next Button -->
+      <button 
+        type="button" 
+        onclick="navigateDownloadLightbox(1)" 
+        class="absolute right-2 sm:right-4 z-20 text-white p-3 rounded-full bg-black/50 hover:bg-amber-400 hover:text-black border border-white/10 transition-all backdrop-blur-md"
+        aria-label="Next Photo"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+
+    <!-- Bottom Action Bar inside Lightbox -->
+    <div class="w-full max-w-xl flex items-center justify-center gap-4 z-20 pt-2">
+      <button 
+        type="button" 
+        id="download-lightbox-dl-btn" 
+        class="py-3 px-8 bg-amber-400 hover:bg-amber-300 text-black font-semibold text-sm rounded-xl btn-gold-glow transition-all flex items-center justify-center gap-2 shadow-xl"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        <span>Download</span>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-[#08080a] border-t border-white/10 py-12 text-gray-400 text-sm">
+    <div class="max-w-6xl mx-auto px-6 flex flex-col items-center justify-center space-y-6 text-center">
+      <div class="flex items-center justify-center gap-5 sm:gap-6">
+        <img src="assets/images/logo.svg" alt="Wei's Portfolio Logo" draggable="false" class="h-8 sm:h-9 w-auto object-contain opacity-90" />
+        <a href="https://www.instagram.com/wei.pictures/" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-amber-400 transition-colors p-1 flex items-center justify-center" aria-label="Instagram">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+          </svg>
+        </a>
+        <a href="mailto:weipic2023@gmail.com" class="text-gray-300 hover:text-amber-400 transition-colors p-1 flex items-center justify-center" aria-label="Email Me">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="2.5 5.3 19 12.4">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+        </a>
+      </div>
+
+      <div class="flex items-center gap-3 text-xs text-gray-500"><p class="text-xs text-gray-500">© 2026 Wei.pictures. All rights reserved.</p><a href="privacy.html" class="hover:text-amber-400">隱私權政策</a></div>
+    </div>
+  </footer>
+  <script src="js/analytics.js"></script>
+
+  <script src="js/portfolio-data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
