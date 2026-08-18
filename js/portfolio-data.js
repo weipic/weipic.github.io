@@ -804,6 +804,22 @@ window.PORTFOLIO_DATA = {
       },
       {
         id: "port-8",
+        title: "聖誕全家福寫真",
+        client: "Christmas",
+        year: "2024",
+        cover: "assets/images/portrait/CH1218 (2).webp",
+        position: "50% 50%",
+        photos: [
+          "assets/images/portrait/CH1218 (4).webp",
+          "assets/images/portrait/CH1218 (5).webp",
+          "assets/images/portrait/CH1218 (3).webp",
+          "assets/images/portrait/CH1218 (2).webp",
+          "assets/images/portrait/CH1218 (1).webp",
+        ],
+        description: "點亮冬夜的幸福時光"
+      },
+      {
+        id: "port-9",
         title: "城市裡的小確幸",
         client: "Passerby",
         year: "2024-2025",
@@ -820,7 +836,7 @@ window.PORTFOLIO_DATA = {
         description: "那是只有我們，才能懂的日常風景"
       },
       {
-        id: "port-9",
+        id: "port-10",
         title: "街頭百態",
         client: "Passerby",
         year: "2025",
