@@ -201,6 +201,7 @@ window.PORTFOLIO_DATA = {
     "logoText": "TAMRON",
     galleryId: "comm-8"
     },
+    /*
     {
     "id": "collab-8",
     "brand": "美若康隱形眼鏡",
@@ -211,6 +212,7 @@ window.PORTFOLIO_DATA = {
     "logoText": "美若康隱形眼鏡",
     galleryId: "comm-5"
     },
+    */
     {
     "id": "collab-7",
     "brand": "MAHIRU",
@@ -241,6 +243,7 @@ window.PORTFOLIO_DATA = {
     "logoText": "PNGL",
     galleryId: "comm-7"
     },
+    /*
     {
     "id": "collab-4",
     "brand": "ACMEITEM",
@@ -251,6 +254,7 @@ window.PORTFOLIO_DATA = {
     "logoText": "ACMEITEM",
     galleryId: "comm-6"
     },
+    */
     {
     "id": "collab-3",
     "brand": "KASE",
@@ -389,10 +393,10 @@ window.PORTFOLIO_DATA = {
     title: "人像攝影",
     titleEn: "Portrait Photography",
     description: "個人寫真與形象照，捕捉個人氣質",
-    cover: "assets/images/portrait/LOLO (7).webp",
+    cover: "assets/images/portrait/passerby (3).webp",
     pageUrl: "portrait.html",
     badge: "Portrait",
-    position: "bottom center",
+    position: "40% 70%",
     scale: 1.1
     },
     {
@@ -544,6 +548,7 @@ window.PORTFOLIO_DATA = {
         ],
         description: "極簡暗調的香氛美學。"
       },
+      /*
       {
         id: "comm-5",
         title: "棒球女孩LOLO-美若康矽水膠隱形眼鏡中職明星賽抽獎活動視覺",
@@ -577,6 +582,7 @@ window.PORTFOLIO_DATA = {
         ],
         description: "球場上的清爽微風，淡紫灰色的防潑水外套襯托出自然好氣色"
       },
+      */
       {
         id: "comm-7",
         title: "LIGHTZIP 秒收捲捲包 27-32L 輕量化後背包",
@@ -657,6 +663,7 @@ window.PORTFOLIO_DATA = {
       },
     ],
     portrait: [
+      /*
       {
         id: "port-1",
         title: "棒球女孩LOLO-日系主題拍攝",
@@ -682,6 +689,7 @@ window.PORTFOLIO_DATA = {
         ],
         description: "純淨藍天下的日系青春映象"
       },
+      */
       {
         id: "port-2",
         title: "昭和浪漫-梓曦",
@@ -1476,6 +1484,7 @@ window.PORTFOLIO_DATA = {
         ],
         description: "2025.04.22"
       },
+      /*
       {
         id: "sp-7",
         title: "棒球女孩LOLO",
@@ -1495,6 +1504,7 @@ window.PORTFOLIO_DATA = {
         ],
         description: "2025.04.26"
       },
+      */
       {
         id: "sp-8",
         title: "中華民國115年全國大專校院運動會一般組北區羽球資格賽",
