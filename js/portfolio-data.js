@@ -19,7 +19,7 @@ window.PORTFOLIO_DATA = {
     instagramHandle: "@wei.pictures",
     experienceYears: "2+",
     stats: [
-      { label: "IG粉絲數", value: "6500+" },
+      { label: "IG粉絲數", value: "˙7000+" },
       { label: "攝影年資", value: "2+" },
       { label: "合作經歷", value: "20+" },
       { label: "攝影獎項", value: "7+" }
