@@ -8,7 +8,12 @@ const workerDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..
 const generatedPath = path.join(workerDir, '.generated', 'gallery-kv.json');
 const wranglerPath = path.join(workerDir, 'node_modules', '.bin', process.platform === 'win32' ? 'wrangler.cmd' : 'wrangler');
 const shouldApply = process.argv.includes('--apply');
+const confirmedRecovery = process.argv.includes('--confirm-local-authority');
 const managedPrefixes = ['gallery:', 'password-index:'];
+
+if (shouldApply && !confirmedRecovery) {
+  throw new Error('雲端管理中心已是正式資料來源；若為災難復原，請明確加上 --confirm-local-authority');
+}
 
 if (!fs.existsSync(generatedPath)) {
   throw new Error('找不到 .generated/gallery-kv.json，請先執行 npm run build:config');

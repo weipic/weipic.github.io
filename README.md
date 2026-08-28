@@ -81,14 +81,15 @@ npm run dev
 - `worker/.generated/`
 - `worker/gallery-config.private.json`
 - `worker/new-passwords.private.txt`
+- `worker/admin-credentials.private.txt`
 
-變更相簿資料時，先執行 `npm run check:config` 比對設定；確認無誤後才使用 `npm run sync:config` 更新線上 KV。
+日常相簿管理改由 [Cloudflare 雲端管理中心](https://weipic-api.weipic2023.workers.dev/admin) 完成，可新增、修改、下架、刪除相簿並從 R2 自動讀取照片清單。本機同步指令已停用，避免舊 JSON 覆蓋雲端資料；災難復原流程請看 `worker/DEPLOY.md`。
 
 ## 發布
 
 - 公開前端：提交並推送至 `main`，由 GitHub Pages 發布。
 - Worker 程式：在 `worker/` 執行 `npm run deploy`。
-- 僅修改相簿資料：不需重新部署 Worker；依部署文件同步 KV 即可。
+- 僅修改相簿資料：不需重新部署 Worker，直接使用雲端管理中心。
 
 發布前請至少執行：
 

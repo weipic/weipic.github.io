@@ -1,3 +1,5 @@
+import { handleAdminRequest } from './admin.js';
+
 const encoder = new TextEncoder();
 
 function json(data, status = 200, headers = {}) {
@@ -309,6 +311,9 @@ async function handlePhoto(request, env, origin, match, ctx) {
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    if (url.pathname === '/admin' || url.pathname.startsWith('/admin/')) {
+      return handleAdminRequest(request, env);
+    }
     const origin = getAllowedOrigin(request, env);
     if (origin === false) return json({ success: false, message: '不允許的來源' }, 403);
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders(origin) });

@@ -1,0 +1,357 @@
+import { ADMIN_APP_JS, ADMIN_HTML, ADMIN_STYLES } from './admin-ui.js';
+
+const encoder = new TextEncoder();
+const ADMIN_COOKIE = '__Host-weipic_admin';
+const ADMIN_SESSION_SECONDS = 8 * 60 * 60;
+const MAX_BODY_BYTES = 256 * 1024;
+
+function json(data, status = 200, headers = {}) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Cache-Control': 'no-store',
+      'X-Content-Type-Options': 'nosniff',
+      'Referrer-Policy': 'no-referrer',
+      ...headers
+    }
+  });
+}
+
+function adminAsset(body, contentType) {
+  return new Response(body, {
+    headers: {
+      'Content-Type': contentType,
+      'Cache-Control': 'no-store',
+      'Content-Security-Policy': "default-src 'none'; frame-ancestors 'none'; base-uri 'none'",
+      'X-Content-Type-Options': 'nosniff',
+      'Referrer-Policy': 'no-referrer'
+    }
+  });
+}
+
+function adminPage() {
+  return new Response(ADMIN_HTML, {
+    headers: {
+      'Content-Type': 'text/html; charset=utf-8',
+      'Cache-Control': 'no-store',
+      'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
+      'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=()',
+      'X-Content-Type-Options': 'nosniff',
+      'Referrer-Policy': 'no-referrer',
+      'X-Frame-Options': 'DENY'
+    }
+  });
+}
+
+function toBase64Url(bytes) {
+  let binary = '';
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+}
+
+function fromBase64Url(value) {
+  const padded = value.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((value.length + 3) % 4);
+  const binary = atob(padded);
+  return Uint8Array.from(binary, char => char.charCodeAt(0));
+}
+
+async function hmac(value, secret) {
+  const key = await crypto.subtle.importKey(
+    'raw', encoder.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+  );
+  return new Uint8Array(await crypto.subtle.sign('HMAC', key, encoder.encode(value)));
+}
+
+async function digestPassword(password, pepper) {
+  return toBase64Url(await hmac(password, pepper));
+}
+
+function constantTimeEqual(left, right) {
+  const a = encoder.encode(String(left || ''));
+  const b = encoder.encode(String(right || ''));
+  let mismatch = a.length ^ b.length;
+  const length = Math.max(a.length, b.length);
+  for (let index = 0; index < length; index++) {
+    mismatch |= (a[index % Math.max(a.length, 1)] || 0) ^ (b[index % Math.max(b.length, 1)] || 0);
+  }
+  return mismatch === 0;
+}
+
+function randomPassword() {
+  const bytes = new Uint8Array(18);
+  crypto.getRandomValues(bytes);
+  return toBase64Url(bytes);
+}
+
+async function issueAdminSession(env) {
+  const payload = toBase64Url(encoder.encode(JSON.stringify({
+    role: 'gallery-admin',
+    exp: Math.floor(Date.now() / 1000) + ADMIN_SESSION_SECONDS
+  })));
+  const signature = toBase64Url(await hmac(`admin.${payload}`, env.TOKEN_SECRET));
+  return `${payload}.${signature}`;
+}
+
+function cookieValue(request, name) {
+  const cookies = String(request.headers.get('Cookie') || '').split(';');
+  for (const cookie of cookies) {
+    const index = cookie.indexOf('=');
+    if (index > 0 && cookie.slice(0, index).trim() === name) return cookie.slice(index + 1).trim();
+  }
+  return '';
+}
+
+async function hasAdminSession(request, env) {
+  if (!env.TOKEN_SECRET) return false;
+  const token = cookieValue(request, ADMIN_COOKIE);
+  const [payload, signature, extra] = token.split('.');
+  if (!payload || !signature || extra) return false;
+  const expected = toBase64Url(await hmac(`admin.${payload}`, env.TOKEN_SECRET));
+  if (!constantTimeEqual(signature, expected)) return false;
+  try {
+    const data = JSON.parse(new TextDecoder().decode(fromBase64Url(payload)));
+    return data.role === 'gallery-admin' && Number(data.exp) > Math.floor(Date.now() / 1000);
+  } catch {
+    return false;
+  }
+}
+
+function sessionCookie(token) {
+  return `${ADMIN_COOKIE}=${token}; Path=/; Secure; HttpOnly; SameSite=Strict; Max-Age=${ADMIN_SESSION_SECONDS}`;
+}
+
+function clearSessionCookie() {
+  return `${ADMIN_COOKIE}=; Path=/; Secure; HttpOnly; SameSite=Strict; Max-Age=0`;
+}
+
+function sameOrigin(request) {
+  const origin = request.headers.get('Origin');
+  if (!origin) return false;
+  return origin === new URL(request.url).origin;
+}
+
+async function readJson(request) {
+  const length = Number(request.headers.get('Content-Length') || 0);
+  if (length > MAX_BODY_BYTES) throw new Error('資料量過大');
+  try {
+    return await request.json();
+  } catch {
+    throw new Error('JSON 格式不正確');
+  }
+}
+
+function cleanText(value, label, maximum, required = false) {
+  const text = String(value || '').trim();
+  if (required && !text) throw new Error(`${label}不可空白`);
+  if (text.length > maximum) throw new Error(`${label}過長`);
+  return text;
+}
+
+function normalizeGallery(input) {
+  const id = cleanText(input.id, '相簿 ID', 100, true);
+  if (!/^[A-Za-z0-9][A-Za-z0-9_-]*$/.test(id)) {
+    throw new Error('相簿 ID 只能使用英文字母、數字、連字號與底線');
+  }
+  const prefix = cleanText(input.prefix, 'R2 資料夾', 500).replace(/^\/+/, '');
+  if (!prefix || prefix.includes('..')) throw new Error('R2 資料夾不可空白或包含 ..');
+  const photos = Array.isArray(input.photos)
+    ? input.photos.map(item => cleanText(typeof item === 'string' ? item : item?.filename, '照片檔名', 1000)).filter(Boolean)
+    : [];
+  if (photos.some(filename => filename.includes('..') || filename.startsWith('/'))) {
+    throw new Error('照片檔名不可包含 .. 或以 / 開頭');
+  }
+  if (new Set(photos).size !== photos.length) throw new Error('照片清單包含重複檔名');
+  const isDeleted = input.isDeleted === true;
+  if (!isDeleted && photos.length === 0) throw new Error('上架中的相簿至少需要一張照片');
+  const expiryDays = Number(input.expiryDays ?? 14);
+  if (!Number.isInteger(expiryDays) || expiryDays < 0 || expiryDays > 3650) {
+    throw new Error('有效天數必須是 0 到 3650 的整數');
+  }
+  const deliveryDate = cleanText(input.deliveryDate, '交件日期', 10);
+  if (deliveryDate && !/^\d{4}[.\/-]\d{2}[.\/-]\d{2}$/.test(deliveryDate)) {
+    throw new Error('交件日期格式必須為 YYYY.MM.DD');
+  }
+  return {
+    id,
+    clientName: cleanText(input.clientName, '客戶名稱', 200),
+    albumTitle: cleanText(input.albumTitle, '相簿名稱', 300, true),
+    pageTitle: cleanText(input.pageTitle, '頁面標題', 300),
+    zipFilename: cleanText(input.zipFilename, 'ZIP 檔名', 200),
+    deliveryDate: deliveryDate.replace(/[\/-]/g, '.'),
+    expiryDays,
+    isDeleted,
+    prefix: prefix.endsWith('/') ? prefix : `${prefix}/`,
+    photos
+  };
+}
+
+function publicAdminGallery(config) {
+  const { passwordDigest: _, ...gallery } = config;
+  return { ...gallery, hasPassword: Boolean(config.passwordDigest) };
+}
+
+async function listAllKeys(namespace, prefix) {
+  const keys = [];
+  let cursor;
+  do {
+    const page = await namespace.list({ prefix, cursor });
+    keys.push(...page.keys);
+    cursor = page.list_complete ? undefined : page.cursor;
+  } while (cursor);
+  return keys;
+}
+
+async function listGalleries(env) {
+  const keys = await listAllKeys(env.GALLERY_CONFIG, 'gallery:');
+  const configs = await Promise.all(keys.map(key => env.GALLERY_CONFIG.get(key.name, 'json')));
+  return configs.filter(Boolean).map(publicAdminGallery).sort((a, b) => a.id.localeCompare(b.id));
+}
+
+async function backupGallery(env, action, config) {
+  if (!config) return;
+  const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const nonce = toBase64Url(crypto.getRandomValues(new Uint8Array(6)));
+  const key = `gallery-backup:${config.id.toLowerCase()}:${stamp}:${nonce}`;
+  await env.GALLERY_CONFIG.put(key, JSON.stringify({ action, savedAt: new Date().toISOString(), gallery: config }));
+}
+
+async function saveGallery(request, env) {
+  const body = await readJson(request);
+  const gallery = normalizeGallery(body.gallery || {});
+  const originalId = cleanText(body.originalId || gallery.id, '原相簿 ID', 100).toLowerCase();
+  const oldConfig = await env.GALLERY_CONFIG.get(`gallery:${originalId}`, 'json');
+  const newId = gallery.id.toLowerCase();
+  const collision = newId !== originalId
+    ? await env.GALLERY_CONFIG.get(`gallery:${newId}`, 'json')
+    : null;
+  if (collision) return json({ success: false, message: '新的相簿 ID 已存在' }, 409);
+
+  let password = String(body.password || '').trim();
+  if (body.generatePassword === true) password = randomPassword();
+  let digest = oldConfig?.passwordDigest || '';
+  if (password) digest = await digestPassword(password, env.PASSWORD_PEPPER);
+  if (!digest) return json({ success: false, message: '新增相簿必須輸入密碼或自動產生密碼' }, 400);
+
+  const indexedId = await env.GALLERY_CONFIG.get(`password-index:${digest}`);
+  if (indexedId && indexedId.toLowerCase() !== originalId) {
+    return json({ success: false, message: '這組密碼已被其他相簿使用，請換一組密碼' }, 409);
+  }
+
+  const config = { ...gallery, passwordDigest: digest, updatedAt: new Date().toISOString() };
+  await backupGallery(env, oldConfig ? 'update' : 'create', oldConfig);
+  await env.GALLERY_CONFIG.put(`gallery:${newId}`, JSON.stringify(config));
+  await env.GALLERY_CONFIG.put(`password-index:${digest}`, gallery.id);
+
+  if (oldConfig && oldConfig.passwordDigest !== digest) {
+    await env.GALLERY_CONFIG.delete(`password-index:${oldConfig.passwordDigest}`);
+  }
+  if (oldConfig && originalId !== newId) {
+    await env.GALLERY_CONFIG.delete(`gallery:${originalId}`);
+  }
+
+  return json({
+    success: true,
+    gallery: publicAdminGallery(config),
+    generatedPassword: body.generatePassword === true ? password : undefined,
+    message: oldConfig ? '相簿已更新' : '相簿已建立'
+  });
+}
+
+async function deleteGallery(id, env) {
+  const normalizedId = cleanText(id, '相簿 ID', 100, true).toLowerCase();
+  const config = await env.GALLERY_CONFIG.get(`gallery:${normalizedId}`, 'json');
+  if (!config) return json({ success: false, message: '找不到相簿' }, 404);
+  await backupGallery(env, 'delete', config);
+  if (config.passwordDigest) await env.GALLERY_CONFIG.delete(`password-index:${config.passwordDigest}`);
+  await env.GALLERY_CONFIG.delete(`gallery:${normalizedId}`);
+  return json({ success: true, message: '相簿下載資訊已刪除，R2 原始照片仍保留' });
+}
+
+async function listR2(prefix, env) {
+  const normalized = cleanText(prefix, 'R2 資料夾', 500, true).replace(/^\/+/, '');
+  if (normalized.includes('..')) return json({ success: false, message: 'R2 資料夾不可包含 ..' }, 400);
+  const folder = normalized.endsWith('/') ? normalized : `${normalized}/`;
+  const filenames = [];
+  let cursor;
+  do {
+    const page = await env.GALLERY_BUCKET.list({ prefix: folder, cursor, limit: 1000 });
+    for (const object of page.objects) {
+      const relative = object.key.slice(folder.length);
+      if (relative && !relative.endsWith('/')) filenames.push(relative);
+      if (filenames.length >= 5000) break;
+    }
+    cursor = page.truncated && filenames.length < 5000 ? page.cursor : undefined;
+  } while (cursor);
+  filenames.sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+  return json({ success: true, prefix: folder, filenames, limited: filenames.length >= 5000 });
+}
+
+async function listBackups(id, env) {
+  const normalizedId = cleanText(id, '相簿 ID', 100, true).toLowerCase();
+  const keys = await listAllKeys(env.GALLERY_CONFIG, `gallery-backup:${normalizedId}:`);
+  const records = await Promise.all(keys.slice(-30).reverse().map(async key => ({
+    key: key.name,
+    ...(await env.GALLERY_CONFIG.get(key.name, 'json'))
+  })));
+  return json({ success: true, backups: records.filter(Boolean).map(record => ({
+    key: record.key,
+    action: record.action,
+    savedAt: record.savedAt,
+    gallery: record.gallery ? publicAdminGallery(record.gallery) : null
+  })) });
+}
+
+async function login(request, env) {
+  if (!sameOrigin(request)) return json({ success: false, message: '不允許的請求來源' }, 403);
+  if (!env.ADMIN_PASSWORD || !env.TOKEN_SECRET || !env.PASSWORD_PEPPER) {
+    return json({ success: false, message: '管理後台尚未完成安全設定' }, 503);
+  }
+  const actor = request.headers.get('CF-Connecting-IP') || 'unknown';
+  const rate = await env.AUTH_RATE_LIMITER.limit({ key: `gallery-admin:${actor}` });
+  if (!rate.success) return json({ success: false, message: '嘗試次數過多，請稍後再試' }, 429);
+  const body = await readJson(request);
+  if (!constantTimeEqual(String(body.password || ''), env.ADMIN_PASSWORD)) {
+    return json({ success: false, message: '管理密碼錯誤' }, 401);
+  }
+  const token = await issueAdminSession(env);
+  return json({ success: true }, 200, { 'Set-Cookie': sessionCookie(token) });
+}
+
+async function routeAdminRequest(request, env) {
+  const url = new URL(request.url);
+  if (request.method === 'GET' && (url.pathname === '/admin' || url.pathname === '/admin/')) return adminPage();
+  if (request.method === 'GET' && url.pathname === '/admin/style.css') return adminAsset(ADMIN_STYLES, 'text/css; charset=utf-8');
+  if (request.method === 'GET' && url.pathname === '/admin/app.js') return adminAsset(ADMIN_APP_JS, 'text/javascript; charset=utf-8');
+  if (request.method === 'POST' && url.pathname === '/admin/api/login') return login(request, env);
+
+  const authenticated = await hasAdminSession(request, env);
+  if (request.method === 'GET' && url.pathname === '/admin/api/session') return json({ authenticated });
+  if (!authenticated) return json({ success: false, message: '管理登入已失效' }, 401);
+  if (!['GET', 'HEAD'].includes(request.method) && !sameOrigin(request)) {
+    return json({ success: false, message: '不允許的請求來源' }, 403);
+  }
+
+  if (request.method === 'POST' && url.pathname === '/admin/api/logout') {
+    return json({ success: true }, 200, { 'Set-Cookie': clearSessionCookie() });
+  }
+  if (request.method === 'GET' && url.pathname === '/admin/api/galleries') {
+    return json({ success: true, galleries: await listGalleries(env) });
+  }
+  if (request.method === 'POST' && url.pathname === '/admin/api/galleries') return saveGallery(request, env);
+  const galleryMatch = url.pathname.match(/^\/admin\/api\/galleries\/([^/]+)$/);
+  if (request.method === 'DELETE' && galleryMatch) return deleteGallery(decodeURIComponent(galleryMatch[1]), env);
+  const backupMatch = url.pathname.match(/^\/admin\/api\/galleries\/([^/]+)\/backups$/);
+  if (request.method === 'GET' && backupMatch) return listBackups(decodeURIComponent(backupMatch[1]), env);
+  if (request.method === 'GET' && url.pathname === '/admin/api/r2') return listR2(url.searchParams.get('prefix'), env);
+  return json({ success: false, message: '找不到管理功能' }, 404);
+}
+
+export async function handleAdminRequest(request, env) {
+  try {
+    return await routeAdminRequest(request, env);
+  } catch (error) {
+    console.error('Gallery admin request failed:', error);
+    return json({ success: false, message: error instanceof Error ? error.message : '雲端操作失敗' }, 400);
+  }
+}
