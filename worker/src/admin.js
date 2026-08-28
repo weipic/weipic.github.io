@@ -4,6 +4,7 @@ const encoder = new TextEncoder();
 const ADMIN_COOKIE = '__Host-weipic_admin';
 const ADMIN_SESSION_SECONDS = 8 * 60 * 60;
 const MAX_BODY_BYTES = 256 * 1024;
+const ADMIN_PASSWORD_KEY = 'admin:password-digest';
 
 function json(data, status = 200, headers = {}) {
   return new Response(JSON.stringify(data), {
@@ -87,6 +88,7 @@ function randomPassword() {
 async function issueAdminSession(env) {
   const payload = toBase64Url(encoder.encode(JSON.stringify({
     role: 'gallery-admin',
+    nonce: toBase64Url(crypto.getRandomValues(new Uint8Array(12))),
     exp: Math.floor(Date.now() / 1000) + ADMIN_SESSION_SECONDS
   })));
   const signature = toBase64Url(await hmac(`admin.${payload}`, env.TOKEN_SECRET));
@@ -302,16 +304,51 @@ async function listBackups(id, env) {
   })) });
 }
 
+async function adminPasswordMatches(password, env) {
+  const storedDigest = await env.GALLERY_CONFIG.get(ADMIN_PASSWORD_KEY);
+  if (storedDigest) {
+    const candidate = await digestPassword(String(password || ''), env.PASSWORD_PEPPER);
+    return constantTimeEqual(candidate, storedDigest);
+  }
+  return Boolean(env.ADMIN_PASSWORD) && constantTimeEqual(String(password || ''), env.ADMIN_PASSWORD);
+}
+
+async function changeAdminPassword(request, env) {
+  const body = await readJson(request);
+  const currentPassword = String(body.currentPassword || '');
+  const newPassword = String(body.newPassword || '').trim();
+  const confirmation = String(body.confirmPassword || '').trim();
+  if (!(await adminPasswordMatches(currentPassword, env))) {
+    return json({ success: false, message: '目前管理密碼錯誤' }, 401);
+  }
+  if (newPassword.length < 8 || newPassword.length > 128) {
+    return json({ success: false, message: '新管理密碼必須為 8 到 128 個字元' }, 400);
+  }
+  if (newPassword !== confirmation) {
+    return json({ success: false, message: '兩次輸入的新密碼不一致' }, 400);
+  }
+  if (constantTimeEqual(currentPassword, newPassword)) {
+    return json({ success: false, message: '新密碼不可與目前密碼相同' }, 400);
+  }
+
+  const digest = await digestPassword(newPassword, env.PASSWORD_PEPPER);
+  await env.GALLERY_CONFIG.put(ADMIN_PASSWORD_KEY, digest);
+  const token = await issueAdminSession(env);
+  return json({ success: true, message: '管理密碼已更新，請保存到密碼管理器' }, 200, {
+    'Set-Cookie': sessionCookie(token)
+  });
+}
+
 async function login(request, env) {
   if (!sameOrigin(request)) return json({ success: false, message: '不允許的請求來源' }, 403);
-  if (!env.ADMIN_PASSWORD || !env.TOKEN_SECRET || !env.PASSWORD_PEPPER) {
+  if (!env.TOKEN_SECRET || !env.PASSWORD_PEPPER) {
     return json({ success: false, message: '管理後台尚未完成安全設定' }, 503);
   }
   const actor = request.headers.get('CF-Connecting-IP') || 'unknown';
   const rate = await env.AUTH_RATE_LIMITER.limit({ key: `gallery-admin:${actor}` });
   if (!rate.success) return json({ success: false, message: '嘗試次數過多，請稍後再試' }, 429);
   const body = await readJson(request);
-  if (!constantTimeEqual(String(body.password || ''), env.ADMIN_PASSWORD)) {
+  if (!(await adminPasswordMatches(body.password, env))) {
     return json({ success: false, message: '管理密碼錯誤' }, 401);
   }
   const token = await issueAdminSession(env);
@@ -334,6 +371,9 @@ async function routeAdminRequest(request, env) {
 
   if (request.method === 'POST' && url.pathname === '/admin/api/logout') {
     return json({ success: true }, 200, { 'Set-Cookie': clearSessionCookie() });
+  }
+  if (request.method === 'POST' && url.pathname === '/admin/api/password') {
+    return changeAdminPassword(request, env);
   }
   if (request.method === 'GET' && url.pathname === '/admin/api/galleries') {
     return json({ success: true, galleries: await listGalleries(env) });

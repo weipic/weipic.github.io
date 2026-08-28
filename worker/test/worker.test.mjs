@@ -129,14 +129,14 @@ test('wrong password and unapproved origin are rejected', async () => {
   assert.equal(origin.status, 403);
 });
 
-async function adminLogin(env) {
+async function adminLogin(env, adminPassword = env.ADMIN_PASSWORD, expectedStatus = 200) {
   const response = await worker.fetch(new Request('https://worker.example/admin/api/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Origin: 'https://worker.example' },
-    body: JSON.stringify({ password: env.ADMIN_PASSWORD })
+    body: JSON.stringify({ password: adminPassword })
   }), env);
-  assert.equal(response.status, 200);
-  return response.headers.get('Set-Cookie').split(';')[0];
+  assert.equal(response.status, expectedStatus);
+  return response.headers.get('Set-Cookie')?.split(';')[0] || '';
 }
 
 function adminRequest(path, cookie, options = {}) {
@@ -164,6 +164,38 @@ test('admin page is isolated and login rate-protected', async () => {
     body: JSON.stringify({ password: 'wrong' })
   }), env);
   assert.equal(denied.status, 401);
+});
+
+test('admin can change the password without storing plaintext credentials', async () => {
+  const env = makeEnv();
+  const oldCookie = await adminLogin(env);
+  const mismatch = await worker.fetch(adminRequest('/admin/api/password', oldCookie, {
+    method: 'POST',
+    body: JSON.stringify({
+      currentPassword: env.ADMIN_PASSWORD,
+      newPassword: 'memorable-password',
+      confirmPassword: 'different-password'
+    })
+  }), env);
+  assert.equal(mismatch.status, 400);
+
+  const changed = await worker.fetch(adminRequest('/admin/api/password', oldCookie, {
+    method: 'POST',
+    body: JSON.stringify({
+      currentPassword: env.ADMIN_PASSWORD,
+      newPassword: 'memorable-password',
+      confirmPassword: 'memorable-password'
+    })
+  }), env);
+  assert.equal(changed.status, 200);
+  const newCookie = changed.headers.get('Set-Cookie').split(';')[0];
+  assert.notEqual(newCookie, oldCookie);
+  assert.notEqual(env._values.get('admin:password-digest'), 'memorable-password');
+
+  const oldSession = await worker.fetch(adminRequest('/admin/api/galleries', oldCookie), env);
+  assert.equal(oldSession.status, 200);
+  await adminLogin(env, env.ADMIN_PASSWORD, 401);
+  await adminLogin(env, 'memorable-password', 200);
 });
 
 test('admin can create, list, scan, and delete a gallery without exposing digests', async () => {
