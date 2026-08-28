@@ -5,6 +5,21 @@ const ADMIN_COOKIE = '__Host-weipic_admin';
 const ADMIN_SESSION_SECONDS = 8 * 60 * 60;
 const MAX_BODY_BYTES = 256 * 1024;
 const ADMIN_PASSWORD_KEY = 'admin:password-digest';
+const R2_METRICS_CACHE_KEY = 'admin:r2-metrics-cache';
+const ANALYTICS_TOKEN_KEY = 'admin:analytics-token-encrypted';
+const R2_METRICS_CACHE_SECONDS = 300;
+const MAX_SINGLE_UPLOAD_BYTES = 50 * 1024 * 1024;
+const MAX_R2_OBJECT_BYTES = 5 * 1024 ** 4;
+const CLASS_A_ACTIONS = new Set([
+  'ListBuckets', 'PutBucket', 'ListObjects', 'PutObject', 'CopyObject',
+  'CompleteMultipartUpload', 'CreateMultipartUpload', 'LifecycleStorageTierTransition',
+  'ListMultipartUploads', 'UploadPart', 'UploadPartCopy', 'ListParts',
+  'PutBucketEncryption', 'PutBucketCors', 'PutBucketLifecycleConfiguration'
+]);
+const CLASS_B_ACTIONS = new Set([
+  'HeadBucket', 'HeadObject', 'GetObject', 'UsageSummary', 'GetBucketEncryption',
+  'GetBucketLocation', 'GetBucketCors', 'GetBucketLifecycleConfiguration'
+]);
 
 function json(data, status = 200, headers = {}) {
   return new Response(JSON.stringify(data), {
@@ -66,6 +81,27 @@ async function hmac(value, secret) {
 
 async function digestPassword(password, pepper) {
   return toBase64Url(await hmac(password, pepper));
+}
+
+async function analyticsEncryptionKey(secret) {
+  const bytes = await crypto.subtle.digest('SHA-256', encoder.encode(`weipic-analytics:${secret}`));
+  return crypto.subtle.importKey('raw', bytes, { name: 'AES-GCM' }, false, ['encrypt', 'decrypt']);
+}
+
+async function encryptAnalyticsToken(token, env) {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const key = await analyticsEncryptionKey(env.TOKEN_SECRET);
+  const encrypted = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, encoder.encode(token));
+  return JSON.stringify({ iv: toBase64Url(iv), data: toBase64Url(new Uint8Array(encrypted)) });
+}
+
+async function decryptAnalyticsToken(value, env) {
+  const record = JSON.parse(value);
+  const key = await analyticsEncryptionKey(env.TOKEN_SECRET);
+  const decrypted = await crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv: fromBase64Url(record.iv) }, key, fromBase64Url(record.data)
+  );
+  return new TextDecoder().decode(decrypted);
 }
 
 function constantTimeEqual(left, right) {
@@ -289,6 +325,194 @@ async function listR2(prefix, env) {
   return json({ success: true, prefix: folder, filenames, limited: filenames.length >= 5000 });
 }
 
+function normalizeR2Prefix(value, required = true) {
+  const normalized = cleanText(value, 'R2 資料夾', 500, required).replace(/^\/+/, '');
+  if ((required && !normalized) || normalized.includes('..') || normalized.includes('\\')) {
+    throw new Error('R2 資料夾不可空白或包含 ..、反斜線');
+  }
+  return normalized && !normalized.endsWith('/') ? `${normalized}/` : normalized;
+}
+
+function normalizeUpload(input) {
+  const prefix = normalizeR2Prefix(input.prefix);
+  const filename = cleanText(input.filename, '檔名', 1000, true);
+  if (filename.includes('/') || filename.includes('\\') || filename.includes('..')) {
+    throw new Error('檔名不可包含路徑符號或 ..');
+  }
+  const size = Number(input.size);
+  if (!Number.isFinite(size) || size <= 0 || size > MAX_R2_OBJECT_BYTES) {
+    throw new Error('檔案大小無效或超過 R2 單一物件上限');
+  }
+  const contentType = cleanText(input.contentType || 'application/octet-stream', '檔案類型', 200);
+  return { key: `${prefix}${filename}`, prefix, filename, size, contentType };
+}
+
+async function ensureUploadTarget(upload, overwrite, env) {
+  if (!overwrite && await env.GALLERY_BUCKET.head(upload.key)) {
+    throw new Error(`R2 已存在同名檔案：${upload.filename}`);
+  }
+}
+
+async function uploadR2Object(request, env, url) {
+  if (!request.body) return json({ success: false, message: '缺少檔案內容' }, 400);
+  const upload = normalizeUpload({
+    prefix: url.searchParams.get('prefix'),
+    filename: url.searchParams.get('filename'),
+    size: url.searchParams.get('size'),
+    contentType: request.headers.get('Content-Type')
+  });
+  if (upload.size > MAX_SINGLE_UPLOAD_BYTES) {
+    return json({ success: false, message: '大型檔案請使用多段上傳' }, 413);
+  }
+  await ensureUploadTarget(upload, url.searchParams.get('overwrite') === 'true', env);
+  const object = await env.GALLERY_BUCKET.put(upload.key, request.body, {
+    httpMetadata: { contentType: upload.contentType },
+    customMetadata: { uploadedVia: 'weipic-admin' }
+  });
+  await env.GALLERY_CONFIG.delete(R2_METRICS_CACHE_KEY);
+  return json({ success: true, key: object?.key || upload.key, size: upload.size });
+}
+
+async function createR2Multipart(request, env) {
+  const body = await readJson(request);
+  const upload = normalizeUpload(body);
+  await ensureUploadTarget(upload, body.overwrite === true, env);
+  const multipart = await env.GALLERY_BUCKET.createMultipartUpload(upload.key, {
+    httpMetadata: { contentType: upload.contentType },
+    customMetadata: { uploadedVia: 'weipic-admin' }
+  });
+  return json({ success: true, key: multipart.key, uploadId: multipart.uploadId });
+}
+
+function multipartFromUrl(url, env) {
+  const key = cleanText(url.searchParams.get('key'), 'R2 物件 key', 1500, true);
+  const uploadId = cleanText(url.searchParams.get('uploadId'), 'uploadId', 1000, true);
+  if (key.startsWith('/') || key.includes('..') || key.includes('\\')) throw new Error('R2 物件 key 不安全');
+  return env.GALLERY_BUCKET.resumeMultipartUpload(key, uploadId);
+}
+
+async function uploadR2Part(request, env, url) {
+  if (!request.body) return json({ success: false, message: '缺少分段內容' }, 400);
+  const partNumber = Number(url.searchParams.get('partNumber'));
+  if (!Number.isInteger(partNumber) || partNumber < 1 || partNumber > 10000) {
+    return json({ success: false, message: '分段編號無效' }, 400);
+  }
+  const part = await multipartFromUrl(url, env).uploadPart(partNumber, request.body);
+  return json({ success: true, partNumber: part.partNumber, etag: part.etag });
+}
+
+async function completeR2Multipart(request, env, url) {
+  const body = await readJson(request);
+  if (!Array.isArray(body.parts) || !body.parts.length || body.parts.length > 10000) {
+    return json({ success: false, message: '多段上傳資料不完整' }, 400);
+  }
+  const parts = body.parts.map(part => ({
+    partNumber: Number(part.partNumber),
+    etag: cleanText(part.etag, 'ETag', 500, true)
+  }));
+  if (parts.some(part => !Number.isInteger(part.partNumber) || part.partNumber < 1)) {
+    return json({ success: false, message: '多段上傳編號無效' }, 400);
+  }
+  const object = await multipartFromUrl(url, env).complete(parts);
+  await env.GALLERY_CONFIG.delete(R2_METRICS_CACHE_KEY);
+  return json({ success: true, key: object.key, etag: object.httpEtag || object.etag || '' });
+}
+
+async function abortR2Multipart(env, url) {
+  await multipartFromUrl(url, env).abort();
+  return json({ success: true });
+}
+
+async function scanR2Storage(env) {
+  let cursor;
+  let objectCount = 0;
+  let payloadSize = 0;
+  do {
+    const page = await env.GALLERY_BUCKET.list({ cursor, limit: 1000 });
+    for (const object of page.objects) {
+      objectCount += 1;
+      payloadSize += Number(object.size || 0);
+    }
+    cursor = page.truncated ? page.cursor : undefined;
+  } while (cursor);
+  return { objectCount, payloadSize };
+}
+
+async function getAnalyticsToken(env) {
+  if (env.CLOUDFLARE_ANALYTICS_TOKEN) return env.CLOUDFLARE_ANALYTICS_TOKEN;
+  const encrypted = await env.GALLERY_CONFIG.get(ANALYTICS_TOKEN_KEY);
+  if (!encrypted) return '';
+  try {
+    return await decryptAnalyticsToken(encrypted, env);
+  } catch (error) {
+    console.error('Unable to decrypt analytics token:', error);
+    return '';
+  }
+}
+
+async function queryR2Operations(env, tokenOverride = '') {
+  const token = tokenOverride || await getAnalyticsToken(env);
+  if (!token || !env.CLOUDFLARE_ACCOUNT_ID || !env.R2_BUCKET_NAME) {
+    return { available: false, classA: null, classB: null, message: '尚未連接 Cloudflare Analytics 唯讀權限' };
+  }
+  const now = new Date();
+  const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+  const query = `query R2Operations($accountTag: string!, $startDate: Time!, $endDate: Time!, $bucketName: string!) {
+    viewer { accounts(filter: { accountTag: $accountTag }) {
+      r2OperationsAdaptiveGroups(limit: 10000, filter: { datetime_geq: $startDate, datetime_leq: $endDate, bucketName: $bucketName }) {
+        sum { requests } dimensions { actionType }
+      }
+    } }
+  }`;
+  const response = await fetch('https://api.cloudflare.com/client/v4/graphql', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query, variables: {
+      accountTag: env.CLOUDFLARE_ACCOUNT_ID,
+      bucketName: env.R2_BUCKET_NAME,
+      startDate: start.toISOString(),
+      endDate: now.toISOString()
+    } })
+  });
+  const data = await response.json();
+  const groups = data?.data?.viewer?.accounts?.[0]?.r2OperationsAdaptiveGroups;
+  if (!response.ok || !Array.isArray(groups) || data.errors?.length) {
+    console.error('R2 analytics query failed:', data.errors || response.status);
+    return { available: false, classA: null, classB: null, message: 'Cloudflare Analytics 暫時無法讀取' };
+  }
+  let classA = 0;
+  let classB = 0;
+  for (const group of groups) {
+    const requests = Number(group?.sum?.requests || 0);
+    const action = group?.dimensions?.actionType;
+    if (CLASS_A_ACTIONS.has(action)) classA += requests;
+    if (CLASS_B_ACTIONS.has(action)) classB += requests;
+  }
+  return { available: true, classA, classB, message: '本月累計作業' };
+}
+
+async function connectAnalytics(request, env) {
+  const body = await readJson(request);
+  const token = cleanText(body.token, 'Analytics token', 1000, true);
+  if (token.length < 20) return json({ success: false, message: 'Analytics token 格式不正確' }, 400);
+  const test = await queryR2Operations(env, token);
+  if (!test.available) return json({ success: false, message: 'Token 無法讀取 R2 Analytics，請確認具備 Account Analytics Read 權限' }, 400);
+  await env.GALLERY_CONFIG.put(ANALYTICS_TOKEN_KEY, await encryptAnalyticsToken(token, env));
+  await env.GALLERY_CONFIG.delete(R2_METRICS_CACHE_KEY);
+  return json({ success: true, message: 'A／B 類作業統計已安全連接' });
+}
+
+async function r2Metrics(env, force = false) {
+  if (!force) {
+    const cached = await env.GALLERY_CONFIG.get(R2_METRICS_CACHE_KEY, 'json');
+    if (cached) return json({ success: true, ...cached, cached: true });
+  }
+  const [storage, operations] = await Promise.all([scanR2Storage(env), queryR2Operations(env)]);
+  const metrics = { ...storage, ...operations, updatedAt: new Date().toISOString() };
+  await env.GALLERY_CONFIG.put(R2_METRICS_CACHE_KEY, JSON.stringify(metrics), { expirationTtl: R2_METRICS_CACHE_SECONDS });
+  return json({ success: true, ...metrics, cached: false });
+}
+
 async function listBackups(id, env) {
   const normalizedId = cleanText(id, '相簿 ID', 100, true).toLowerCase();
   const keys = await listAllKeys(env.GALLERY_CONFIG, `gallery-backup:${normalizedId}:`);
@@ -383,6 +607,13 @@ async function routeAdminRequest(request, env) {
   if (request.method === 'DELETE' && galleryMatch) return deleteGallery(decodeURIComponent(galleryMatch[1]), env);
   const backupMatch = url.pathname.match(/^\/admin\/api\/galleries\/([^/]+)\/backups$/);
   if (request.method === 'GET' && backupMatch) return listBackups(decodeURIComponent(backupMatch[1]), env);
+  if (request.method === 'GET' && url.pathname === '/admin/api/r2/metrics') return r2Metrics(env, url.searchParams.get('refresh') === 'true');
+  if (request.method === 'POST' && url.pathname === '/admin/api/r2/analytics-token') return connectAnalytics(request, env);
+  if (request.method === 'PUT' && url.pathname === '/admin/api/r2/object') return uploadR2Object(request, env, url);
+  if (request.method === 'POST' && url.pathname === '/admin/api/r2/multipart/create') return createR2Multipart(request, env);
+  if (request.method === 'PUT' && url.pathname === '/admin/api/r2/multipart/part') return uploadR2Part(request, env, url);
+  if (request.method === 'POST' && url.pathname === '/admin/api/r2/multipart/complete') return completeR2Multipart(request, env, url);
+  if (request.method === 'POST' && url.pathname === '/admin/api/r2/multipart/abort') return abortR2Multipart(env, url);
   if (request.method === 'GET' && url.pathname === '/admin/api/r2') return listR2(url.searchParams.get('prefix'), env);
   return json({ success: false, message: '找不到管理功能' }, 404);
 }

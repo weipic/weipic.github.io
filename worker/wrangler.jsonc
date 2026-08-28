@@ -6,7 +6,9 @@
 	"workers_dev": true,
 	"vars": {
 		"ALLOWED_ORIGINS": "https://weipic.github.io,http://localhost:8000,http://127.0.0.1:8000",
-		"TOKEN_TTL_SECONDS": "900"
+		"TOKEN_TTL_SECONDS": "900",
+		"CLOUDFLARE_ACCOUNT_ID": "67d372f2e0d54d39e6703405e3e0824e",
+		"R2_BUCKET_NAME": "weipic-deliveries"
 	},
 	"kv_namespaces": [
 		{

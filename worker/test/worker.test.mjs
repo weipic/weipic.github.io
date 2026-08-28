@@ -10,6 +10,12 @@ const digest = createHmac('sha256', pepper).update(password).digest('base64url')
 
 function makeEnv({ hasObject = true } = {}) {
   const imageTransforms = [];
+  const r2Values = new Map(hasObject ? [
+    ['test/001.jpg', { size: 5, contentType: 'image/jpeg' }],
+    ['new-client/001.jpg', { size: 5, contentType: 'image/jpeg' }],
+    ['new-client/002.jpg', { size: 6, contentType: 'image/jpeg' }]
+  ] : []);
+  const multipartValues = new Map();
   const gallery = {
     id: 'test-album',
     passwordDigest: digest,
@@ -29,6 +35,8 @@ function makeEnv({ hasObject = true } = {}) {
     ADMIN_PASSWORD: 'test-admin-password',
     TOKEN_TTL_SECONDS: '900',
     ALLOWED_ORIGINS: 'https://weipic.github.io',
+    CLOUDFLARE_ACCOUNT_ID: 'test-account',
+    R2_BUCKET_NAME: 'test-bucket',
     AUTH_RATE_LIMITER: { limit: async () => ({ success: true }) },
     GALLERY_CONFIG: {
       get: async (key, type) => {
@@ -45,15 +53,43 @@ function makeEnv({ hasObject = true } = {}) {
       })
     },
     GALLERY_BUCKET: {
-      head: async () => hasObject ? { key: 'test/001.jpg', etag: 'test-etag', httpEtag: '"test-etag"' } : null,
-      get: async () => hasObject ? {
+      head: async key => r2Values.has(key) ? { key, size: r2Values.get(key).size, etag: 'test-etag', httpEtag: '"test-etag"' } : null,
+      get: async key => r2Values.has(key) ? {
         body: new Blob(['image']),
         httpEtag: '"test"',
         writeHttpMetadata(headers) { headers.set('Content-Type', 'image/jpeg'); }
       } : null,
-      list: async ({ prefix }) => ({
-        objects: [{ key: `${prefix}001.jpg` }, { key: `${prefix}002.jpg` }],
+      put: async (key, body) => {
+        const bytes = await new Response(body).arrayBuffer();
+        r2Values.set(key, { size: bytes.byteLength, contentType: 'application/octet-stream' });
+        return { key, size: bytes.byteLength, httpEtag: '"put-etag"' };
+      },
+      list: async ({ prefix = '' }) => ({
+        objects: [...r2Values.entries()].filter(([key]) => key.startsWith(prefix)).map(([key, value]) => ({ key, size: value.size })),
         truncated: false
+      }),
+      createMultipartUpload: async key => {
+        const uploadId = `upload-${multipartValues.size + 1}`;
+        multipartValues.set(uploadId, { key, parts: new Map() });
+        return { key, uploadId };
+      },
+      resumeMultipartUpload: (key, uploadId) => ({
+        async uploadPart(partNumber, body) {
+          const upload = multipartValues.get(uploadId);
+          if (!upload || upload.key !== key) throw new Error('NoSuchUpload');
+          const bytes = await new Response(body).arrayBuffer();
+          upload.parts.set(partNumber, bytes);
+          return { partNumber, etag: `etag-${partNumber}` };
+        },
+        async complete(parts) {
+          const upload = multipartValues.get(uploadId);
+          if (!upload || parts.length !== upload.parts.size) throw new Error('InvalidPart');
+          const size = [...upload.parts.values()].reduce((total, bytes) => total + bytes.byteLength, 0);
+          r2Values.set(key, { size, contentType: 'application/octet-stream' });
+          multipartValues.delete(uploadId);
+          return { key, size, httpEtag: '"multipart-etag"' };
+        },
+        async abort() { multipartValues.delete(uploadId); }
       })
     },
     IMAGES: {
@@ -69,7 +105,8 @@ function makeEnv({ hasObject = true } = {}) {
       }
     },
     _imageTransforms: imageTransforms,
-    _values: values
+    _values: values,
+    _r2Values: r2Values
   };
 }
 
@@ -232,4 +269,71 @@ test('admin can create, list, scan, and delete a gallery without exposing digest
   assert.equal(removed.status, 200);
   assert.equal(env._values.has('gallery:new-client'), false);
   assert.equal([...env._values.keys()].some(key => key.startsWith('gallery-backup:new-client:')), true);
+});
+
+test('admin can inspect R2 storage and upload small and multipart objects', async () => {
+  const env = makeEnv();
+  const cookie = await adminLogin(env);
+  const metrics = await worker.fetch(adminRequest('/admin/api/r2/metrics', cookie), env);
+  const metricsData = await metrics.json();
+  assert.equal(metrics.status, 200);
+  assert.equal(metricsData.objectCount, 3);
+  assert.equal(metricsData.payloadSize, 16);
+  assert.equal(metricsData.available, false);
+
+  const small = new Blob(['photo'], { type: 'image/jpeg' });
+  const uploaded = await worker.fetch(adminRequest('/admin/api/r2/object?prefix=uploads&filename=small.jpg&size=5&overwrite=false', cookie, {
+    method: 'PUT', body: small, headers: { 'Content-Type': 'image/jpeg' }
+  }), env);
+  assert.equal(uploaded.status, 200);
+  assert.equal(env._r2Values.get('uploads/small.jpg').size, 5);
+
+  const created = await worker.fetch(adminRequest('/admin/api/r2/multipart/create', cookie, {
+    method: 'POST',
+    body: JSON.stringify({ prefix: 'uploads/', filename: 'large.jpg', size: 60 * 1024 * 1024, contentType: 'image/jpeg' })
+  }), env);
+  const createData = await created.json();
+  assert.equal(created.status, 200);
+  const query = new URLSearchParams({ key: createData.key, uploadId: createData.uploadId, partNumber: '1' });
+  const part = await worker.fetch(adminRequest(`/admin/api/r2/multipart/part?${query}`, cookie, {
+    method: 'PUT', body: new Blob(['part']), headers: { 'Content-Type': 'application/octet-stream' }
+  }), env);
+  const partData = await part.json();
+  assert.equal(part.status, 200);
+  const completeQuery = new URLSearchParams({ key: createData.key, uploadId: createData.uploadId });
+  const completed = await worker.fetch(adminRequest(`/admin/api/r2/multipart/complete?${completeQuery}`, cookie, {
+    method: 'POST', body: JSON.stringify({ parts: [{ partNumber: partData.partNumber, etag: partData.etag }] })
+  }), env);
+  assert.equal(completed.status, 200);
+  assert.equal(env._r2Values.get('uploads/large.jpg').size, 4);
+});
+
+test('analytics token is verified and encrypted before R2 operation metrics are stored', async () => {
+  const env = makeEnv();
+  const cookie = await adminLogin(env);
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify({
+    data: { viewer: { accounts: [{ r2OperationsAdaptiveGroups: [
+      { sum: { requests: 12 }, dimensions: { actionType: 'ListObjects' } },
+      { sum: { requests: 34 }, dimensions: { actionType: 'GetObject' } }
+    ] }] } }
+  }), { headers: { 'Content-Type': 'application/json' } });
+  try {
+    const token = 'analytics-read-only-token-for-test';
+    const connected = await worker.fetch(adminRequest('/admin/api/r2/analytics-token', cookie, {
+      method: 'POST', body: JSON.stringify({ token })
+    }), env);
+    assert.equal(connected.status, 200);
+    const encrypted = env._values.get('admin:analytics-token-encrypted');
+    assert.ok(encrypted);
+    assert.doesNotMatch(encrypted, new RegExp(token));
+
+    const metrics = await worker.fetch(adminRequest('/admin/api/r2/metrics?refresh=true', cookie), env);
+    const data = await metrics.json();
+    assert.equal(data.available, true);
+    assert.equal(data.classA, 12);
+    assert.equal(data.classB, 34);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });

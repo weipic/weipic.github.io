@@ -63,6 +63,9 @@ https://weipic-api.weipic2023.workers.dev/admin
 - 輸入 R2 資料夾後自動讀取照片檔名，不必手動整理 JSON。
 - 複製客戶下載網址及查看修改／刪除前的最近備份。
 - 從右上角「修改密碼」更換管理密碼，不需要 Wrangler 或重新部署。
+- 檢視 R2 儲存大小、物件數量及本月 A／B 類作業統計。
+- 從手機或電腦直接多選照片上傳到私有 R2；超過 50 MiB 的單檔自動使用 8 MiB 多段上傳。
+- 依交件日期（預設最新優先）或相簿名稱 A–Z 排序。
 - 刪除相簿資訊時保留 R2 原始照片，避免誤刪攝影原檔。
 
 管理登入使用獨立的 Worker secret `ADMIN_PASSWORD` 作為初始／復原密碼、限速登入、8 小時 HttpOnly/SameSite 工作階段，以及同源請求檢查。第一次從管理頁修改後，只在 KV 的 `admin:password-digest` 保存加上 pepper 的摘要，初始 secret 不再能登入；已登入裝置最長會在原本的 8 小時工作階段結束後登出。請把新管理密碼保存到密碼管理器，不要放進 Git 或傳給客戶。
@@ -70,6 +73,20 @@ https://weipic-api.weipic2023.workers.dev/admin
 若忘記修改後的管理密碼，可從 Cloudflare KV 刪除 `admin:password-digest`，管理頁便會恢復使用 Worker secret `ADMIN_PASSWORD`；登入後應立即設定新密碼。
 
 KV 是最終資料來源，變更通常很快可見，但全球邊緣快取可能需要約 60 秒或更久才完全更新。
+
+### R2 統計與上傳
+
+R2 容量及物件數由 Worker 的私有 R2 binding 直接掃描，每 5 分鐘快取一次。按「更新統計」可以強制重新計算；掃描本身會產生 R2 `ListObjects` A 類作業。
+
+A／B 類作業使用 Cloudflare 與 Dashboard 相同的 GraphQL Analytics 資料。第一次按「連接 A／B 統計」時：
+
+1. 從畫面連結建立自訂 API Token。
+2. 權限只選 `Account → Account Analytics → Read`，不要加入任何寫入權限。
+3. 將只顯示一次的 token 貼回管理頁，按「驗證並連接」。
+
+Token 驗證成功後會使用由 `TOKEN_SECRET` 衍生的 AES-GCM 金鑰加密，僅將密文保存在 KV；管理 API 不提供讀回明碼的功能。若更換 `TOKEN_SECRET`，需重新連接 Analytics。
+
+「上傳照片到 R2」支援多檔選取、每檔進度、同名檔案防覆蓋，以及選擇性允許覆蓋。上傳成功後，再於新增／編輯相簿中輸入同一 R2 資料夾並按「從 R2 讀取照片」，即可自動建立照片清單。
 
 ## 舊本機設定與災難復原
 
