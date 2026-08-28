@@ -17,7 +17,7 @@ Wei 的個人攝影作品集網站，收錄商業、人像、演唱會、活動�
 
 ## 技術架構
 
-公開網站以 HTML、JavaScript 與 Tailwind CSS 製作，透過 GitHub Pages 發布。私密相簿由 Cloudflare Worker 提供 API，並搭配 KV、R2、Images 與 Rate Limiting；密碼、照片清單及 R2 路徑不會寫入公開前端。
+公開網站以 HTML、JavaScript 與 Tailwind CSS 製作，透過 GitHub Pages 發布。客戶交圖頁會連線至獨立的 Cloudflare 私密相簿 API；密碼、照片清單及 R2 路徑不會寫入公開前端。
 
 ## 專案結構
 
@@ -37,11 +37,8 @@ Wei 的個人攝影作品集網站，收錄商業、人像、演唱會、活動�
 ├── css/                      # Tailwind 與自訂樣式
 ├── js/                       # 作品資料與前端互動
 ├── assets/images/            # 公開網站圖片
-├── scripts/                  # 建置與安全稽核工具
-└── worker/                   # 私密相簿 Cloudflare Worker
+└── scripts/                  # 建置與安全稽核工具
 ```
-
-Worker 設定與發布流程請參考 [worker/DEPLOY.md](worker/DEPLOY.md)。
 
 ## 本機開發
 
@@ -66,36 +63,14 @@ npm run audit           # 執行安全及資源完整性檢查
 npm run check           # 重新建置 CSS 並執行稽核
 ```
 
-## 私密相簿 Worker
-
-```bash
-cd worker
-npm install
-npm test
-npm run dev
-```
-
-私密相簿設定、密碼及 Worker secrets 均已列入 `.gitignore`。請勿將下列檔案加入 Git、Issue 或其他公開位置：
-
-- `worker/.dev.vars`
-- `worker/.generated/`
-- `worker/gallery-config.private.json`
-- `worker/new-passwords.private.txt`
-- `worker/admin-credentials.private.txt`
-
-日常相簿管理改由 [Cloudflare 雲端管理中心](https://weipic-api.weipic2023.workers.dev/admin) 完成，可新增、修改、排序、下架與刪除相簿，檢視 R2 容量／作業統計，並直接多檔上傳照片與自動讀取照片清單。本機同步指令已停用，避免舊 JSON 覆蓋雲端資料；災難復原流程請看 `worker/DEPLOY.md`。
-
 ## 發布
 
-- 公開前端：提交並推送至 `main`，由 GitHub Pages 發布。
-- Worker 程式：在 `worker/` 執行 `npm run deploy`。
-- 僅修改相簿資料：不需重新部署 Worker，直接使用雲端管理中心。
+公開前端提交並推送至 `main` 後，由 GitHub Pages 發布。日常客戶相簿與 R2 照片管理請使用 [Cloudflare 雲端管理中心](https://weipic-api.weipic2023.workers.dev/admin)，不需由本專案部署。
 
 發布前請至少執行：
 
 ```bash
 npm run check
-cd worker && npm test
 ```
 
 ## 授權

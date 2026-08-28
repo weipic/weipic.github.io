@@ -2,8 +2,3 @@
 .DS_Store
 node_modules/
 GUIDE.md
-worker/.dev.vars
-worker/.generated/
-worker/gallery-config.private.json
-worker/new-passwords.private.txt
-worker/admin-credentials.private.txt

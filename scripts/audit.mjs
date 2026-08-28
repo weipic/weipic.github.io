@@ -7,7 +7,7 @@ const projectFiles = execFileSync('rg', ['--files'], { encoding: 'utf8' })
 const htmlFiles = projectFiles.filter(file => file.endsWith('.html'));
 const frontendFiles = [...htmlFiles, 'js/app.js', 'js/analytics.js', 'js/portfolio-data.js'];
 const forbidden = [
-  [/https:\/\/pub-[^\s"']+\.r2\.dev/i, '公開 R2 網址', [...frontendFiles, 'GUIDE.md', 'worker/DEPLOY.md']],
+  [/https:\/\/pub-[^\s"']+\.r2\.dev/i, '公開 R2 網址', [...frontendFiles, 'GUIDE.md']],
   [/password\s*:\s*["'][^"']+["']/i, '硬編碼密碼', frontendFiles],
   [/cdn\.tailwindcss\.com/i, 'Tailwind CDN', htmlFiles],
   [/cdnjs\.cloudflare\.com\/ajax\/libs\/jszip/i, '遠端 JSZip', htmlFiles],
