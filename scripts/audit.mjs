@@ -1,5 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
+import path from 'node:path';
 
 const failures = [];
 const projectFiles = execFileSync('rg', ['--files'], { encoding: 'utf8' })
@@ -12,7 +13,8 @@ const forbidden = [
   [/cdn\.tailwindcss\.com/i, 'Tailwind CDN', htmlFiles],
   [/cdnjs\.cloudflare\.com\/ajax\/libs\/jszip/i, '遠端 JSZip', htmlFiles],
   [/assets\/images\/profile\/avatar\.png/i, '不存在的 avatar.png', [...htmlFiles, 'GUIDE.md']],
-  [/http:\/\/xhslink\.com/i, '不安全的 HTTP 連結', frontendFiles]
+  [/http:\/\/xhslink\.com/i, '不安全的 HTTP 連結', frontendFiles],
+  [/(?:translate\.google|translate-pa\.googleapis|googtrans|goog-te|googleTranslateElement)/i, 'Google Translate 殘留程式', [...frontendFiles, 'scripts/modernize-html.mjs']]
 ];
 
 for (const [pattern, label, files] of forbidden) {
@@ -27,12 +29,26 @@ for (const file of htmlFiles) {
   for (const required of ['meta name="referrer"', 'Content-Security-Policy', 'css/tailwind.generated.css']) {
     if (!html.includes(required)) failures.push(`${file}: 缺少 ${required}`);
   }
-  for (const translateOrigin of ['https://translate.google.com', 'https://translate.googleapis.com', 'https://translate-pa.googleapis.com', 'https://*.googleapis.com', 'https://www.gstatic.com']) {
-    if (!html.includes(translateOrigin)) failures.push(`${file}: CSP 缺少 Google Translate 網域 ${translateOrigin}`);
+  for (const requiredSeo of ['rel="canonical"', 'hreflang="zh-TW"', 'hreflang="ja"', 'hreflang="en"', 'hreflang="x-default"']) {
+    if (!html.includes(requiredSeo)) failures.push(`${file}: 缺少 SEO 標記 ${requiredSeo}`);
   }
-  const localRefs = [...html.matchAll(/(?:src|href)="((?:assets|css|js)\/[^"?#]+)"/g)].map(match => match[1]);
+  const localRefs = [...html.matchAll(/(?:src|href)="((?:\/|\.\.\/|\.\/)?(?:assets|css|js)\/[^"?#]+)"/g)].map(match => match[1]);
   for (const ref of localRefs) {
-    if (!fs.existsSync(ref)) failures.push(`${file}: 本機資源不存在 ${ref}`);
+    const resolvedRef = ref.startsWith('/')
+      ? ref.slice(1)
+      : path.normalize(path.join(path.dirname(file), ref));
+    if (!fs.existsSync(resolvedRef)) failures.push(`${file}: 本機資源不存在 ${ref}`);
+  }
+}
+
+for (const locale of ['en', 'jp']) {
+  for (const file of htmlFiles.filter(file => file.startsWith(`${locale}/`))) {
+    const html = fs.readFileSync(file, 'utf8');
+    const wrongPrefix = locale === 'en' ? '/jp/' : '/en/';
+    if (new RegExp(`href="${wrongPrefix}`).test(html)) failures.push(`${file}: 站內連結跳離目前語系`);
+    if (!html.includes(`href="/${locale}/`) && !file.endsWith('/index.html')) failures.push(`${file}: 缺少 /${locale}/ 語系內部連結`);
+    if (/(?:src|href)="\/(?:assets|css|js)\//.test(html)) failures.push(`${file}: 子目錄資源仍使用根目錄絕對路徑`);
+    if (!html.includes('src="../js/app.js"')) failures.push(`${file}: 缺少可供本機開啟的相對 app.js 路徑`);
   }
 }
 
@@ -43,8 +59,8 @@ if (!/clientGalleries\s*:\s*\[\s*\]/.test(dataSource)) {
 if (!fs.existsSync('css/tailwind.generated.css')) failures.push('缺少建置後的 Tailwind CSS');
 if (!fs.existsSync('js/vendor/jszip.min.js')) failures.push('缺少本機 JSZip');
 const appSource = fs.readFileSync('js/app.js', 'utf8');
-if (!/window\.setLanguage\s*=\s*function[\s\S]{0,2500}window\.location\.reload\(\)/.test(appSource)) {
-  failures.push('js/app.js: 語言切換後必須重新整理以可靠套用 Google Translate');
+if (!/localStorage\.setItem\('preferred_lang'/.test(appSource) || !/getLocalizedPagePath/.test(appSource)) {
+  failures.push('js/app.js: 缺少靜態語系路徑與 preferred_lang 偏好記憶邏輯');
 }
 
 if (failures.length) {

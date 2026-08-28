@@ -4,8 +4,16 @@
 <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://translate.google.com https://translate.googleapis.com https://*.googleapis.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://translate.googleapis.com https://www.gstatic.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://weipic-api.weipic2023.workers.dev https://www.google-analytics.com https://translate.google.com https://www.google.com https://www.gstatic.com https://fonts.gstatic.com https://*.googleusercontent.com; connect-src 'self' https://weipic-api.weipic2023.workers.dev https://www.google-analytics.com https://region1.google-analytics.com https://formsubmit.co https://translate.google.com https://translate.googleapis.com https://translate-pa.googleapis.com https://*.googleapis.com https://*.googleusercontent.com https://play.google.com; frame-src https:; object-src 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co; upgrade-insecure-requests" />
-  <!-- Favicon -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://weipic-api.weipic2023.workers.dev https://www.google-analytics.com https://fonts.gstatic.com; connect-src 'self' https://weipic-api.weipic2023.workers.dev https://www.google-analytics.com https://region1.google-analytics.com https://formsubmit.co; frame-src https:; object-src 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co; upgrade-insecure-requests" />
+  <link rel="canonical" href="https://weipic.github.io/download" />
+  <link rel="alternate" hreflang="zh-TW" href="https://weipic.github.io/download" />
+  <link rel="alternate" hreflang="ja" href="https://weipic.github.io/jp/download" />
+  <link rel="alternate" hreflang="en" href="https://weipic.github.io/en/download" />
+  <link rel="alternate" hreflang="x-default" href="https://weipic.github.io/download" />
+
+
+
+<!-- Favicon -->
   <link rel="icon" type="image/png" href="assets/images/favicon.png" />
   <link rel="apple-touch-icon" href="assets/images/favicon.png" />
 
@@ -130,34 +138,34 @@
   <!-- Header Navigation Bar (Website standard navbar; unlisted download page) -->
   <header class="header-glass py-5 transition-all duration-300">
     <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
-      
+
       <!-- Brand Logo -->
-      <a href="index.html" class="flex items-center gap-3 group text-decoration-none">
+      <a href="/" class="flex items-center gap-3 group text-decoration-none">
         <img src="assets/images/logo.svg" alt="Wei's Portfolio Logo" draggable="false" class="h-9 sm:h-10 w-auto object-contain transition-opacity duration-300 group-hover:opacity-85" />
       </a>
 
       <!-- Desktop Navigation Menu -->
       <nav class="hidden md:flex items-center gap-6">
-        <a href="index.html" class="nav-link">關於我與經歷</a>
-        
+        <a href="/" class="nav-link">關於我與經歷</a>
+
         <!-- Category Dropdown -->
         <div class="relative group py-2">
-          <a href="index.html#categories-section" class="nav-link flex items-center gap-1 cursor-pointer">
+          <a href="/#categories-section" class="nav-link flex items-center gap-1 cursor-pointer">
             攝影作品
             <svg class="w-3.5 h-3.5 text-gray-400 group-hover:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
           </a>
           <div class="absolute left-0 top-full hidden group-hover:block w-56 bg-[#121318] border border-white/10 rounded-xl shadow-2xl p-2 z-50 backdrop-blur-xl">
-            <a href="commercial.html" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">商業攝影</a>
-            <a href="portrait.html" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">人像攝影</a>
-            <a href="concert.html" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">演唱會攝影</a>
-            <a href="event.html" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">活動攝影</a>
-            <a href="sports.html" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">運動攝影</a>
-            <a href="graduation.html" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">畢業攝影</a>
-            <a href="landscape.html" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">風景攝影</a>
+            <a href="/commercial" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">商業攝影</a>
+            <a href="/portrait" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">人像攝影</a>
+            <a href="/concert" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">演唱會攝影</a>
+            <a href="/event" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">活動攝影</a>
+            <a href="/sports" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">運動攝影</a>
+            <a href="/graduation" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">畢業攝影</a>
+            <a href="/landscape" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">風景攝影</a>
           </div>
         </div>
 
-        <a href="contact.html" class="nav-link">預約與聯絡</a>
+        <a href="/contact" class="nav-link">預約與聯絡</a>
 
         <!-- Header Social & Language Buttons -->
         <div class="flex items-center gap-2.5 ml-2 border-l border-white/15 pl-4">
@@ -205,18 +213,18 @@
 
     <!-- Mobile Drawer Navigation -->
     <div id="mobile-menu" class="hidden md:hidden bg-[#121318] border-b border-white/10 px-6 py-6 space-y-4">
-      <a href="index.html" class="block text-sm text-white font-semibold">關於我與合作經歷</a>
+      <a href="/" class="block text-sm text-white font-semibold">關於我與合作經歷</a>
       <div class="border-t border-white/10 pt-2 space-y-2">
         <p class="text-xs text-gray-500 font-mono uppercase tracking-wider">攝影分類專頁</p>
-        <a href="commercial.html" class="block text-sm text-gray-300 hover:text-amber-400">商業攝影</a>
-        <a href="portrait.html" class="block text-sm text-gray-300 hover:text-amber-400">人像攝影</a>
-        <a href="concert.html" class="block text-sm text-gray-300 hover:text-amber-400">演唱會攝影</a>
-        <a href="event.html" class="block text-sm text-gray-300 hover:text-amber-400">活動攝影</a>
-        <a href="sports.html" class="block text-sm text-gray-300 hover:text-amber-400">運動攝影</a>
-        <a href="graduation.html" class="block text-sm text-gray-300 hover:text-amber-400">畢業攝影</a>
-        <a href="landscape.html" class="block text-sm text-gray-300 hover:text-amber-400">風景攝影</a>
+        <a href="/commercial" class="block text-sm text-gray-300 hover:text-amber-400">商業攝影</a>
+        <a href="/portrait" class="block text-sm text-gray-300 hover:text-amber-400">人像攝影</a>
+        <a href="/concert" class="block text-sm text-gray-300 hover:text-amber-400">演唱會攝影</a>
+        <a href="/event" class="block text-sm text-gray-300 hover:text-amber-400">活動攝影</a>
+        <a href="/sports" class="block text-sm text-gray-300 hover:text-amber-400">運動攝影</a>
+        <a href="/graduation" class="block text-sm text-gray-300 hover:text-amber-400">畢業攝影</a>
+        <a href="/landscape" class="block text-sm text-gray-300 hover:text-amber-400">風景攝影</a>
       </div>
-      <a href="contact.html" class="block text-sm text-gray-300 hover:text-amber-400 pt-2 border-t border-white/10">預約與聯絡 Contact</a>
+      <a href="/contact" class="block text-sm text-gray-300 hover:text-amber-400 pt-2 border-t border-white/10">預約與聯絡 Contact</a>
     </div>
   </header>
 
@@ -228,7 +236,7 @@
     <!-- ========================================================================= -->
     <section id="password-section" class="w-full max-w-md my-auto pt-2 sm:pt-4">
       <div class="glass-panel p-8 sm:p-10 rounded-3xl relative overflow-hidden text-center transition-all duration-300">
-        
+
         <!-- Ambient Decorative Glow -->
         <div class="absolute -top-24 -left-24 w-48 h-48 bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
         <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -251,17 +259,17 @@
         <!-- Password Entry Form -->
         <form id="password-form" action="javascript:void(0)" onsubmit="event.preventDefault()" class="space-y-5">
           <div class="relative">
-            <input 
-              type="password" 
-              id="password-input" 
-              placeholder="請輸入密碼" 
+            <input
+              type="password"
+              id="password-input"
+              placeholder="請輸入密碼"
               required
               autocomplete="current-password"
               class="w-full px-4 py-3.5 bg-[#0a0a0c]/80 border border-white/15 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition-all pr-11"
             />
-            <button 
-              type="button" 
-              id="toggle-password-btn" 
+            <button
+              type="button"
+              id="toggle-password-btn"
               class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors p-1"
               aria-label="Toggle Password Visibility"
             >
@@ -278,8 +286,8 @@
             <span>密碼不正確，請重新輸入</span>
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             class="w-full py-3.5 px-6 bg-amber-400 hover:bg-amber-300 text-black font-semibold text-sm rounded-xl btn-gold-glow transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
             <span>解鎖存取相簿</span>
@@ -302,7 +310,7 @@
       <!-- Header Album Info Banner -->
       <div class="glass-panel p-6 sm:p-8 rounded-3xl relative overflow-hidden">
         <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-          
+
           <!-- Left Album Info -->
           <div class="space-y-2">
             <div class="flex flex-wrap items-center gap-2.5">
@@ -314,11 +322,11 @@
                 <span> Cloudflare R2 雲端儲存</span>
               </span>
             </div>
-            
+
             <h1 id="album-title-display" class="text-2xl sm:text-4xl font-bold text-white font-serif tracking-tight pt-1">
               2026 精選寫真與活動紀錄全輯
             </h1>
-            
+
             <!-- Expiry Warning -->
             <p class="text-xs sm:text-sm text-amber-300/90 flex items-center gap-1.5 pt-1" role="status" aria-live="polite">
               <svg class="w-4 h-4 shrink-0 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
@@ -328,11 +336,11 @@
 
           <!-- Right Action Controls: Download All ZIP Button -->
           <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-            <a 
-              id="download-zip-btn" 
-              href="#" 
-              target="_blank" 
-              rel="noopener noreferrer" 
+            <a
+              id="download-zip-btn"
+              href="#"
+              target="_blank"
+              rel="noopener noreferrer"
               class="flex-1 sm:flex-none py-3.5 px-6 bg-amber-400 hover:bg-amber-300 text-black font-semibold text-sm rounded-xl btn-gold-glow transition-all flex items-center justify-center gap-2 shadow-lg"
             >
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
@@ -382,7 +390,7 @@
     <!-- ========================================================================= -->
     <section id="expired-section" class="w-full max-w-md my-auto pt-2 sm:pt-4 hidden">
       <div class="glass-panel p-8 sm:p-10 rounded-3xl relative overflow-hidden text-center transition-all duration-300">
-        
+
         <!-- Ambient Decorative Red Glow -->
         <div class="absolute -top-24 -left-24 w-48 h-48 bg-red-500/15 rounded-full blur-3xl pointer-events-none"></div>
         <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -401,8 +409,8 @@
           此相簿已超過 14 天保存期限並由 Cloudflare 伺服器自動刪除。如需重新發送檔案，請聯繫攝影師。
         </p>
 
-        <a 
-          href="mailto:weipic2023@gmail.com" 
+        <a
+          href="mailto:weipic2023@gmail.com"
           class="w-full py-3.5 px-6 bg-white/10 hover:bg-white/20 text-white font-semibold text-sm rounded-xl border border-white/15 transition-all flex items-center justify-center gap-2"
         >
           <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="2.5 5.3 19 12.4"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
@@ -417,7 +425,7 @@
     <!-- ========================================================================= -->
     <section id="notfound-section" class="w-full max-w-md my-auto pt-2 sm:pt-4 hidden">
       <div class="glass-panel p-8 sm:p-10 rounded-3xl relative overflow-hidden text-center transition-all duration-300">
-        
+
         <!-- Ambient Decorative Glow -->
         <div class="absolute -top-24 -left-24 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
         <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-white/5 rounded-full blur-3xl pointer-events-none"></div>
@@ -436,8 +444,8 @@
           您存取的相簿編號不存在或網址拼寫有誤。請確認您的存取連結或返回首頁。
         </p>
 
-        <a 
-          href="index.html" 
+        <a
+          href="/"
           class="w-full py-3.5 px-6 bg-amber-400 hover:bg-amber-300 text-black font-semibold text-sm rounded-xl btn-gold-glow transition-all flex items-center justify-center gap-2 cursor-pointer"
         >
           <span>返回首頁</span>
@@ -453,15 +461,15 @@
   <!-- 🔍 3. 燈箱全螢幕預覽 Modal (Download Lightbox Modal) -->
   <!-- ========================================================================= -->
   <div id="download-lightbox-modal" class="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-2xl hidden flex-col items-center justify-between p-4 sm:p-6 transition-all duration-300">
-    
+
     <!-- Top Header Bar inside Lightbox -->
     <div class="w-full max-w-7xl flex items-center justify-between z-20">
       <span id="download-lightbox-counter" class="text-xs font-mono text-gray-400 bg-white/10 px-3 py-1 rounded-full border border-white/10">
         1 / 1
       </span>
-      <button 
-        type="button" 
-        onclick="closeDownloadLightbox()" 
+      <button
+        type="button"
+        onclick="closeDownloadLightbox()"
         class="text-gray-400 hover:text-white p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors backdrop-blur-md"
         aria-label="Close Lightbox"
       >
@@ -472,9 +480,9 @@
     <!-- Center High-Res Image Box -->
     <div id="download-lightbox-stage" class="relative flex-grow flex items-center justify-center w-full max-h-[82vh] my-auto overflow-hidden touch-pan-y">
       <!-- Prev Button -->
-      <button 
-        type="button" 
-        onclick="navigateDownloadLightbox(-1)" 
+      <button
+        type="button"
+        onclick="navigateDownloadLightbox(-1)"
         class="absolute left-2 sm:left-4 z-20 text-white p-3 rounded-full bg-black/50 hover:bg-amber-400 hover:text-black border border-white/10 transition-all backdrop-blur-md"
         aria-label="Previous Photo"
       >
@@ -485,9 +493,9 @@
       <img id="download-lightbox-img" src="" alt="High Res Preview" class="max-w-full max-h-[78vh] object-contain rounded-lg shadow-2xl transition-all duration-300 select-none" />
 
       <!-- Next Button -->
-      <button 
-        type="button" 
-        onclick="navigateDownloadLightbox(1)" 
+      <button
+        type="button"
+        onclick="navigateDownloadLightbox(1)"
         class="absolute right-2 sm:right-4 z-20 text-white p-3 rounded-full bg-black/50 hover:bg-amber-400 hover:text-black border border-white/10 transition-all backdrop-blur-md"
         aria-label="Next Photo"
       >
@@ -497,9 +505,9 @@
 
     <!-- Bottom Action Bar inside Lightbox -->
     <div class="w-full max-w-xl flex items-center justify-center gap-4 z-20 pt-2">
-      <button 
-        type="button" 
-        id="download-lightbox-dl-btn" 
+      <button
+        type="button"
+        id="download-lightbox-dl-btn"
         class="py-3 px-8 bg-amber-400 hover:bg-amber-300 text-black font-semibold text-sm rounded-xl btn-gold-glow transition-all flex items-center justify-center gap-2 shadow-xl"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
@@ -526,12 +534,13 @@
         </a>
       </div>
 
-      <div class="flex items-center gap-3 text-xs text-gray-500"><p class="text-xs text-gray-500">© 2026 Wei.pictures. All rights reserved.</p><a href="privacy.html" class="hover:text-amber-400">隱私權政策</a></div>
+      <div class="flex items-center gap-3 text-xs text-gray-500"><p class="text-xs text-gray-500">© 2026 Wei.pictures. All rights reserved.</p><a href="/privacy" class="hover:text-amber-400">隱私權政策</a></div>
     </div>
   </footer>
   <script src="js/analytics.js"></script>
 
   <script src="js/portfolio-data.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

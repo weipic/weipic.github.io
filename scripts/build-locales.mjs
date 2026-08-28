@@ -1,0 +1,201 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import vm from 'node:vm';
+import { localeDefinitions } from './locales/content.mjs';
+
+const rootDir = process.cwd();
+const pages = [
+  'index.html', 'commercial.html', 'portrait.html', 'concert.html', 'event.html',
+  'sports.html', 'graduation.html', 'landscape.html', 'contact.html', 'download.html',
+  'privacy.html', '404.html'
+];
+const siteUrl = 'https://weipic.github.io';
+const localizableDataKeys = new Set([
+  'name', 'subTitle', 'tagline', 'location', 'label', 'bio', 'skills', 'brand',
+  'role', 'category', 'description', 'logoText', 'title', 'titleEn', 'client',
+  'result', 'badge', 'albumTitle', 'clientName', 'pageTitle', 'tabTitle',
+  'ogTitle', 'ogDescription', 'linkLabel'
+]);
+
+function replaceAllMapped(source, translations) {
+  return Object.entries(translations)
+    .sort(([a], [b]) => b.length - a.length)
+    .reduce((result, [from, to]) => result.split(from).join(to), source);
+}
+
+function pageSlug(file) {
+  return file === 'index.html' ? '' : file.replace(/\.html$/, '');
+}
+
+function pageUrl(prefix, file) {
+  const slug = pageSlug(file);
+  return `${siteUrl}${prefix ? `/${prefix}` : ''}/${slug}`;
+}
+
+function seoLinks(file, canonicalUrl) {
+  const slug = pageSlug(file);
+  const suffix = slug ? `/${slug}` : '/';
+  return [
+    `  <link rel="canonical" href="${canonicalUrl}" />`,
+    `  <link rel="alternate" hreflang="zh-TW" href="${siteUrl}${suffix}" />`,
+    `  <link rel="alternate" hreflang="ja" href="${siteUrl}/jp${suffix}" />`,
+    `  <link rel="alternate" hreflang="en" href="${siteUrl}/en${suffix}" />`,
+    `  <link rel="alternate" hreflang="x-default" href="${siteUrl}${suffix}" />`
+  ].join('\n');
+}
+
+function rewriteInternalLinks(html, prefix) {
+  html = html.replace(/href="\/?(index|commercial|portrait|concert|event|sports|graduation|landscape|contact|download|privacy|404)(?:\.html)?(#[^"]*)?"/g, (_, page, hash = '') => {
+    const slug = page === 'index' ? '' : page;
+    const base = prefix ? `/${prefix}/` : '/';
+    return `href="${base}${slug}${hash}"`;
+  });
+  if (prefix) html = html.replace(/href="\/(#[^"]*)?"/g, (_, hash = '') => `href="/${prefix}/${hash}"`);
+  return html.replace(/[ \t]+$/gm, '');
+}
+
+function stripRootPreferenceRedirect(html) {
+  return html.replace(/\s*<script>\s*\(\(\) => \{\s*try \{\s*const preferred = localStorage\.getItem\('preferred_lang'\);[\s\S]*?\}\)\(\);\s*<\/script>\s*/m, '\n');
+}
+
+function addSeo(html, file, prefix) {
+  const canonicalUrl = pageUrl(prefix, file);
+  html = html.replace(/\s*<link rel="canonical"[^>]*>\s*/g, '\n');
+  html = html.replace(/\s*<link rel="alternate"[^>]*>\s*/g, '\n');
+  if (/<meta name="robots"[^>]*>/.test(html)) {
+    html = html.replace(/(<meta name="robots"[^>]*>)/, `$1\n${seoLinks(file, canonicalUrl)}`);
+  } else {
+    html = html.replace(/(<meta http-equiv="Content-Security-Policy"[^>]*>)/, `$1\n${seoLinks(file, canonicalUrl)}`);
+  }
+  html = html.replace(/<meta property="og:url" content="[^"]*" \/>/, `<meta property="og:url" content="${canonicalUrl}" />`);
+  html = html.replace(/<meta name="twitter:url" content="[^"]*" \/>/, `<meta name="twitter:url" content="${canonicalUrl}" />`);
+  return html;
+}
+
+function rootPreferenceRedirect() {
+  return `  <script>
+    (() => {
+      try {
+        const preferred = localStorage.getItem('preferred_lang');
+        if (preferred === 'jp' || preferred === 'en') {
+          const target = window.location.protocol === 'file:'
+            ? preferred + '/index.html'
+            : '/' + preferred + '/';
+          window.location.replace(target + window.location.search + window.location.hash);
+        }
+      } catch (_) {}
+    })();
+  </script>`;
+}
+
+function prepareHtml(source, file, locale) {
+  const { code, prefix, htmlTranslations } = locale;
+  let html = replaceAllMapped(stripRootPreferenceRedirect(source), htmlTranslations);
+  html = html.replace(/<html lang="[^"]+"/, `<html lang="${code}"`);
+  html = addSeo(html, file, prefix);
+  html = rewriteInternalLinks(html, prefix);
+  html = html
+    .replace(/(?:src|href)="\/?(assets|css|js)\//g, match => match.replace(/="\/?/, '="../'))
+    .replace(/\s*<script src="\.\.\/js\/i18n\.js"><\/script>/g, '')
+    .replace(/<script src="\.\.\/js\/portfolio-data\.js"><\/script>/, `<script src="../js/portfolio-data.${prefix}.js"></script>`)
+    .replace(/<script src="\.\.\/js\/app\.js"><\/script>/, '<script src="../js/i18n.js"></script>\n  <script src="../js/app.js"></script>');
+  return html;
+}
+
+function loadPortfolioData() {
+  const source = fs.readFileSync(path.join(rootDir, 'js/portfolio-data.js'), 'utf8');
+  const context = { window: {} };
+  vm.runInNewContext(source, context, { filename: 'js/portfolio-data.js' });
+  return context.window.PORTFOLIO_DATA;
+}
+
+function localizeData(value, translations, prefix, key = '') {
+  if (Array.isArray(value)) return value.map(item => localizeData(item, translations, prefix, key));
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value).map(([childKey, childValue]) => [
+      childKey,
+      localizeData(childValue, translations, prefix, childKey)
+    ]));
+  }
+  if (typeof value === 'string' && value.startsWith('assets/')) return `../${value}`;
+  if (typeof value === 'string' && key === 'href' && /^[a-z0-9_-]+\.html(?:#.*)?$/i.test(value)) {
+    const [file, hash = ''] = value.split('#');
+    return `${file}${hash ? `#${hash}` : ''}`;
+  }
+  if (typeof value === 'string' && localizableDataKeys.has(key)) {
+    return translations[value] ?? value;
+  }
+  return value;
+}
+
+function buildI18nRuntime() {
+  const dictionaries = Object.fromEntries(Object.values(localeDefinitions).map(locale => [locale.code, locale.uiTranslations]));
+  return `/* Generated by scripts/build-locales.mjs. */
+(() => {
+  const dictionaries = ${JSON.stringify(dictionaries, null, 2)};
+  const getLanguage = () => {
+    const segments = location.pathname.split('/').filter(Boolean);
+    return segments.includes('jp') ? 'ja' : (segments.includes('en') ? 'en' : 'zh-TW');
+  };
+  const translate = (value, language = getLanguage()) => dictionaries[language]?.[value] ?? value;
+  const replacePhrases = (value, language) => {
+    if (!value || language === 'zh-TW') return value;
+    return Object.entries(dictionaries[language] || {})
+      .sort(([a], [b]) => b.length - a.length)
+      .reduce((result, [from, to]) => result.split(from).join(to), value);
+  };
+  const localizeNode = (root) => {
+    const language = getLanguage();
+    if (language === 'zh-TW') return;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(node => {
+      if (node.parentElement?.closest('script, style, code')) return;
+      node.nodeValue = replacePhrases(node.nodeValue, language);
+    });
+    const elements = root.nodeType === Node.ELEMENT_NODE ? [root, ...root.querySelectorAll('*')] : [...document.querySelectorAll('*')];
+    elements.forEach(element => ['aria-label', 'title', 'placeholder', 'content'].forEach(attribute => {
+      if (element.hasAttribute?.(attribute)) element.setAttribute(attribute, replacePhrases(element.getAttribute(attribute), language));
+    }));
+  };
+  window.WEI_I18N = { translate, localizeNode, getLanguage };
+  const start = () => {
+    localizeNode(document);
+    new MutationObserver(records => records.forEach(record => record.addedNodes.forEach(node => {
+      if (node.nodeType === Node.ELEMENT_NODE) localizeNode(node);
+      if (node.nodeType === Node.TEXT_NODE) node.nodeValue = replacePhrases(node.nodeValue, getLanguage());
+    }))).observe(document.body, { childList: true, subtree: true });
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true });
+  else start();
+})();
+`;
+}
+
+const sourcePages = Object.fromEntries(pages.map(file => [file, fs.readFileSync(path.join(rootDir, file), 'utf8')]));
+const data = loadPortfolioData();
+
+for (const [file, source] of Object.entries(sourcePages)) {
+  let rootHtml = addSeo(rewriteInternalLinks(source, ''), file, '');
+  if (file === 'index.html' && !rootHtml.includes("localStorage.getItem('preferred_lang')")) {
+    rootHtml = rootHtml.replace('</head>', `${rootPreferenceRedirect()}\n</head>`);
+  }
+  if (!rootHtml.includes('js/i18n.js')) rootHtml = rootHtml.replace('<script src="js/app.js"></script>', '<script src="js/i18n.js"></script>\n  <script src="js/app.js"></script>');
+  fs.writeFileSync(path.join(rootDir, file), rootHtml);
+}
+
+for (const locale of Object.values(localeDefinitions)) {
+  fs.mkdirSync(path.join(rootDir, locale.prefix), { recursive: true });
+  for (const [file, source] of Object.entries(sourcePages)) {
+    fs.writeFileSync(path.join(rootDir, locale.prefix, file), prepareHtml(source, file, locale));
+  }
+  const localizedData = localizeData(data, locale.dataTranslations, locale.prefix);
+  fs.writeFileSync(
+    path.join(rootDir, `js/portfolio-data.${locale.prefix}.js`),
+    `/* Generated by scripts/build-locales.mjs. */\nwindow.PORTFOLIO_DATA = ${JSON.stringify(localizedData, null, 2)};\n`
+  );
+}
+
+fs.writeFileSync(path.join(rootDir, 'js/i18n.js'), buildI18nRuntime());
+console.log(`Built ${pages.length * Object.keys(localeDefinitions).length} localized HTML pages and native language assets.`);

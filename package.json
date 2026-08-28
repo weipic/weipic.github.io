@@ -3,9 +3,10 @@
   "private": true,
   "scripts": {
     "build:vendor": "mkdir -p js/vendor && cp node_modules/jszip/dist/jszip.min.js js/vendor/jszip.min.js",
+    "build:locales": "node scripts/build-locales.mjs",
     "build:css": "tailwindcss -c tailwind.config.js -i css/tailwind.input.css -o css/tailwind.generated.css --minify",
     "audit": "node scripts/audit.mjs",
-    "check": "npm run build:css && npm run audit"
+    "check": "npm run build:locales && npm run build:css && npm run audit"
   },
   "devDependencies": {
     "jszip": "3.10.1",

@@ -10,6 +10,41 @@ let isCollabExpanded = false;
 let isAwardsExpanded = false;
 let contactFormRenderedAt = 0;
 
+const SITE_LANGUAGES = Object.freeze({
+  'zh-TW': { prefix: '', storage: 'zh-TW' },
+  'ja': { prefix: 'jp', storage: 'jp' },
+  'en': { prefix: 'en', storage: 'en' }
+});
+
+function getSiteLanguage() {
+  const segments = window.location.pathname.split('/').filter(Boolean);
+  if (segments.includes('jp')) return 'ja';
+  if (segments.includes('en')) return 'en';
+  return 'zh-TW';
+}
+
+function t(key, replacements = {}) {
+  const value = window.WEI_I18N?.translate?.(key, getSiteLanguage()) ?? key;
+  return Object.entries(replacements).reduce(
+    (result, [name, replacement]) => result.replaceAll(`{${name}}`, String(replacement)),
+    value
+  );
+}
+
+function getLocalizedPagePath(langCode, pageName = getCurrentPageName(), hash = '') {
+  const language = SITE_LANGUAGES[langCode] ? langCode : 'zh-TW';
+  const prefix = SITE_LANGUAGES[language].prefix;
+  const normalizedPage = !pageName || pageName === 'index' ? '' : pageName.replace(/\.html$/, '');
+  if (window.location.protocol === 'file:') {
+    const currentPrefix = SITE_LANGUAGES[getSiteLanguage()].prefix;
+    const filename = `${normalizedPage || 'index'}.html`;
+    if (currentPrefix) return `${prefix ? `../${prefix}/` : '../'}${filename}${hash}`;
+    return `${prefix ? `${prefix}/` : ''}${filename}${hash}`;
+  }
+  const base = prefix ? `/${prefix}/` : '/';
+  return `${base}${normalizedPage}${hash}`;
+}
+
 function escapeHtml(value) {
   return String(value ?? '')
     .replace(/&/g, '&amp;')
@@ -90,11 +125,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Helper: Adapt URLs based on environment (file:// vs http/https)
 function adaptLinksForEnvironment() {
-  if (window.location.protocol === 'file:') return;
-
   // Clean .html from address bar using history.replaceState on web server
   const path = window.location.pathname;
-  if (path.endsWith('.html')) {
+  if (window.location.protocol !== 'file:' && path.endsWith('.html')) {
     let cleanPath = path.replace(/\.html$/, '');
     if (cleanPath.endsWith('/index') || cleanPath === 'index' || cleanPath === '/index') {
       cleanPath = cleanPath.replace(/\/index$/, '/').replace(/^index$/, './');
@@ -103,17 +136,18 @@ function adaptLinksForEnvironment() {
     window.history.replaceState(null, '', newUrl || './');
   }
 
-  // Dynamically rewrite internal .html links to clean extensionless URLs for web server
+  // Keep every internal navigation link in the active static language tree.
+  const activeLanguage = getSiteLanguage();
   document.querySelectorAll('a[href]').forEach(a => {
     const href = a.getAttribute('href');
     if (!href) return;
-    if (href === 'index.html') {
-      a.setAttribute('href', './');
-    } else if (href.startsWith('index.html#')) {
-      a.setAttribute('href', './' + href.substring(10));
-    } else if (href.endsWith('.html') && !href.includes('://')) {
-      a.setAttribute('href', href.replace(/\.html$/, ''));
-    }
+    if (/^(?:https?:|mailto:|tel:|#|data:|blob:)/i.test(href)) return;
+    const [pathAndQuery, hash = ''] = href.split('#');
+    const [rawPath, query = ''] = pathAndQuery.split('?');
+    const cleanPath = rawPath.replace(/^\.\//, '').replace(/^\/(?:jp|en)\//, '').replace(/^\//, '').replace(/\.html$/, '');
+    const pageName = !cleanPath || cleanPath === 'index' ? 'index' : cleanPath.split('/').pop();
+    const localized = getLocalizedPagePath(activeLanguage, pageName);
+    a.setAttribute('href', `${localized}${query ? `?${query}` : ''}${hash ? `#${hash}` : ''}`);
   });
 }
 
@@ -121,6 +155,7 @@ function adaptLinksForEnvironment() {
 function getCurrentPageName() {
   const path = window.location.pathname;
   let page = path.split('/').filter(Boolean).pop() || 'index';
+  if (page === 'jp' || page === 'en') page = 'index';
   return page.replace('.html', '');
 }
 
@@ -1564,98 +1599,21 @@ function initMobileTouchHover() {
 }
 
 /* ====================================================================
-   🌐 GOOGLE TRANSLATE & MULTI-LANGUAGE LOGIC
+   NATIVE STATIC-LANGUAGE ROUTING
    ==================================================================== */
-let googleTranslateRetryTimer = null;
-
-function showTranslationError() {
-  if (document.getElementById('translation-error-toast')) return;
-  const toast = document.createElement('div');
-  toast.id = 'translation-error-toast';
-  toast.setAttribute('role', 'alert');
-  toast.className = 'fixed bottom-5 left-1/2 -translate-x-1/2 z-[10001] rounded-xl border border-red-400/30 bg-[#17171c]/95 px-4 py-3 text-xs text-red-200 shadow-2xl';
-  toast.textContent = '翻譯服務目前無法載入，請檢查網路或稍後再試。';
-  document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 5000);
-}
-
-function applyGoogleTranslation(langCode, attempt = 0) {
-  if (langCode === 'zh-TW') return;
-  const select = document.querySelector('.goog-te-combo');
-  if (select) {
-    select.value = langCode;
-    select.dispatchEvent(new Event('change', { bubbles: true }));
-    return;
-  }
-  if (attempt >= 30) {
-    showTranslationError();
-    return;
-  }
-  clearTimeout(googleTranslateRetryTimer);
-  googleTranslateRetryTimer = setTimeout(() => applyGoogleTranslation(langCode, attempt + 1), 200);
-}
-
-window.googleTranslateElementInit = function() {
-  if (!window.google?.translate?.TranslateElement) return;
-  new google.translate.TranslateElement({
-    pageLanguage: 'zh-TW',
-    includedLanguages: 'zh-TW,en,ja',
-    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-    autoDisplay: false
-  }, 'google_translate_element');
-
-  const activeLang = localStorage.getItem('selected_lang') || 'zh-TW';
-  if (activeLang !== 'zh-TW') applyGoogleTranslation(activeLang);
-};
-
 window.setLanguage = function(langCode) {
-  const currentDomain = window.location.hostname;
-
-  trackGAEvent('切換網站語言', {
-    '目標語言': langCode
-  });
-  
-  if (langCode === 'zh-TW') {
-    document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    if (currentDomain) {
-      document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=${currentDomain}; path=/;`;
-      document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=.${currentDomain}; path=/;`;
-    }
-  } else {
-    const val = `/zh-TW/${langCode}`;
-    document.cookie = `googtrans=${val}; path=/;`;
-    if (currentDomain) {
-      document.cookie = `googtrans=${val}; domain=${currentDomain}; path=/;`;
-      document.cookie = `googtrans=${val}; domain=.${currentDomain}; path=/;`;
-    }
-  }
-  
-  localStorage.setItem('selected_lang', langCode);
-
-  updateLanguageUIState(langCode);
-  document.getElementById('lang-dropdown-menu')?.classList.remove('show');
-  // Google Translate's legacy widget applies its language cookie most
-  // reliably during page startup. Reload for every language change, then let
-  // googleTranslateElementInit select the stored language after rendering.
-  window.location.reload();
+  const normalized = langCode === 'jp' ? 'ja' : langCode;
+  const targetLanguage = SITE_LANGUAGES[normalized] ? normalized : 'zh-TW';
+  const storedLanguage = SITE_LANGUAGES[targetLanguage].storage;
+  try {
+    localStorage.setItem('preferred_lang', storedLanguage);
+  } catch (_) {}
+  trackGAEvent('switch_site_language', { target_language: storedLanguage });
+  window.location.assign(getLocalizedPagePath(targetLanguage, getCurrentPageName(), window.location.hash));
 };
-
-function loadGoogleTranslateScript() {
-  if (window.google?.translate?.TranslateElement) return;
-  if (document.getElementById('google-translate-script')) return;
-  const script = document.createElement('script');
-  script.id = 'google-translate-script';
-  script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
-  script.async = true;
-  script.onerror = () => {
-    script.remove();
-    showTranslationError();
-  };
-  document.body.appendChild(script);
-}
 
 function updateLanguageUIState(langCode) {
-  const activeLang = langCode || localStorage.getItem('selected_lang') || 'zh-TW';
+  const activeLang = langCode || getSiteLanguage();
   const allLangBtns = document.querySelectorAll('.lang-opt-btn');
   
   allLangBtns.forEach(btn => {
@@ -1671,13 +1629,6 @@ function updateLanguageUIState(langCode) {
 }
 
 function initLanguageSelector() {
-  if (!document.getElementById('google_translate_element')) {
-    const div = document.createElement('div');
-    div.id = 'google_translate_element';
-    div.style.display = 'none';
-    document.body.appendChild(div);
-  }
-
   const langBtn = document.getElementById('lang-btn');
   const langMenu = document.getElementById('lang-dropdown-menu');
 
@@ -1694,9 +1645,7 @@ function initLanguageSelector() {
     });
   }
 
-  const storedLang = localStorage.getItem('selected_lang') || 'zh-TW';
-  updateLanguageUIState(storedLang);
-  if (storedLang !== 'zh-TW') loadGoogleTranslateScript();
+  updateLanguageUIState(getSiteLanguage());
 }
 
 // --------------------------------------------------------------------

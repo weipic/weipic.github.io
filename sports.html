@@ -4,8 +4,16 @@
 <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://translate.google.com https://translate.googleapis.com https://*.googleapis.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://translate.googleapis.com https://www.gstatic.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://weipic-api.weipic2023.workers.dev https://www.google-analytics.com https://translate.google.com https://www.google.com https://www.gstatic.com https://fonts.gstatic.com https://*.googleusercontent.com; connect-src 'self' https://weipic-api.weipic2023.workers.dev https://www.google-analytics.com https://region1.google-analytics.com https://formsubmit.co https://translate.google.com https://translate.googleapis.com https://translate-pa.googleapis.com https://*.googleapis.com https://*.googleusercontent.com https://play.google.com; frame-src https:; object-src 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co; upgrade-insecure-requests" />
-  <!-- Favicon -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://weipic-api.weipic2023.workers.dev https://www.google-analytics.com https://fonts.gstatic.com; connect-src 'self' https://weipic-api.weipic2023.workers.dev https://www.google-analytics.com https://region1.google-analytics.com https://formsubmit.co; frame-src https:; object-src 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co; upgrade-insecure-requests" />
+  <link rel="canonical" href="https://weipic.github.io/sports" />
+  <link rel="alternate" hreflang="zh-TW" href="https://weipic.github.io/sports" />
+  <link rel="alternate" hreflang="ja" href="https://weipic.github.io/jp/sports" />
+  <link rel="alternate" hreflang="en" href="https://weipic.github.io/en/sports" />
+  <link rel="alternate" hreflang="x-default" href="https://weipic.github.io/sports" />
+
+
+
+<!-- Favicon -->
   <link rel="icon" type="image/png" href="assets/images/favicon.png" />
   <link rel="apple-touch-icon" href="assets/images/favicon.png" />
 
@@ -145,28 +153,28 @@
 
   <header class="header-glass py-5 transition-all duration-300">
     <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
-      <a href="index.html" class="flex items-center gap-3 group text-decoration-none">
+      <a href="/" class="flex items-center gap-3 group text-decoration-none">
         <img src="assets/images/logo.svg" alt="Wei's Portfolio Logo" draggable="false" class="h-9 sm:h-10 w-auto object-contain transition-opacity duration-300 group-hover:opacity-85" />
       </a>
 
       <nav class="hidden md:flex items-center gap-6">
-        <a href="index.html" class="nav-link">關於我與經歷</a>
+        <a href="/" class="nav-link">關於我與經歷</a>
         <div class="relative group py-2">
-          <a href="index.html#categories-section" class="nav-link active flex items-center gap-1">
+          <a href="/#categories-section" class="nav-link active flex items-center gap-1">
             攝影作品
             <svg class="w-3.5 h-3.5 text-amber-400 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
           </a>
           <div class="absolute left-0 top-full hidden group-hover:block w-56 bg-[#121318] border border-white/10 rounded-xl shadow-2xl p-2 z-50 backdrop-blur-xl">
-            <a href="commercial.html" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">商業攝影</a>
-            <a href="portrait.html" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">人像攝影</a>
-            <a href="concert.html" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">演唱會攝影</a>
-            <a href="event.html" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">活動攝影</a>
-            <a href="sports.html" class="block px-3 py-2 text-xs text-amber-400 bg-white/10 rounded-lg font-semibold">運動攝影</a>
-            <a href="graduation.html" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">畢業攝影</a>
-            <a href="landscape.html" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">風景攝影</a>
+            <a href="/commercial" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">商業攝影</a>
+            <a href="/portrait" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">人像攝影</a>
+            <a href="/concert" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">演唱會攝影</a>
+            <a href="/event" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">活動攝影</a>
+            <a href="/sports" class="block px-3 py-2 text-xs text-amber-400 bg-white/10 rounded-lg font-semibold">運動攝影</a>
+            <a href="/graduation" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">畢業攝影</a>
+            <a href="/landscape" class="block px-3 py-2 text-xs text-gray-300 hover:text-amber-400 hover:bg-white/5 rounded-lg transition-colors">風景攝影</a>
           </div>
         </div>
-        <a href="contact.html" class="nav-link">預約與聯絡</a>
+        <a href="/contact" class="nav-link">預約與聯絡</a>
 
         <div class="flex items-center gap-2.5 ml-2 border-l border-white/15 pl-4">
           <a href="https://www.instagram.com/wei.pictures/" target="_blank" rel="noopener noreferrer" class="header-social-btn" aria-label="Instagram">
@@ -207,19 +215,19 @@
     </div>
 
     <div id="mobile-menu" class="hidden md:hidden bg-[#121318] border-b border-white/10 px-6 py-6 space-y-4">
-      <a href="index.html" class="block text-sm text-gray-300">關於我與合作經歷</a>
+      <a href="/" class="block text-sm text-gray-300">關於我與合作經歷</a>
       <div class="border-t border-white/10 pt-2 space-y-2">
         <p class="text-xs text-gray-500 font-mono uppercase tracking-wider">攝影分類專頁</p>
-        <a href="commercial.html" class="block text-sm text-gray-300">商業攝影</a>
-        <a href="portrait.html" class="block text-sm text-gray-300">人像攝影</a>
-        <a href="concert.html" class="block text-sm text-gray-300">演唱會攝影</a>
-        <a href="event.html" class="block text-sm text-gray-300">活動攝影</a>
-        <a href="sports.html" class="block text-sm text-amber-400 font-semibold">運動攝影</a>
-        <a href="graduation.html" class="block text-sm text-gray-300">畢業攝影</a>
-        <a href="landscape.html" class="block text-sm text-gray-300">風景攝影</a>
+        <a href="/commercial" class="block text-sm text-gray-300">商業攝影</a>
+        <a href="/portrait" class="block text-sm text-gray-300">人像攝影</a>
+        <a href="/concert" class="block text-sm text-gray-300">演唱會攝影</a>
+        <a href="/event" class="block text-sm text-gray-300">活動攝影</a>
+        <a href="/sports" class="block text-sm text-amber-400 font-semibold">運動攝影</a>
+        <a href="/graduation" class="block text-sm text-gray-300">畢業攝影</a>
+        <a href="/landscape" class="block text-sm text-gray-300">風景攝影</a>
       </div>
-      <a href="contact.html" class="block text-sm text-gray-300 border-t border-white/10 pt-2">預約與聯絡 Contact</a>
-      
+      <a href="/contact" class="block text-sm text-gray-300 border-t border-white/10 pt-2">預約與聯絡 Contact</a>
+
       <!-- Mobile Language Options -->
       <div class="border-t border-white/10 pt-3 space-y-2">
         <p class="text-xs text-gray-500 font-mono uppercase tracking-wider flex items-center gap-1.5">
@@ -267,12 +275,13 @@
         </a>
       </div>
 
-      <div class="flex items-center gap-3 text-xs text-gray-500"><p class="text-xs text-gray-500">© 2026 Wei.pictures. All rights reserved.</p><a href="privacy.html" class="hover:text-amber-400">隱私權政策</a></div>
+      <div class="flex items-center gap-3 text-xs text-gray-500"><p class="text-xs text-gray-500">© 2026 Wei.pictures. All rights reserved.</p><a href="/privacy" class="hover:text-amber-400">隱私權政策</a></div>
     </div>
   </footer>
   <script src="js/analytics.js"></script>
 
   <script src="js/portfolio-data.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

@@ -525,31 +525,8 @@ img, picture, .no-download {
 }
 
 /* ====================================================================
-   🌐 GOOGLE TRANSLATE & LANGUAGE SELECTOR STYLING
+   NATIVE STATIC-LANGUAGE SELECTOR
    ==================================================================== */
-.goog-te-banner-frame,
-.goog-te-balloon-frame,
-#goog-gt-tt,
-.goog-te-spinner-pos,
-.goog-tooltip,
-.goog-tooltip:hover {
-  display: none !important;
-}
-
-body {
-  top: 0px !important;
-  position: static !important;
-}
-
-.goog-text-highlight {
-  background-color: transparent !important;
-  box-shadow: none !important;
-  border-bottom: none !important;
-}
-
-#google_translate_element {
-  display: none !important;
-}
 
 .lang-dropdown-menu {
   opacity: 0;
@@ -844,4 +821,3 @@ body {
   box-shadow: 0 0 30px rgba(218, 165, 32, 0.5);
   transform: translateY(-2px);
 }
-
