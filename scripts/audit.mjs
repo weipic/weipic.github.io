@@ -62,6 +62,18 @@ const appSource = fs.readFileSync('js/app.js', 'utf8');
 if (!/localStorage\.setItem\('preferred_lang'/.test(appSource) || !/getLocalizedPagePath/.test(appSource)) {
   failures.push('js/app.js: 缺少靜態語系路徑與 preferred_lang 偏好記憶邏輯');
 }
+if (!/t\('相簿剩餘 \{days\} 天將自動刪除/.test(appSource) ||
+    !/window\.location\.assign\(`\$\{targetPath\}\$\{window\.location\.search\}\$\{window\.location\.hash\}`\)/.test(appSource)) {
+  failures.push('js/app.js: 相簿倒數必須使用完整三語句型，語言切換必須保留相簿查詢參數');
+}
+const localeSource = fs.readFileSync('scripts/locales/content.mjs', 'utf8');
+for (const countdownTranslation of [
+  '相簿剩餘 {days} 天將自動刪除',
+  'This gallery will be deleted in {days} days.',
+  'このギャラリーはあと{days}日で自動削除されます。'
+]) {
+  if (!localeSource.includes(countdownTranslation)) failures.push(`scripts/locales/content.mjs: 缺少倒數翻譯 ${countdownTranslation}`);
+}
 
 if (failures.length) {
   console.error(`安全與完整性檢查失敗（${failures.length}）：\n- ${failures.join('\n- ')}`);

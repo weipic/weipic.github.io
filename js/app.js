@@ -1609,7 +1609,8 @@ window.setLanguage = function(langCode) {
     localStorage.setItem('preferred_lang', storedLanguage);
   } catch (_) {}
   trackGAEvent('switch_site_language', { target_language: storedLanguage });
-  window.location.assign(getLocalizedPagePath(targetLanguage, getCurrentPageName(), window.location.hash));
+  const targetPath = getLocalizedPagePath(targetLanguage, getCurrentPageName());
+  window.location.assign(`${targetPath}${window.location.search}${window.location.hash}`);
 };
 
 function updateLanguageUIState(langCode) {
@@ -2198,14 +2199,14 @@ function updateAlbumExpiryCountdown(config) {
   const expiryTime = getAlbumExpiryTime(config);
   const expiryDays = Number(config?.expiryDays ?? 14);
   if (expiryTime === null) {
-    countdownEl.textContent = `相簿將於 ${expiryDays} 天後自動刪除，請務必及時下載備份。`;
+    countdownEl.textContent = t('相簿將於 {days} 天後自動刪除，請務必及時下載備份。', { days: expiryDays });
     return;
   }
   const remainingMs = expiryTime - Date.now();
   const remainingDays = Math.max(0, Math.ceil(remainingMs / 86400000));
   countdownEl.textContent = remainingDays > 0
-    ? `相簿剩餘 ${remainingDays} 天將自動刪除，請務必及時下載備份。`
-    : '相簿將於今天自動刪除，請立即下載備份。';
+    ? t('相簿剩餘 {days} 天將自動刪除，請務必及時下載備份。', { days: remainingDays })
+    : t('相簿將於今天自動刪除，請立即下載備份。');
 }
 
 function startAlbumExpiryCountdown(config) {

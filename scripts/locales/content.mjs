@@ -105,6 +105,8 @@ const common = [
   ['相簿將於', 'This gallery will be deleted automatically in', 'このギャラリーは'],
   ['天後自動刪除，請務必及時下載備份。', 'days. Please download and back up your photos in time.', '日後に自動削除されます。期限までにダウンロードとバックアップをお願いします。'],
   ['相簿剩餘', 'This gallery will be deleted in', 'このギャラリーはあと'],
+  ['相簿將於 {days} 天後自動刪除，請務必及時下載備份。', 'This gallery will be deleted automatically in {days} days. Please download and back up your photos in time.', 'このギャラリーは{days}日後に自動削除されます。期限までにダウンロードとバックアップをお願いします。'],
+  ['相簿剩餘 {days} 天將自動刪除，請務必及時下載備份。', 'This gallery will be deleted in {days} days. Please download and back up your photos in time.', 'このギャラリーはあと{days}日で自動削除されます。期限までにダウンロードとバックアップをお願いします。'],
   ['相簿將於今天自動刪除，請立即下載備份。', 'This gallery will be deleted today. Download and back up your photos now.', 'このギャラリーは本日自動削除されます。今すぐダウンロードとバックアップを行ってください。'],
   ['攝影作品輯', 'Photography Collection', 'フォトコレクション'],
   ['下載中...', 'Downloading...', 'ダウンロード中…'],
