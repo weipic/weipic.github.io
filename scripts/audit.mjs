@@ -3,8 +3,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const failures = [];
-const projectFiles = execFileSync('rg', ['--files'], { encoding: 'utf8' })
-  .trim().split('\n').filter(Boolean);
+let projectFiles;
+try {
+  projectFiles = execFileSync('rg', ['--files'], { encoding: 'utf8' })
+    .trim().split('\n').filter(Boolean);
+} catch {
+  projectFiles = execFileSync('git', ['ls-files'], { encoding: 'utf8' })
+    .trim().split('\n').filter(Boolean);
+}
 const htmlFiles = projectFiles.filter(file => file.endsWith('.html'));
 const frontendFiles = [...htmlFiles, 'js/app.js', 'js/analytics.js', 'js/portfolio-data.js'];
 const forbidden = [

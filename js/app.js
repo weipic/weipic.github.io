@@ -715,7 +715,7 @@ function renderCategoryPage(categoryId) {
         <div class="pt-6 max-w-4xl mx-auto">
           <div class="category-tab-wrapper">
             <div class="category-tab-bar">
-              <a href="index.html" class="category-tab-item">首頁</a>
+              <a href="index.html" class="category-tab-item">${t('首頁')}</a>
               ${data.categories.map(cat => `
                 <a href="${cat.pageUrl}" class="category-tab-item ${cat.id === categoryId ? 'active' : ''}">
                   ${cat.title}
@@ -727,10 +727,10 @@ function renderCategoryPage(categoryId) {
       </div>
     `;
 
-    // Auto-scroll active category tab into center view on mobile/desktop
+    // Auto-scroll active category tab into center view on mobile touch scroll
     const activeTab = headerContainer.querySelector('.category-tab-item.active');
     const tabBar = headerContainer.querySelector('.category-tab-bar');
-    if (activeTab && tabBar) {
+    if (activeTab && tabBar && tabBar.scrollWidth > tabBar.clientWidth) {
       setTimeout(() => {
         activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
       }, 50);
