@@ -66,6 +66,11 @@ if (!/t\('相簿剩餘 \{days\} 天將自動刪除/.test(appSource) ||
     !/window\.location\.assign\(`\$\{targetPath\}\$\{window\.location\.search\}\$\{window\.location\.hash\}`\)/.test(appSource)) {
   failures.push('js/app.js: 相簿倒數必須使用完整三語句型，語言切換必須保留相簿查詢參數');
 }
+if (!/function localizeGalleryConfig/.test(appSource) ||
+    !/\['clientName', 'albumTitle', 'pageTitle'\]/.test(appSource) ||
+    !/matchedGallery = localizeGalleryConfig\(verification\.gallery\)/.test(appSource)) {
+  failures.push('js/app.js: 客戶相簿缺少雲端英文／日文欄位選用邏輯');
+}
 const localeSource = fs.readFileSync('scripts/locales/content.mjs', 'utf8');
 for (const countdownTranslation of [
   '相簿剩餘 {days} 天將自動刪除',

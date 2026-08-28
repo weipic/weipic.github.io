@@ -23,6 +23,18 @@ function getSiteLanguage() {
   return 'zh-TW';
 }
 
+function localizeGalleryConfig(config) {
+  if (!config || typeof config !== 'object') return config;
+  const suffix = getSiteLanguage() === 'en' ? 'En' : getSiteLanguage() === 'ja' ? 'Ja' : '';
+  if (!suffix) return config;
+  const localized = { ...config };
+  for (const field of ['clientName', 'albumTitle', 'pageTitle']) {
+    const translatedValue = String(config[`${field}${suffix}`] || '').trim();
+    if (translatedValue) localized[field] = translatedValue;
+  }
+  return localized;
+}
+
 function t(key, replacements = {}) {
   const value = window.WEI_I18N?.translate?.(key, getSiteLanguage()) ?? key;
   return Object.entries(replacements).reduce(
@@ -1879,6 +1891,7 @@ const KNOWN_ALBUM_TITLES = {
 };
 
 function getAlbumTitleForId(targetId, targetGallery) {
+  targetGallery = localizeGalleryConfig(targetGallery);
   if (targetGallery && targetGallery.albumTitle) {
     return targetGallery.albumTitle;
   }
@@ -1961,7 +1974,7 @@ function initDownloadPage() {
 
   let targetGallery = null;
   if (targetId) {
-    targetGallery = findGalleryByIdOrSlug(targetId);
+    targetGallery = localizeGalleryConfig(findGalleryByIdOrSlug(targetId));
   }
 
   // Handle invalid case ID on custom route or 404 page
@@ -2044,7 +2057,7 @@ function initDownloadPage() {
         // Authentication is intentionally Worker-only. Never keep passwords or
         // private R2 object paths in the public front-end bundle.
         const verification = await verifyPasswordWithWorker(targetId || null, enteredPass);
-        matchedGallery = verification.gallery;
+        matchedGallery = localizeGalleryConfig(verification.gallery);
         verificationMessage = verification.message || verificationMessage;
 
         if (matchedGallery) {
@@ -2225,6 +2238,7 @@ function getZipDownloadFilename(config) {
 }
 
 function unlockGalleryView(config) {
+  config = localizeGalleryConfig(config);
   const passwordSection = document.getElementById('password-section');
   const deliverySection = document.getElementById('delivery-gallery-section');
   if (!deliverySection) return;
