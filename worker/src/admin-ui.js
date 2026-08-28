@@ -156,7 +156,7 @@ function notice(message,error=false){const el=byId('notice');el.textContent=mess
 function escapeText(value){return String(value==null?'':value);}
 function isInactive(g){if(g.isDeleted)return true;if(!g.deliveryDate)return false;const p=g.deliveryDate.split(/[.\/-]/).map(Number);if(p.length!==3)return false;return Date.now()>Date.UTC(p[0],p[1]-1,p[2])+Number(g.expiryDays||0)*86400000;}
 function statusLabel(g){if(g.isDeleted)return '已下架';return isInactive(g)?'已到期':'有效下載';}
-function clientUrl(id){return 'https://weipic.github.io/download/'+encodeURIComponent(id);}
+function clientUrl(id){return 'https://weipic.github.io/download?id='+encodeURIComponent(id);}
 function button(label,action,kind='ghost'){const el=document.createElement('button');el.type='button';el.className=kind;el.textContent=label;el.addEventListener('click',action);return el;}
 function dateValue(g){if(!g.deliveryDate)return 0;const p=g.deliveryDate.split(/[.\/-]/).map(Number);return p.length===3?Date.UTC(p[0],p[1]-1,p[2]):0;}
 function formatBytes(bytes){const value=Number(bytes||0);if(value<1024)return value+' B';const units=['KB','MB','GB','TB'];let n=value/1024,index=0;while(n>=1024&&index<units.length-1){n/=1024;index++;}return n.toLocaleString('zh-TW',{maximumFractionDigits:n>=100?0:n>=10?1:2})+' '+units[index];}

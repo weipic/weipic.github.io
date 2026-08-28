@@ -195,6 +195,10 @@ test('admin page is isolated and login rate-protected', async () => {
   assert.match(page.headers.get('Content-Security-Policy'), /frame-ancestors 'none'/);
   assert.doesNotMatch(await page.text(), /passwordDigest|test-password-pepper/);
 
+  const appScript = await worker.fetch(new Request('https://worker.example/admin/app.js'), env);
+  assert.equal(appScript.status, 200);
+  assert.match(await appScript.text(), /https:\/\/weipic\.github\.io\/download\?id=/);
+
   const denied = await worker.fetch(new Request('https://worker.example/admin/api/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Origin: 'https://worker.example' },
