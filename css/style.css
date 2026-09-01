@@ -288,6 +288,25 @@ img, picture, .no-download {
   height: calc(100% + 2px);
 }
 
+/* Cover the desktop hover compositing seam between the image and card body. */
+@media (hover: hover) and (pointer: fine) {
+  #categories .luxury-card > .p-6 {
+    position: relative;
+    z-index: 1;
+    background: var(--bg-surface);
+  }
+
+  #categories .luxury-card > .p-6::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--bg-surface);
+  }
+}
+
 .luxury-card:hover .image-hover-zoom img,
 .luxury-card.touch-active .image-hover-zoom img,
 .gallery-item:hover .image-hover-zoom img,
