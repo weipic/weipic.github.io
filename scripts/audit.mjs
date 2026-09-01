@@ -73,6 +73,7 @@ if (!/localStorage\.setItem\('preferred_lang'/.test(appSource) || !/getLocalized
 }
 if (!/function ensureMobileLanguageSelector/.test(appSource) ||
     !/mobileLanguageSelector/.test(appSource) ||
+    !/mobileMenu\.querySelector\('\.lang-opt-btn'\)/.test(appSource) ||
     !/grid grid-cols-3 gap-2/.test(appSource)) {
   failures.push('js/app.js: 手機選單缺少三語切換控制');
 }

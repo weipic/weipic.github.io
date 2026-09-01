@@ -1643,7 +1643,7 @@ function updateLanguageUIState(langCode) {
 
 function ensureMobileLanguageSelector() {
   const mobileMenu = document.getElementById('mobile-menu');
-  if (!mobileMenu || mobileMenu.querySelector('[data-mobile-language-selector]')) return;
+  if (!mobileMenu || mobileMenu.querySelector('.lang-opt-btn')) return;
 
   const section = document.createElement('div');
   section.dataset.mobileLanguageSelector = 'true';
