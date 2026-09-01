@@ -401,7 +401,7 @@ function renderHomePage() {
 
           <!-- CTA Actions -->
           <div class="flex flex-wrap items-center gap-4 pt-2">
-            <a href="#categories-section" class="btn-gold">
+            <a href="#categories" class="btn-gold">
               瀏覽攝影作品
             </a>
             <a href="contact" class="btn-outline">

@@ -45,7 +45,7 @@ if (!homepageHeader || !homepageFooter) throw new Error('無法從 index.html �
 let privacy = fs.readFileSync('privacy.html', 'utf8').replace(/隱私說明|隱私權說明/g, '隱私權政策');
 const privacyHeader = homepageHeader
   .replace('class="nav-link active">關於我與經歷', 'class="nav-link">關於我與經歷')
-  .replace('href="#categories-section"', 'href="index.html#categories-section"');
+  .replace('href="#categories"', 'href="index.html#categories"');
 privacy = privacy.replace(/<header[\s\S]*?<\/header>/, privacyHeader);
 privacy = privacy.replace(/<body class="[^"]*">/, '<body class="min-h-screen bg-[#0a0a0c] text-[#f5f5f7] antialiased flex flex-col">');
 privacy = privacy.replace('<main class="mx-auto max-w-4xl px-6 py-14 sm:py-20">', '<main class="mx-auto w-full max-w-4xl flex-grow px-6 pb-20 pt-32 sm:pt-36">');

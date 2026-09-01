@@ -275,6 +275,19 @@ img, picture, .no-download {
   backface-visibility: hidden;
 }
 
+/* Keep the category title clear of the fixed header when following #categories. */
+#categories {
+  scroll-margin-top: 1.5rem;
+}
+
+/* Overscan category covers to hide GPU subpixel seams during hover scaling. */
+#categories .image-hover-zoom img {
+  position: absolute;
+  inset: -1px;
+  width: calc(100% + 2px);
+  height: calc(100% + 2px);
+}
+
 .luxury-card:hover .image-hover-zoom img,
 .luxury-card.touch-active .image-hover-zoom img,
 .gallery-item:hover .image-hover-zoom img,
