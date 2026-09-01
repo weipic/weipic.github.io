@@ -700,7 +700,7 @@ function renderCategoryPage(categoryId) {
   const headerContainer = document.getElementById('category-header-container');
   if (headerContainer && categoryObj) {
     headerContainer.innerHTML = `
-      <div class="max-w-6xl mx-auto px-6 pt-24 pb-10 text-center space-y-4">
+      <div class="max-w-6xl mx-auto px-6 pt-28 pb-10 text-center space-y-4">
         <p class="text-amber-400 text-xs sm:text-sm font-semibold tracking-widest uppercase">
           ${categoryObj.badge}
         </p>
