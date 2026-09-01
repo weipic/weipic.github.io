@@ -41,6 +41,10 @@ for (const file of htmlFiles) {
   if (html.includes('<footer') && !html.includes('footer-legal-row flex items-baseline')) {
     failures.push(`${file}: 頁尾版權與隱私權政策未使用文字基線對齊`);
   }
+  const mobileMenu = html.match(/<div id="mobile-menu"[\s\S]*?<\/div>\s*<\/header>/)?.[0] || '';
+  if (/Mobile Language Options|lang-opt-btn/.test(mobileMenu)) {
+    failures.push(`${file}: 手機語言選單必須由共用 js/app.js 建立，不得在 HTML 重複定義`);
+  }
   const localRefs = [...html.matchAll(/(?:src|href)="((?:\/|\.\.\/|\.\/)?(?:assets|css|js)\/[^"?#]+)"/g)].map(match => match[1]);
   for (const ref of localRefs) {
     const resolvedRef = ref.startsWith('/')
@@ -73,7 +77,7 @@ if (!/localStorage\.setItem\('preferred_lang'/.test(appSource) || !/getLocalized
 }
 if (!/function ensureMobileLanguageSelector/.test(appSource) ||
     !/mobileLanguageSelector/.test(appSource) ||
-    !/mobileMenu\.querySelector\('\.lang-opt-btn'\)/.test(appSource) ||
+    !/mobileMenu\.querySelector\('\[data-mobile-language-selector\]'\)/.test(appSource) ||
     !/grid grid-cols-3 gap-2/.test(appSource)) {
   failures.push('js/app.js: 手機選單缺少三語切換控制');
 }
