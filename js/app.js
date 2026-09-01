@@ -1641,7 +1641,26 @@ function updateLanguageUIState(langCode) {
   });
 }
 
+function ensureMobileLanguageSelector() {
+  const mobileMenu = document.getElementById('mobile-menu');
+  if (!mobileMenu || mobileMenu.querySelector('[data-mobile-language-selector]')) return;
+
+  const section = document.createElement('div');
+  section.dataset.mobileLanguageSelector = 'true';
+  section.className = 'border-t border-white/10 pt-4';
+  section.innerHTML = `
+    <p class="mb-3 text-xs font-mono uppercase tracking-wider text-gray-500">語言 / Language</p>
+    <div class="grid grid-cols-3 gap-2" role="group" aria-label="Language Selector">
+      <button type="button" onclick="setLanguage('zh-TW')" data-lang="zh-TW" class="lang-opt-btn rounded-lg border border-white/10 px-3 py-2.5 text-center text-xs text-gray-300 transition-colors hover:border-amber-400/50 hover:text-amber-400">繁體中文</button>
+      <button type="button" onclick="setLanguage('en')" data-lang="en" class="lang-opt-btn rounded-lg border border-white/10 px-3 py-2.5 text-center text-xs text-gray-300 transition-colors hover:border-amber-400/50 hover:text-amber-400">English</button>
+      <button type="button" onclick="setLanguage('ja')" data-lang="ja" class="lang-opt-btn rounded-lg border border-white/10 px-3 py-2.5 text-center text-xs text-gray-300 transition-colors hover:border-amber-400/50 hover:text-amber-400">日本語</button>
+    </div>
+  `;
+  mobileMenu.appendChild(section);
+}
+
 function initLanguageSelector() {
+  ensureMobileLanguageSelector();
   const langBtn = document.getElementById('lang-btn');
   const langMenu = document.getElementById('lang-dropdown-menu');
 

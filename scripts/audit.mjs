@@ -68,6 +68,11 @@ const appSource = fs.readFileSync('js/app.js', 'utf8');
 if (!/localStorage\.setItem\('preferred_lang'/.test(appSource) || !/getLocalizedPagePath/.test(appSource)) {
   failures.push('js/app.js: 缺少靜態語系路徑與 preferred_lang 偏好記憶邏輯');
 }
+if (!/function ensureMobileLanguageSelector/.test(appSource) ||
+    !/mobileLanguageSelector/.test(appSource) ||
+    !/grid grid-cols-3 gap-2/.test(appSource)) {
+  failures.push('js/app.js: 手機選單缺少三語切換控制');
+}
 if (!/t\('相簿剩餘 \{days\} 天將自動刪除/.test(appSource) ||
     !/window\.location\.assign\(`\$\{targetPath\}\$\{window\.location\.search\}\$\{window\.location\.hash\}`\)/.test(appSource)) {
   failures.push('js/app.js: 相簿倒數必須使用完整三語句型，語言切換必須保留相簿查詢參數');
