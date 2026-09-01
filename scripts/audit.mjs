@@ -38,6 +38,9 @@ for (const file of htmlFiles) {
   for (const requiredSeo of ['rel="canonical"', 'hreflang="zh-TW"', 'hreflang="ja"', 'hreflang="en"', 'hreflang="x-default"']) {
     if (!html.includes(requiredSeo)) failures.push(`${file}: 缺少 SEO 標記 ${requiredSeo}`);
   }
+  if (html.includes('<footer') && !html.includes('footer-legal-row flex items-baseline')) {
+    failures.push(`${file}: 頁尾版權與隱私權政策未使用文字基線對齊`);
+  }
   const localRefs = [...html.matchAll(/(?:src|href)="((?:\/|\.\.\/|\.\/)?(?:assets|css|js)\/[^"?#]+)"/g)].map(match => match[1]);
   for (const ref of localRefs) {
     const resolvedRef = ref.startsWith('/')
