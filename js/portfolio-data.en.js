@@ -2130,6 +2130,6 @@ window.PORTFOLIO_DATA = {
       }
     ]
   },
-  "workerApiEndpoint": "https://weipic-api.weipic2023.workers.dev/",
+  "workerApiEndpoint": "https://api.wei.pictures/",
   "clientGalleries": []
 };

@@ -1852,7 +1852,7 @@ function getAlbumIdFromUrl() {
   return null;
 }
 
-const WORKER_API_ENDPOINT = (window.PORTFOLIO_DATA && window.PORTFOLIO_DATA.workerApiEndpoint) || "https://weipic-api.weipic2023.workers.dev/";
+const WORKER_API_ENDPOINT = (window.PORTFOLIO_DATA && window.PORTFOLIO_DATA.workerApiEndpoint) || "https://api.wei.pictures/";
 
 async function verifyPasswordWithWorker(albumId, password) {
   const trimmed = (password || '').trim();

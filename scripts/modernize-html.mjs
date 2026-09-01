@@ -7,7 +7,7 @@ const files = [
   'yeh_photo.notes.html'
 ];
 
-const csp = "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://weipic-api.weipic2023.workers.dev https://www.google-analytics.com https://fonts.gstatic.com; connect-src 'self' https://weipic-api.weipic2023.workers.dev https://www.google-analytics.com https://region1.google-analytics.com https://formsubmit.co; frame-src https:; object-src 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co; upgrade-insecure-requests";
+const csp = "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://api.wei.pictures https://www.google-analytics.com https://fonts.gstatic.com; connect-src 'self' https://api.wei.pictures https://www.google-analytics.com https://region1.google-analytics.com https://formsubmit.co; frame-src https:; object-src 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co; upgrade-insecure-requests";
 
 const existingFiles = files.filter(file => fs.existsSync(file));
 

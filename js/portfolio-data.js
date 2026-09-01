@@ -2081,7 +2081,6 @@ window.PORTFOLIO_DATA = {
   // ------------------------------------------------------------------
   // 📸 客戶私密交圖專區設定 (Private Client Delivery Gallery Config)
   // ------------------------------------------------------------------
-  workerApiEndpoint: "https://weipic-api.weipic2023.workers.dev/",
+  workerApiEndpoint: "https://api.wei.pictures/",
   clientGalleries: []
 };
-
