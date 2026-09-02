@@ -6,7 +6,7 @@ window.PORTFOLIO_DATA = {
     "tagline": "",
     "avatar": "../assets/images/profile/avatar.webp",
     "location": "Taipei, Taiwan",
-    "email": "weipic2023@gmail.com",
+    "email": "contact@wei.pictures",
     "instagram": "https://www.instagram.com/wei.pictures/",
     "instagramHandle": "@wei.pictures",
     "experienceYears": "2+",
@@ -32,7 +32,7 @@ window.PORTFOLIO_DATA = {
       "I'm Wei, an 18-year-old photographer with around two years of experience. I continue to explore new subjects and the stories shaped by light and shadow.",
       "My work spans portraits, landscapes, street photography, sports, and documentary imagery, preserving meaningful moments from everyday life.",
       "Follow along, share your feedback, or get in touch by email or the booking form for photography collaborations.",
-      "<a href=\"mailto:weipic2023@gmail.com\">weipic2023@gmail.com</a>"
+      "<a href=\"mailto:contact@wei.pictures\">contact@wei.pictures</a>"
     ],
     "skills": [
       "Commercial Photography",

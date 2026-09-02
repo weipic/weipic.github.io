@@ -14,7 +14,7 @@ window.PORTFOLIO_DATA = {
     tagline: "",
     avatar: "assets/images/profile/avatar.webp",
     location: "Taipei, Taiwan",
-    email: "weipic2023@gmail.com",
+    email: "contact@wei.pictures",
     instagram: "https://www.instagram.com/wei.pictures/",
     instagramHandle: "@wei.pictures",
     experienceYears: "2+",
@@ -28,7 +28,7 @@ window.PORTFOLIO_DATA = {
       "我是Wei，18y，攝影資歷約兩年，仍在不斷嘗試各種題材，探索光影與故事。",
       "拍攝範圍涵蓋人像、風景、街拍、運動與紀實，持續記錄生活中的每個瞬間。",
       "歡迎追蹤與指教，各式拍攝合作需求歡迎來信聯繫或是填寫網頁預約表單！",
-      '<a href="mailto:weipic2023@gmail.com">weipic2023@gmail.com</a>'
+      '<a href="mailto:contact@wei.pictures">contact@wei.pictures</a>'
     ],
     skills: ["商業攝影", "人像寫真", "演唱會紀實", "品牌活動紀錄", "運動攝影", "畢業寫真", "風景視覺"]
   },

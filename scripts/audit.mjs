@@ -54,6 +54,20 @@ for (const file of htmlFiles) {
   }
 }
 
+const rootHtmlFiles = htmlFiles.filter(file => !file.includes('/'));
+for (const file of rootHtmlFiles) {
+  const html = fs.readFileSync(file, 'utf8');
+  for (const requiredRedirectPart of [
+    "localStorage.getItem('pref_lang')",
+    "localStorage.setItem('pref_lang', preferred)",
+    "String(navigator.language || '').toLowerCase().startsWith('ja')",
+    "if (preferred === 'zh-TW') return",
+    'window.location.replace(target + window.location.search + window.location.hash)'
+  ]) {
+    if (!html.includes(requiredRedirectPart)) failures.push(`${file}: 根目錄頁面缺少完整首次語系分流 ${requiredRedirectPart}`);
+  }
+}
+
 for (const locale of ['en', 'jp']) {
   for (const file of htmlFiles.filter(file => file.startsWith(`${locale}/`))) {
     const html = fs.readFileSync(file, 'utf8');
@@ -62,6 +76,15 @@ for (const locale of ['en', 'jp']) {
     if (!html.includes(`href="/${locale}/`) && !file.endsWith('/index.html')) failures.push(`${file}: 缺少 /${locale}/ 語系內部連結`);
     if (/(?:src|href)="\/(?:assets|css|js)\//.test(html)) failures.push(`${file}: 子目錄資源仍使用根目錄絕對路徑`);
     if (!html.includes('src="../js/app.js"')) failures.push(`${file}: 缺少可供本機開啟的相對 app.js 路徑`);
+    if (!/setLanguage\('zh-TW'\)/.test(html)) failures.push(`${file}: 語言選單缺少繁體中文`);
+    if (!html.includes('WEI_LANGUAGE_PREFERENCE_START')) failures.push(`${file}: 已分流語系頁面缺少偏好同步`);
+  }
+}
+
+for (const file of ['download.html', 'en/download.html', 'jp/download.html']) {
+  const html = fs.readFileSync(file, 'utf8');
+  if (!/inline-flex shrink-0 whitespace-nowrap[^>]*>[\s\S]*?id="photo-count-display"/.test(html)) {
+    failures.push(`${file}: 手機版相片數量標籤可能換行`);
   }
 }
 
@@ -72,14 +95,26 @@ if (!/clientGalleries\s*:\s*\[\s*\]/.test(dataSource)) {
 if (!fs.existsSync('css/tailwind.generated.css')) failures.push('缺少建置後的 Tailwind CSS');
 if (!fs.existsSync('js/vendor/jszip.min.js')) failures.push('缺少本機 JSZip');
 const appSource = fs.readFileSync('js/app.js', 'utf8');
-if (!/localStorage\.setItem\('preferred_lang'/.test(appSource) || !/getLocalizedPagePath/.test(appSource)) {
-  failures.push('js/app.js: 缺少靜態語系路徑與 preferred_lang 偏好記憶邏輯');
+if (!/localStorage\.setItem\('pref_lang'/.test(appSource) || !/getLocalizedPagePath/.test(appSource)) {
+  failures.push('js/app.js: 缺少靜態語系路徑與 pref_lang 偏好記憶邏輯');
+}
+if (!/const distanceDelay = 300 \* Math\.max\(0, Math\.floor\(startY \/ 1000\)\)/.test(appSource) ||
+    !/const duration = 1300 \+ Math\.min\(distanceDelay, 1500\)/.test(appSource) ||
+    !/16 \* Math\.pow\(progress, 5\)/.test(appSource) ||
+    !/1 - Math\.pow\(-2 \* progress \+ 2, 5\) \/ 2/.test(appSource) ||
+    !/behavior: 'auto'/.test(appSource)) {
+  failures.push('js/app.js: 返回頂部缺少參考網站的距離時間、easeInOutQuint 曲線或 CSS smooth 衝突防護');
 }
 if (!/function ensureMobileLanguageSelector/.test(appSource) ||
     !/mobileLanguageSelector/.test(appSource) ||
     !/mobileMenu\.querySelector\('\[data-mobile-language-selector\]'\)/.test(appSource) ||
     !/grid grid-cols-3 gap-2/.test(appSource)) {
-  failures.push('js/app.js: 手機選單缺少三語切換控制');
+  failures.push('js/app.js: 手機選單缺少中英日語切換控制');
+}
+const contactTextFiles = projectFiles.filter(file => /\.(?:html|js|mjs|md|json|ya?ml|txt)$/i.test(file));
+const legacyContactAddress = ['weipic2023', 'gmail.com'].join('@');
+if (contactTextFiles.some(file => fs.readFileSync(file, 'utf8').includes(legacyContactAddress))) {
+  failures.push(`專案仍包含舊聯絡信箱 ${legacyContactAddress}`);
 }
 if (!/t\('相簿剩餘 \{days\} 天將自動刪除/.test(appSource) ||
     !/window\.location\.assign\(`\$\{targetPath\}\$\{window\.location\.search\}\$\{window\.location\.hash\}`\)/.test(appSource)) {

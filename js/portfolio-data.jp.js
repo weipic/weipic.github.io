@@ -6,7 +6,7 @@ window.PORTFOLIO_DATA = {
     "tagline": "",
     "avatar": "../assets/images/profile/avatar.webp",
     "location": "台湾・台北",
-    "email": "weipic2023@gmail.com",
+    "email": "contact@wei.pictures",
     "instagram": "https://www.instagram.com/wei.pictures/",
     "instagramHandle": "@wei.pictures",
     "experienceYears": "2+",
@@ -32,7 +32,7 @@ window.PORTFOLIO_DATA = {
       "Weiと申します。18歳、撮影歴は約2年です。さまざまな題材に挑戦しながら、光と影、そして物語の可能性を探っています。",
       "ポートレート、風景、ストリート、スポーツ、ドキュメンタリーを幅広く撮影し、日常の一瞬一瞬を記録しています。",
       "ぜひフォローしてご覧ください。撮影のご依頼・ご相談は、メールまたは予約フォームからお気軽にお問い合わせください。",
-      "<a href=\"mailto:weipic2023@gmail.com\">weipic2023@gmail.com</a>"
+      "<a href=\"mailto:contact@wei.pictures\">contact@wei.pictures</a>"
     ],
     "skills": [
       "商業写真",

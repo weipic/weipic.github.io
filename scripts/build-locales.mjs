@@ -9,7 +9,7 @@ const pages = [
   'sports.html', 'graduation.html', 'landscape.html', 'contact.html', 'download.html',
   'privacy.html', '404.html'
 ];
-const siteUrl = 'https://weipic.github.io';
+const siteUrl = 'https://wei.pictures';
 const localizableDataKeys = new Set([
   'name', 'subTitle', 'tagline', 'location', 'label', 'bio', 'skills', 'brand',
   'role', 'category', 'description', 'logoText', 'title', 'titleEn', 'client',
@@ -55,7 +55,9 @@ function rewriteInternalLinks(html, prefix) {
 }
 
 function stripRootPreferenceRedirect(html) {
-  return html.replace(/\s*<script>\s*\(\(\) => \{\s*try \{\s*const preferred = localStorage\.getItem\('preferred_lang'\);[\s\S]*?\}\)\(\);\s*<\/script>\s*/m, '\n');
+  return html
+    .replace(/\s*<!-- WEI_LANGUAGE_REDIRECT_START -->[\s\S]*?<!-- WEI_LANGUAGE_REDIRECT_END -->\s*/g, '\n')
+    .replace(/\s*<script>\s*\(\(\) => \{\s*try \{\s*const preferred = localStorage\.getItem\('preferred_lang'\);[\s\S]*?\}\)\(\);\s*<\/script>\s*/m, '\n');
 }
 
 function addSeo(html, file, prefix) {
@@ -72,20 +74,50 @@ function addSeo(html, file, prefix) {
   return html;
 }
 
-function rootPreferenceRedirect() {
-  return `  <script>
+function rootPreferenceRedirect(file) {
+  const slug = pageSlug(file);
+  return `  <!-- WEI_LANGUAGE_REDIRECT_START -->
+  <script>
     (() => {
+      let preferred = '';
       try {
-        const preferred = localStorage.getItem('preferred_lang');
-        if (preferred === 'jp' || preferred === 'en') {
-          const target = window.location.protocol === 'file:'
-            ? preferred + '/index.html'
-            : '/' + preferred + '/';
-          window.location.replace(target + window.location.search + window.location.hash);
-        }
+        preferred = localStorage.getItem('pref_lang') || '';
       } catch (_) {}
+      if (preferred !== 'jp' && preferred !== 'en') {
+        if (preferred === 'zh-TW') return;
+        preferred = String(navigator.language || '').toLowerCase().startsWith('ja') ? 'jp' : 'en';
+        try { localStorage.setItem('pref_lang', preferred); } catch (_) {}
+      }
+      const target = window.location.protocol === 'file:'
+        ? preferred + '/${slug || 'index'}.html'
+        : '/' + preferred + '/${slug}';
+      window.location.replace(target + window.location.search + window.location.hash);
     })();
-  </script>`;
+  </script>
+  <!-- WEI_LANGUAGE_REDIRECT_END -->`;
+}
+
+function localizedPreferenceRedirect(file, locale) {
+  const slug = pageSlug(file);
+  return `  <!-- WEI_LANGUAGE_PREFERENCE_START -->
+  <script>
+    (() => {
+      const current = '${locale.prefix}';
+      let preferred = '';
+      try { preferred = localStorage.getItem('pref_lang') || ''; } catch (_) {}
+      if (!['zh-TW', 'jp', 'en'].includes(preferred)) {
+        try { localStorage.setItem('pref_lang', current); } catch (_) {}
+        return;
+      }
+      if (preferred === current) return;
+      const prefix = preferred === 'zh-TW' ? '' : '/' + preferred;
+      const target = window.location.protocol === 'file:'
+        ? (preferred === 'zh-TW' ? '../' : '../' + preferred + '/') + '${slug || 'index'}.html'
+        : prefix + '/${slug}';
+      window.location.replace(target + window.location.search + window.location.hash);
+    })();
+  </script>
+  <!-- WEI_LANGUAGE_PREFERENCE_END -->`;
 }
 
 function prepareHtml(source, file, locale) {
@@ -99,6 +131,7 @@ function prepareHtml(source, file, locale) {
     .replace(/\s*<script src="\.\.\/js\/i18n\.js"><\/script>/g, '')
     .replace(/<script src="\.\.\/js\/portfolio-data\.js"><\/script>/, `<script src="../js/portfolio-data.${prefix}.js"></script>`)
     .replace(/<script src="\.\.\/js\/app\.js"><\/script>/, '<script src="../js/i18n.js"></script>\n  <script src="../js/app.js"></script>');
+  html = html.replace('</head>', `${localizedPreferenceRedirect(file, locale)}\n</head>`);
   return html;
 }
 
@@ -177,10 +210,8 @@ const sourcePages = Object.fromEntries(pages.map(file => [file, fs.readFileSync(
 const data = loadPortfolioData();
 
 for (const [file, source] of Object.entries(sourcePages)) {
-  let rootHtml = addSeo(rewriteInternalLinks(source, ''), file, '');
-  if (file === 'index.html' && !rootHtml.includes("localStorage.getItem('preferred_lang')")) {
-    rootHtml = rootHtml.replace('</head>', `${rootPreferenceRedirect()}\n</head>`);
-  }
+  let rootHtml = addSeo(rewriteInternalLinks(stripRootPreferenceRedirect(source), ''), file, '');
+  rootHtml = rootHtml.replace('</head>', `${rootPreferenceRedirect(file)}\n</head>`);
   if (!rootHtml.includes('js/i18n.js')) rootHtml = rootHtml.replace('<script src="js/app.js"></script>', '<script src="js/i18n.js"></script>\n  <script src="js/app.js"></script>');
   fs.writeFileSync(path.join(rootDir, file), rootHtml);
 }

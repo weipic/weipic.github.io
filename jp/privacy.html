@@ -6,11 +6,11 @@
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https://www.google-analytics.com https://fonts.gstatic.com; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com; frame-src https:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests" />
   <meta name="robots" content="index,follow" />
-  <link rel="canonical" href="https://weipic.github.io/jp/privacy" />
-  <link rel="alternate" hreflang="zh-TW" href="https://weipic.github.io/privacy" />
-  <link rel="alternate" hreflang="ja" href="https://weipic.github.io/jp/privacy" />
-  <link rel="alternate" hreflang="en" href="https://weipic.github.io/en/privacy" />
-  <link rel="alternate" hreflang="x-default" href="https://weipic.github.io/privacy" />
+  <link rel="canonical" href="https://wei.pictures/jp/privacy" />
+  <link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/privacy" />
+  <link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/privacy" />
+  <link rel="alternate" hreflang="en" href="https://wei.pictures/en/privacy" />
+  <link rel="alternate" hreflang="x-default" href="https://wei.pictures/privacy" />
 
 
 
@@ -19,6 +19,25 @@
   <link rel="icon" type="image/png" href="../assets/images/favicon.png" />
   <link rel="stylesheet" href="../css/tailwind.generated.css" />
   <link rel="stylesheet" href="../css/style.css" />
+  <!-- WEI_LANGUAGE_PREFERENCE_START -->
+  <script>
+    (() => {
+      const current = 'jp';
+      let preferred = '';
+      try { preferred = localStorage.getItem('pref_lang') || ''; } catch (_) {}
+      if (!['zh-TW', 'jp', 'en'].includes(preferred)) {
+        try { localStorage.setItem('pref_lang', current); } catch (_) {}
+        return;
+      }
+      if (preferred === current) return;
+      const prefix = preferred === 'zh-TW' ? '' : '/' + preferred;
+      const target = window.location.protocol === 'file:'
+        ? (preferred === 'zh-TW' ? '../' : '../' + preferred + '/') + 'privacy.html'
+        : prefix + '/privacy';
+      window.location.replace(target + window.location.search + window.location.hash);
+    })();
+  </script>
+  <!-- WEI_LANGUAGE_PREFERENCE_END -->
 </head>
 <body class="min-h-screen bg-[#0a0a0c] text-[#f5f5f7] antialiased flex flex-col">
   <header class="header-glass py-5 transition-all duration-300">
@@ -59,7 +78,7 @@
               <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
             </svg>
           </a>
-          <a href="mailto:weipic2023@gmail.com" class="header-social-btn" aria-label="Email">
+          <a href="mailto:contact@wei.pictures" class="header-social-btn" aria-label="Email">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="2.5 5.3 19 12.4">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
             </svg>
@@ -115,7 +134,7 @@
   </header>
   <main class="mx-auto w-full max-w-4xl flex-grow px-6 pb-20 pt-32 sm:pt-36">
     <h1 class="text-3xl font-bold sm:text-4xl">プライバシーポリシー</h1>
-    <p class="mt-3 text-sm text-gray-400">最終更新日：2026年8月28日</p>
+    <p class="mt-3 text-sm text-gray-400">最終更新日：2026年9月2日</p>
     <button type="button" onclick="resetAnalyticsConsent()" class="mt-5 rounded-lg border border-white/15 px-4 py-2 text-xs text-gray-100 transition-colors hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-amber-400/70">Cookie 設定をリセット</button>
     <div class="mt-8 rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-sm leading-7 text-gray-300 sm:p-6">
       <p>Wei's Portfolio（以下「本サイト」）は、お客様のプライバシーを尊重します。本ポリシーでは、作品の閲覧、撮影のお問い合わせ、言語の切り替え、お客様用ギャラリーの利用に伴うデータ、利用目的、第三者サービス、お客様が選択できる内容を説明します。</p>
@@ -155,7 +174,7 @@
         <div class="mt-3 space-y-3">
           <p>許可を選択するまで Google Analytics は読み込まれません。許可後はアクセスと操作に関する統計レポートの作成に使用します。Google signals と広告パーソナライズ信号は無効にしており、氏名、メールアドレス、ギャラリーのパスワードを解析サービスへ意図的に送信しません。</p>
           <p>同意または拒否の選択はブラウザーのローカル領域に保存されます。解析 Cookie を拒否しても、作品閲覧、問い合わせフォーム、お客様用ギャラリーには影響しません。上部のボタンで選択をリセットでき、ブラウザーからサイトデータの削除や Cookie の制限も行えます。</p>
-          <p>多言語閲覧のため、本サイトは <code>localStorage</code> に <code>preferred_lang</code> 言語設定を保存します。ブラウザーが Cookie またはその他のローカルキャッシュ機能でこの設定を扱う場合も、言語の記憶とサイト内の言語維持にのみ使用します。氏名、メールアドレス、IP アドレスその他の個人を特定できる情報（PII）は含まれず、閲覧体験の向上のみを目的とします。</p>
+          <p>多言語閲覧のため、本サイトは言語設定がまだない場合にのみブラウザーまたはシステムの言語を読み取り、初回は英語または日本語ページへ自動的に振り分けます。その後、手動で選択した繁体字中国語・英語・日本語を含む <code>pref_lang</code> 言語設定を <code>localStorage</code> に保存し、以後のサイト内表示言語を維持します。この記録には氏名、メールアドレス、IPアドレスその他の個人を特定できる情報（PII）は含まれず、ブラウザーのサイトデータ設定から削除できます。閲覧体験の向上のみを目的とします。</p>
         </div>
       </section>
 
@@ -203,7 +222,7 @@
         <h2 class="text-xl font-semibold text-white">ポリシーの更新とお問い合わせ</h2>
         <div class="mt-3 space-y-3">
           <p>サイト機能、第三者サービス、法令の変更に応じて本ポリシーを改定する場合があります。更新内容は本ページに掲載し、最終更新日を修正します。重要な変更は分かりやすい方法でお知らせします。</p>
-          <p>本ポリシー、個人データの取扱い、権利行使に関するご質問は、次のアドレスへお送りください： <a href="mailto:weipic2023@gmail.com" class="text-amber-400 underline">weipic2023@gmail.com</a>。確認と回答のため、ご要望と連絡先をご記載ください。</p>
+          <p>本ポリシー、個人データの取扱い、権利行使に関するご質問は、次のアドレスへお送りください： <a href="mailto:contact@wei.pictures" class="text-amber-400 underline">contact@wei.pictures</a>。確認と回答のため、ご要望と連絡先をご記載ください。</p>
         </div>
       </section>
     </div>
@@ -224,7 +243,7 @@
         </a>
 
         <!-- Email Icon (Borderless, matching IG size) -->
-        <a href="mailto:weipic2023@gmail.com" class="text-gray-300 hover:text-amber-400 transition-colors p-1 flex items-center justify-center" aria-label="Email Me">
+        <a href="mailto:contact@wei.pictures" class="text-gray-300 hover:text-amber-400 transition-colors p-1 flex items-center justify-center" aria-label="Email Me">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="2.5 5.3 19 12.4">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
           </svg>

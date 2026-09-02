@@ -9,6 +9,7 @@ let currentPhotoIndex = 0;
 let isCollabExpanded = false;
 let isAwardsExpanded = false;
 let contactFormRenderedAt = 0;
+let backToTopAnimationFrame = 0;
 
 const SITE_LANGUAGES = Object.freeze({
   'zh-TW': { prefix: '', storage: 'zh-TW' },
@@ -88,7 +89,40 @@ function trackGAEvent(eventName, eventParams = {}) {
 }
 
 function scrollPageToTop(behavior = 'smooth') {
-  window.scrollTo({ top: 0, left: 0, behavior });
+  if (backToTopAnimationFrame) {
+    window.cancelAnimationFrame(backToTopAnimationFrame);
+    backToTopAnimationFrame = 0;
+  }
+  if (behavior !== 'smooth') {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    return;
+  }
+
+  const startY = window.scrollY;
+  if (startY <= 0) return;
+  // Match the reference site's Salient scroll-to-top timing: 1.3 seconds at
+  // short distances, +0.3 seconds per 1000px, capped at 2.8 seconds.
+  const distanceDelay = 300 * Math.max(0, Math.floor(startY / 1000));
+  const duration = 1300 + Math.min(distanceDelay, 1500);
+  const startedAt = performance.now();
+  const smoothEase = progress => progress < 0.5
+    ? 16 * Math.pow(progress, 5)
+    : 1 - Math.pow(-2 * progress + 2, 5) / 2;
+
+  const animate = now => {
+    const progress = Math.min((now - startedAt) / duration, 1);
+    window.scrollTo({
+      top: Math.round(startY * (1 - smoothEase(progress))),
+      left: 0,
+      behavior: 'auto'
+    });
+    if (progress < 1) {
+      backToTopAnimationFrame = window.requestAnimationFrame(animate);
+    } else {
+      backToTopAnimationFrame = 0;
+    }
+  };
+  backToTopAnimationFrame = window.requestAnimationFrame(animate);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -802,14 +836,14 @@ function renderContactPage() {
         <div class="space-y-5 pt-4 border-t border-white/10 text-sm">
           <!-- Email Row -->
           <div class="flex items-center gap-4">
-            <a href="mailto:weipic2023@gmail.com" class="text-gray-300 hover:text-amber-400 transition-colors p-1 flex items-center justify-center shrink-0" aria-label="Email Me">
+            <a href="mailto:contact@wei.pictures" class="text-gray-300 hover:text-amber-400 transition-colors p-1 flex items-center justify-center shrink-0" aria-label="Email Me">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="2.5 5.3 19 12.4">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
               </svg>
             </a>
             <div>
               <p class="text-xs text-gray-500 uppercase tracking-wider">EMAIL</p>
-              <a href="mailto:weipic2023@gmail.com" class="font-medium text-white hover:text-amber-400 transition-colors">weipic2023@gmail.com</a>
+              <a href="mailto:contact@wei.pictures" class="font-medium text-white hover:text-amber-400 transition-colors">contact@wei.pictures</a>
             </div>
           </div>
 
@@ -905,7 +939,7 @@ async function handleFormSubmit(e) {
   }
 
   try {
-    const response = await fetch('https://formsubmit.co/ajax/weipic2023@gmail.com', {
+    const response = await fetch('https://formsubmit.co/ajax/contact@wei.pictures', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -941,7 +975,7 @@ async function handleFormSubmit(e) {
     console.error('Form submission error:', error);
     if (statusMsg) {
       statusMsg.className = 'text-xs py-3 px-4 rounded-lg bg-red-500/20 border border-red-500/40 text-red-300 font-medium block';
-      statusMsg.innerText = '⚠️ 送出失敗，請再試一次或直接寄信至 weipic2023@gmail.com';
+      statusMsg.innerText = '⚠️ 送出失敗，請再試一次或直接寄信至 contact@wei.pictures';
     }
   } finally {
     if (submitBtn) {
@@ -1615,10 +1649,10 @@ function initMobileTouchHover() {
    ==================================================================== */
 window.setLanguage = function(langCode) {
   const normalized = langCode === 'jp' ? 'ja' : langCode;
-  const targetLanguage = SITE_LANGUAGES[normalized] ? normalized : 'zh-TW';
+  const targetLanguage = SITE_LANGUAGES[normalized] ? normalized : 'en';
   const storedLanguage = SITE_LANGUAGES[targetLanguage].storage;
   try {
-    localStorage.setItem('preferred_lang', storedLanguage);
+    localStorage.setItem('pref_lang', storedLanguage);
   } catch (_) {}
   trackGAEvent('switch_site_language', { target_language: storedLanguage });
   const targetPath = getLocalizedPagePath(targetLanguage, getCurrentPageName());
@@ -1798,7 +1832,7 @@ function updateOpenGraphMetaTags(gallery) {
   const description = gallery.ogDescription || `歡迎存取 ${gallery.clientName || '貴賓'} 的 ${gallery.albumTitle || '相片全輯'}。請輸入專屬密碼進行高畫質相片全輯下載與單張預覽。`;
   
   // Never place private photos or short-lived access tokens in social metadata.
-  let image = "https://weipic.github.io/assets/images/download_cover.jpg";
+  let image = "https://wei.pictures/assets/images/download_cover.jpg";
   image = getEncodedPhotoUrl(image);
 
   setMetaTagContent('property', 'og:title', title);
