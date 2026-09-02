@@ -364,7 +364,7 @@ function hasPhotosOrGallery(item) {
 // --------------------------------------------------------------------
 // 1. Render Home Page
 // --------------------------------------------------------------------
-function getCategoryDisplayTitle(category) {
+function getCategoryTabTitle(category) {
   const title = String(category?.title || '');
   return document.documentElement.lang.toLowerCase().startsWith('en')
     ? title.replace(/\s+Photography$/i, '')
@@ -642,11 +642,11 @@ function renderHomePage() {
               <div class="p-6 space-y-2">
                 <div class="flex items-center justify-between">
                   <h3 class="text-2xl font-bold font-serif-title text-white group-hover:text-amber-400 transition-colors">
-                    ${getCategoryDisplayTitle(cat)}
+                    ${cat.title}
                   </h3>
                   <svg class="w-5 h-5 text-gray-500 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                 </div>
-                <p class="text-xs text-amber-400/80 uppercase tracking-widest font-cinzel">${getCategoryDisplayTitle({ title: cat.titleEn })}</p>
+                <p class="text-xs text-amber-400/80 uppercase tracking-widest font-cinzel">${cat.titleEn}</p>
                 <p class="text-xs sm:text-sm text-gray-400 leading-relaxed pt-1">
                   ${cat.description}
                 </p>
@@ -774,7 +774,7 @@ function renderCategoryPage(categoryId) {
               <a href="index.html" class="category-tab-item">${t('首頁')}</a>
               ${data.categories.map(cat => `
                 <a href="${cat.pageUrl}" class="category-tab-item ${cat.id === categoryId ? 'active' : ''}">
-                  ${getCategoryDisplayTitle(cat)}
+                  ${getCategoryTabTitle(cat)}
                 </a>
               `).join('')}
             </div>

@@ -163,6 +163,12 @@ function localizedPreferenceRedirect(file, locale) {
 function prepareHtml(source, file, locale) {
   const { code, prefix, htmlTranslations } = locale;
   let html = replaceAllMapped(stripRootPreferenceRedirect(source), htmlTranslations);
+  if (code === 'en') {
+    html = html.replace(
+      /(<a\b[^>]*data-footer-category[^>]*>)([^<]*?) Photography(<\/a>)/g,
+      '$1$2$3'
+    );
+  }
   html = html.replace(/<html lang="[^"]+"/, `<html lang="${code}"`);
   html = addSeo(html, file, prefix);
   html = rewriteInternalLinks(html, prefix);
