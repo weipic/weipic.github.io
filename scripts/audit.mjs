@@ -108,8 +108,15 @@ if (!/const distanceDelay = 300 \* Math\.max\(0, Math\.floor\(startY \/ 1000\)\)
     !/const duration = 1300 \+ Math\.min\(distanceDelay, 1500\)/.test(appSource) ||
     !/16 \* Math\.pow\(progress, 5\)/.test(appSource) ||
     !/1 - Math\.pow\(-2 \* progress \+ 2, 5\) \/ 2/.test(appSource) ||
+    !/backToTopScrollRoot\.style\.scrollBehavior = 'auto'/.test(appSource) ||
+    !/top: startY \* \(1 - smoothEase\(progress\)\)/.test(appSource) ||
+    /Math\.round\(startY \* \(1 - smoothEase\(progress\)\)\)/.test(appSource) ||
     !/behavior: 'auto'/.test(appSource)) {
   failures.push('js/app.js: 返回頂部缺少參考網站的距離時間、easeInOutQuint 曲線或 CSS smooth 衝突防護');
+}
+if (!/function updateVisibility\(\) \{\s*if \(backToTopAnimationFrame\) return;[\s\S]*?getBoundingClientRect\(\)/.test(appSource) ||
+    !/if \(shouldCompact === compactState\) return/.test(appSource)) {
+  failures.push('js/app.js: 返回頂部期間仍可能重複執行導覽列或按鈕版面更新');
 }
 if (!/function ensureMobileLanguageSelector/.test(appSource) ||
     !/mobileLanguageSelector/.test(appSource) ||

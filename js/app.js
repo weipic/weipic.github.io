@@ -10,6 +10,8 @@ let isCollabExpanded = false;
 let isAwardsExpanded = false;
 let contactFormRenderedAt = 0;
 let backToTopAnimationFrame = 0;
+let backToTopScrollRoot = null;
+let backToTopPreviousScrollBehavior = '';
 
 const SITE_LANGUAGES = Object.freeze({
   'zh-TW': { prefix: '', storage: 'zh-TW' },
@@ -88,11 +90,20 @@ function trackGAEvent(eventName, eventParams = {}) {
   }
 }
 
-function scrollPageToTop(behavior = 'smooth') {
+function finishBackToTopAnimation() {
   if (backToTopAnimationFrame) {
     window.cancelAnimationFrame(backToTopAnimationFrame);
     backToTopAnimationFrame = 0;
   }
+  if (backToTopScrollRoot) {
+    backToTopScrollRoot.style.scrollBehavior = backToTopPreviousScrollBehavior;
+    backToTopScrollRoot = null;
+    backToTopPreviousScrollBehavior = '';
+  }
+}
+
+function scrollPageToTop(behavior = 'smooth') {
+  finishBackToTopAnimation();
   if (behavior !== 'smooth') {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     return;
@@ -100,6 +111,9 @@ function scrollPageToTop(behavior = 'smooth') {
 
   const startY = window.scrollY;
   if (startY <= 0) return;
+  backToTopScrollRoot = document.documentElement;
+  backToTopPreviousScrollBehavior = backToTopScrollRoot.style.scrollBehavior;
+  backToTopScrollRoot.style.scrollBehavior = 'auto';
   // Match the reference site's Salient scroll-to-top timing: 1.3 seconds at
   // short distances, +0.3 seconds per 1000px, capped at 2.8 seconds.
   const distanceDelay = 300 * Math.max(0, Math.floor(startY / 1000));
@@ -112,14 +126,15 @@ function scrollPageToTop(behavior = 'smooth') {
   const animate = now => {
     const progress = Math.min((now - startedAt) / duration, 1);
     window.scrollTo({
-      top: Math.round(startY * (1 - smoothEase(progress))),
+      top: startY * (1 - smoothEase(progress)),
       left: 0,
       behavior: 'auto'
     });
     if (progress < 1) {
       backToTopAnimationFrame = window.requestAnimationFrame(animate);
     } else {
-      backToTopAnimationFrame = 0;
+      finishBackToTopAnimation();
+      window.updateBackToTopVisibility?.();
     }
   };
   backToTopAnimationFrame = window.requestAnimationFrame(animate);
@@ -1439,15 +1454,21 @@ function initNavbarScroll() {
   const header = document.querySelector('header');
   if (!header) return;
 
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
+  let compactState = null;
+  const updateNavbar = () => {
+    const shouldCompact = window.scrollY > 50;
+    if (shouldCompact === compactState) return;
+    compactState = shouldCompact;
+    if (shouldCompact) {
       header.classList.add('py-3');
       header.classList.remove('py-5');
     } else {
       header.classList.add('py-5');
       header.classList.remove('py-3');
     }
-  });
+  };
+  window.addEventListener('scroll', updateNavbar, { passive: true });
+  updateNavbar();
 }
 
 function initBackToTopButton(currentPage) {
@@ -1487,6 +1508,7 @@ function initBackToTopButton(currentPage) {
   }
 
   function updateVisibility() {
+    if (backToTopAnimationFrame) return;
     const consentBanner = document.getElementById('analytics-consent-banner');
     const placeAboveConsentBanner = Boolean(consentBanner && window.innerWidth < 640);
     const shouldShow = window.scrollY > 700 &&
