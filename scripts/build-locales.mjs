@@ -80,13 +80,40 @@ function rootPreferenceRedirect(file) {
   <script>
     (() => {
       let preferred = '';
+      let preferenceSource = '';
       try {
         preferred = localStorage.getItem('pref_lang') || '';
+        preferenceSource = localStorage.getItem('pref_lang_source') || '';
       } catch (_) {}
+      const systemLanguage = String(navigator.language || '').toLowerCase().replaceAll('_', '-');
+      const isChinese = ['zh', 'yue', 'cmn'].some(code =>
+        systemLanguage === code || systemLanguage.startsWith(code + '-')
+      );
+      // Repair the English value written by the previous detector on Chinese
+      // systems, while preserving English explicitly selected by the user.
+      if (isChinese && preferred === 'en' && preferenceSource !== 'manual') {
+        preferred = 'zh-TW';
+        try {
+          localStorage.setItem('pref_lang', preferred);
+          localStorage.setItem('pref_lang_source', 'auto');
+        } catch (_) {}
+        return;
+      }
       if (preferred !== 'jp' && preferred !== 'en') {
         if (preferred === 'zh-TW') return;
-        preferred = String(navigator.language || '').toLowerCase().startsWith('ja') ? 'jp' : 'en';
-        try { localStorage.setItem('pref_lang', preferred); } catch (_) {}
+        if (isChinese) {
+          preferred = 'zh-TW';
+          try {
+            localStorage.setItem('pref_lang', preferred);
+            localStorage.setItem('pref_lang_source', 'auto');
+          } catch (_) {}
+          return;
+        }
+        preferred = systemLanguage === 'ja' || systemLanguage.startsWith('ja-') ? 'jp' : 'en';
+        try {
+          localStorage.setItem('pref_lang', preferred);
+          localStorage.setItem('pref_lang_source', 'auto');
+        } catch (_) {}
       }
       const target = window.location.protocol === 'file:'
         ? preferred + '/${slug || 'index'}.html'
@@ -106,7 +133,10 @@ function localizedPreferenceRedirect(file, locale) {
       let preferred = '';
       try { preferred = localStorage.getItem('pref_lang') || ''; } catch (_) {}
       if (!['zh-TW', 'jp', 'en'].includes(preferred)) {
-        try { localStorage.setItem('pref_lang', current); } catch (_) {}
+        try {
+          localStorage.setItem('pref_lang', current);
+          localStorage.setItem('pref_lang_source', 'route');
+        } catch (_) {}
         return;
       }
       if (preferred === current) return;

@@ -26,7 +26,10 @@
       let preferred = '';
       try { preferred = localStorage.getItem('pref_lang') || ''; } catch (_) {}
       if (!['zh-TW', 'jp', 'en'].includes(preferred)) {
-        try { localStorage.setItem('pref_lang', current); } catch (_) {}
+        try {
+          localStorage.setItem('pref_lang', current);
+          localStorage.setItem('pref_lang_source', 'route');
+        } catch (_) {}
         return;
       }
       if (preferred === current) return;
@@ -174,7 +177,7 @@
         <div class="mt-3 space-y-3">
           <p>Google Analytics is not loaded before you choose to allow it. Once allowed, it provides statistical reports about traffic and interaction. Google signals and advertising-personalization signals are disabled, and the Site does not intentionally send contact names, email addresses, or gallery passwords to analytics.</p>
           <p>Your allow or deny choice is stored locally in your browser. Declining analytics Cookies does not affect portfolio browsing, the contact form, or client galleries. You may reset the choice using the button above, delete site data, or restrict Cookies through your browser.</p>
-          <p>For multilingual browsing, the Site reads your browser or system language only when no language preference exists and initially routes you to the English or Japanese pages. It then stores the <code>pref_lang</code> preference in <code>localStorage</code>, including a manual choice of Traditional Chinese, English, or Japanese, to keep later navigation in your selected language. This record contains no name, email address, IP address, or other personally identifiable information (PII), can be cleared through your browser's site-data settings, and exists solely to improve the browsing experience.</p>
+          <p>For multilingual browsing, the Site reads your browser or system language only when no language preference exists. Chinese-language systems initially see the Chinese pages, English-language systems see the English pages, Japanese-language systems see the Japanese pages, and all other languages default to English. It then stores the <code>pref_lang</code> preference and whether it was set automatically or manually in <code>localStorage</code>, including a manual choice of Traditional Chinese, English, or Japanese, to keep later navigation in your selected language. These records contain no name, email address, IP address, or other personally identifiable information (PII), can be cleared through your browser's site-data settings, and exist solely to improve the browsing experience.</p>
         </div>
       </section>
 

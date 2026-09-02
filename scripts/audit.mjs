@@ -59,8 +59,12 @@ for (const file of rootHtmlFiles) {
   const html = fs.readFileSync(file, 'utf8');
   for (const requiredRedirectPart of [
     "localStorage.getItem('pref_lang')",
+    "localStorage.getItem('pref_lang_source')",
     "localStorage.setItem('pref_lang', preferred)",
-    "String(navigator.language || '').toLowerCase().startsWith('ja')",
+    "localStorage.setItem('pref_lang_source', 'auto')",
+    "String(navigator.language || '').toLowerCase().replaceAll('_', '-')",
+    "['zh', 'yue', 'cmn'].some(code =>",
+    "preferred = systemLanguage === 'ja' || systemLanguage.startsWith('ja-') ? 'jp' : 'en'",
     "if (preferred === 'zh-TW') return",
     'window.location.replace(target + window.location.search + window.location.hash)'
   ]) {
@@ -95,7 +99,9 @@ if (!/clientGalleries\s*:\s*\[\s*\]/.test(dataSource)) {
 if (!fs.existsSync('css/tailwind.generated.css')) failures.push('缺少建置後的 Tailwind CSS');
 if (!fs.existsSync('js/vendor/jszip.min.js')) failures.push('缺少本機 JSZip');
 const appSource = fs.readFileSync('js/app.js', 'utf8');
-if (!/localStorage\.setItem\('pref_lang'/.test(appSource) || !/getLocalizedPagePath/.test(appSource)) {
+if (!/localStorage\.setItem\('pref_lang'/.test(appSource) ||
+    !/localStorage\.setItem\('pref_lang_source', 'manual'\)/.test(appSource) ||
+    !/getLocalizedPagePath/.test(appSource)) {
   failures.push('js/app.js: 缺少靜態語系路徑與 pref_lang 偏好記憶邏輯');
 }
 if (!/const distanceDelay = 300 \* Math\.max\(0, Math\.floor\(startY \/ 1000\)\)/.test(appSource) ||

@@ -45,7 +45,10 @@
       let preferred = '';
       try { preferred = localStorage.getItem('pref_lang') || ''; } catch (_) {}
       if (!['zh-TW', 'jp', 'en'].includes(preferred)) {
-        try { localStorage.setItem('pref_lang', current); } catch (_) {}
+        try {
+          localStorage.setItem('pref_lang', current);
+          localStorage.setItem('pref_lang_source', 'route');
+        } catch (_) {}
         return;
       }
       if (preferred === current) return;

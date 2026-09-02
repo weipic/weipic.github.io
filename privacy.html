@@ -23,13 +23,40 @@
   <script>
     (() => {
       let preferred = '';
+      let preferenceSource = '';
       try {
         preferred = localStorage.getItem('pref_lang') || '';
+        preferenceSource = localStorage.getItem('pref_lang_source') || '';
       } catch (_) {}
+      const systemLanguage = String(navigator.language || '').toLowerCase().replaceAll('_', '-');
+      const isChinese = ['zh', 'yue', 'cmn'].some(code =>
+        systemLanguage === code || systemLanguage.startsWith(code + '-')
+      );
+      // Repair the English value written by the previous detector on Chinese
+      // systems, while preserving English explicitly selected by the user.
+      if (isChinese && preferred === 'en' && preferenceSource !== 'manual') {
+        preferred = 'zh-TW';
+        try {
+          localStorage.setItem('pref_lang', preferred);
+          localStorage.setItem('pref_lang_source', 'auto');
+        } catch (_) {}
+        return;
+      }
       if (preferred !== 'jp' && preferred !== 'en') {
         if (preferred === 'zh-TW') return;
-        preferred = String(navigator.language || '').toLowerCase().startsWith('ja') ? 'jp' : 'en';
-        try { localStorage.setItem('pref_lang', preferred); } catch (_) {}
+        if (isChinese) {
+          preferred = 'zh-TW';
+          try {
+            localStorage.setItem('pref_lang', preferred);
+            localStorage.setItem('pref_lang_source', 'auto');
+          } catch (_) {}
+          return;
+        }
+        preferred = systemLanguage === 'ja' || systemLanguage.startsWith('ja-') ? 'jp' : 'en';
+        try {
+          localStorage.setItem('pref_lang', preferred);
+          localStorage.setItem('pref_lang_source', 'auto');
+        } catch (_) {}
       }
       const target = window.location.protocol === 'file:'
         ? preferred + '/privacy.html'
@@ -174,7 +201,7 @@
         <div class="mt-3 space-y-3">
           <p>本網站不會在您尚未選擇允許時載入 Google Analytics。允許後，Google Analytics 會協助產生網站流量與互動情形的統計報表；本網站已關閉 Google signals 與廣告個人化訊號，且不會主動將聯絡人姓名、電子郵件或相簿密碼傳送至分析服務。</p>
           <p>您的同意或拒絕選擇會保存在瀏覽器的本機儲存空間。拒絕分析 Cookie 不影響一般作品瀏覽、聯絡表單或客戶交圖功能。您可隨時使用頁面上方的按鈕清除選擇並重新設定；也可透過瀏覽器刪除網站資料或限制 Cookie。</p>
-          <p>針對多語言功能，本網站會在尚無語言偏好時讀取瀏覽器／系統語言，首次自動分流至英文或日文頁面；之後使用 <code>localStorage</code> 儲存 <code>pref_lang</code> 語系偏好，包含使用者手動選擇的繁體中文、英文或日文，以維持後續站內導覽語言。該記錄不包含姓名、電子郵件、IP 位址或其他可識別個人資訊（PII），且可透過瀏覽器的網站資料設定清除，目的僅是改善瀏覽體驗。</p>
+          <p>針對多語言功能，本網站會在尚無語言偏好時讀取瀏覽器／系統語言，中文語系首次顯示中文頁面、英文語系顯示英文頁面、日文語系顯示日文頁面，其他語系預設顯示英文頁面；之後使用 <code>localStorage</code> 儲存 <code>pref_lang</code> 語系偏好及其自動或手動設定來源，包含使用者手動選擇的繁體中文、英文或日文，以維持後續站內導覽語言。這些記錄不包含姓名、電子郵件、IP 位址或其他可識別個人資訊（PII），且可透過瀏覽器的網站資料設定清除，目的僅是改善瀏覽體驗。</p>
         </div>
       </section>
 

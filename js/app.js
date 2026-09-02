@@ -1653,6 +1653,7 @@ window.setLanguage = function(langCode) {
   const storedLanguage = SITE_LANGUAGES[targetLanguage].storage;
   try {
     localStorage.setItem('pref_lang', storedLanguage);
+    localStorage.setItem('pref_lang_source', 'manual');
   } catch (_) {}
   trackGAEvent('switch_site_language', { target_language: storedLanguage });
   const targetPath = getLocalizedPagePath(targetLanguage, getCurrentPageName());

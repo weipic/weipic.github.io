@@ -26,7 +26,10 @@
       let preferred = '';
       try { preferred = localStorage.getItem('pref_lang') || ''; } catch (_) {}
       if (!['zh-TW', 'jp', 'en'].includes(preferred)) {
-        try { localStorage.setItem('pref_lang', current); } catch (_) {}
+        try {
+          localStorage.setItem('pref_lang', current);
+          localStorage.setItem('pref_lang_source', 'route');
+        } catch (_) {}
         return;
       }
       if (preferred === current) return;
@@ -174,7 +177,7 @@
         <div class="mt-3 space-y-3">
           <p>許可を選択するまで Google Analytics は読み込まれません。許可後はアクセスと操作に関する統計レポートの作成に使用します。Google signals と広告パーソナライズ信号は無効にしており、氏名、メールアドレス、ギャラリーのパスワードを解析サービスへ意図的に送信しません。</p>
           <p>同意または拒否の選択はブラウザーのローカル領域に保存されます。解析 Cookie を拒否しても、作品閲覧、問い合わせフォーム、お客様用ギャラリーには影響しません。上部のボタンで選択をリセットでき、ブラウザーからサイトデータの削除や Cookie の制限も行えます。</p>
-          <p>多言語閲覧のため、本サイトは言語設定がまだない場合にのみブラウザーまたはシステムの言語を読み取り、初回は英語または日本語ページへ自動的に振り分けます。その後、手動で選択した繁体字中国語・英語・日本語を含む <code>pref_lang</code> 言語設定を <code>localStorage</code> に保存し、以後のサイト内表示言語を維持します。この記録には氏名、メールアドレス、IPアドレスその他の個人を特定できる情報（PII）は含まれず、ブラウザーのサイトデータ設定から削除できます。閲覧体験の向上のみを目的とします。</p>
+          <p>多言語閲覧のため、本サイトは言語設定がまだない場合にのみブラウザーまたはシステムの言語を読み取ります。中国語環境では中国語ページ、英語環境では英語ページ、日本語環境では日本語ページを初回表示し、その他の言語は英語を既定とします。その後、手動で選択した繁体字中国語・英語・日本語を含む <code>pref_lang</code> 言語設定と、その設定が自動か手動かを <code>localStorage</code> に保存し、以後のサイト内表示言語を維持します。これらの記録には氏名、メールアドレス、IPアドレスその他の個人を特定できる情報（PII）は含まれず、ブラウザーのサイトデータ設定から削除できます。閲覧体験の向上のみを目的とします。</p>
         </div>
       </section>
 

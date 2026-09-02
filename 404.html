@@ -50,13 +50,40 @@
   <script>
     (() => {
       let preferred = '';
+      let preferenceSource = '';
       try {
         preferred = localStorage.getItem('pref_lang') || '';
+        preferenceSource = localStorage.getItem('pref_lang_source') || '';
       } catch (_) {}
+      const systemLanguage = String(navigator.language || '').toLowerCase().replaceAll('_', '-');
+      const isChinese = ['zh', 'yue', 'cmn'].some(code =>
+        systemLanguage === code || systemLanguage.startsWith(code + '-')
+      );
+      // Repair the English value written by the previous detector on Chinese
+      // systems, while preserving English explicitly selected by the user.
+      if (isChinese && preferred === 'en' && preferenceSource !== 'manual') {
+        preferred = 'zh-TW';
+        try {
+          localStorage.setItem('pref_lang', preferred);
+          localStorage.setItem('pref_lang_source', 'auto');
+        } catch (_) {}
+        return;
+      }
       if (preferred !== 'jp' && preferred !== 'en') {
         if (preferred === 'zh-TW') return;
-        preferred = String(navigator.language || '').toLowerCase().startsWith('ja') ? 'jp' : 'en';
-        try { localStorage.setItem('pref_lang', preferred); } catch (_) {}
+        if (isChinese) {
+          preferred = 'zh-TW';
+          try {
+            localStorage.setItem('pref_lang', preferred);
+            localStorage.setItem('pref_lang_source', 'auto');
+          } catch (_) {}
+          return;
+        }
+        preferred = systemLanguage === 'ja' || systemLanguage.startsWith('ja-') ? 'jp' : 'en';
+        try {
+          localStorage.setItem('pref_lang', preferred);
+          localStorage.setItem('pref_lang_source', 'auto');
+        } catch (_) {}
       }
       const target = window.location.protocol === 'file:'
         ? preferred + '/404.html'
