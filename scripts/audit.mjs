@@ -62,9 +62,12 @@ for (const file of rootHtmlFiles) {
     "localStorage.getItem('pref_lang_source')",
     "localStorage.setItem('pref_lang', preferred)",
     "localStorage.setItem('pref_lang_source', 'auto')",
-    "String(navigator.language || '').toLowerCase().replaceAll('_', '-')",
-    "['zh', 'yue', 'cmn'].some(code =>",
-    "preferred = systemLanguage === 'ja' || systemLanguage.startsWith('ja-') ? 'jp' : 'en'",
+    "Array.isArray(navigator.languages)",
+    "localeCandidates.push(navigator.language || '')",
+    "Intl.DateTimeFormat().resolvedOptions().locale",
+    "const isChinese = matchesLanguage(['zh', 'yue', 'cmn'])",
+    "const isJapanese = matchesLanguage(['ja'])",
+    "preferred = isJapanese ? 'jp' : 'en'",
     "if (preferred === 'zh-TW') return",
     'window.location.replace(target + window.location.search + window.location.hash)'
   ]) {

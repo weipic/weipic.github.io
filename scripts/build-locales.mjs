@@ -85,10 +85,20 @@ function rootPreferenceRedirect(file) {
         preferred = localStorage.getItem('pref_lang') || '';
         preferenceSource = localStorage.getItem('pref_lang_source') || '';
       } catch (_) {}
-      const systemLanguage = String(navigator.language || '').toLowerCase().replaceAll('_', '-');
-      const isChinese = ['zh', 'yue', 'cmn'].some(code =>
-        systemLanguage === code || systemLanguage.startsWith(code + '-')
+      const localeCandidates = [];
+      try {
+        if (Array.isArray(navigator.languages)) localeCandidates.push(...navigator.languages);
+      } catch (_) {}
+      localeCandidates.push(navigator.language || '');
+      try { localeCandidates.push(Intl.DateTimeFormat().resolvedOptions().locale || ''); } catch (_) {}
+      const normalizedLanguages = [...new Set(localeCandidates
+        .map(language => String(language || '').toLowerCase().replaceAll('_', '-'))
+        .filter(Boolean))];
+      const matchesLanguage = codes => normalizedLanguages.some(language =>
+        codes.some(code => language === code || language.startsWith(code + '-'))
       );
+      const isChinese = matchesLanguage(['zh', 'yue', 'cmn']);
+      const isJapanese = matchesLanguage(['ja']);
       // Repair the English value written by the previous detector on Chinese
       // systems, while preserving English explicitly selected by the user.
       if (isChinese && preferred === 'en' && preferenceSource !== 'manual') {
@@ -109,7 +119,7 @@ function rootPreferenceRedirect(file) {
           } catch (_) {}
           return;
         }
-        preferred = systemLanguage === 'ja' || systemLanguage.startsWith('ja-') ? 'jp' : 'en';
+        preferred = isJapanese ? 'jp' : 'en';
         try {
           localStorage.setItem('pref_lang', preferred);
           localStorage.setItem('pref_lang_source', 'auto');

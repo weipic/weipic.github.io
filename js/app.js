@@ -744,6 +744,7 @@ function renderCategoryPage(categoryId) {
 
   const categoryObj = data.categories.find(c => c.id === categoryId);
   const projects = data.galleries[categoryId] || [];
+  const isEnglishPage = document.documentElement.lang.toLowerCase().startsWith('en');
 
   // Category Header Banner
   const headerContainer = document.getElementById('category-header-container');
@@ -767,7 +768,7 @@ function renderCategoryPage(categoryId) {
               <a href="index.html" class="category-tab-item">${t('首頁')}</a>
               ${data.categories.map(cat => `
                 <a href="${cat.pageUrl}" class="category-tab-item ${cat.id === categoryId ? 'active' : ''}">
-                  ${cat.title}
+                  ${isEnglishPage ? cat.title.replace(/\s+Photography$/i, '') : cat.title}
                 </a>
               `).join('')}
             </div>
