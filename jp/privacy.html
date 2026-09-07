@@ -22,6 +22,8 @@
   <!-- WEI_LANGUAGE_PREFERENCE_START -->
   <script>
     (() => {
+      const isBot = /bot|crawler|spider|google|bing|yandex|duckduck|slurp|baidu|lighthouse|facebookexternalhit|twitterbot/i.test(navigator.userAgent) || navigator.webdriver;
+      if (isBot) return;
       const current = 'jp';
       let preferred = '';
       try { preferred = localStorage.getItem('pref_lang') || ''; } catch (_) {}

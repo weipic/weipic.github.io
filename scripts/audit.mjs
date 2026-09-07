@@ -101,6 +101,8 @@ if (!/clientGalleries\s*:\s*\[\s*\]/.test(dataSource)) {
 }
 if (!fs.existsSync('css/tailwind.generated.css')) failures.push('缺少建置後的 Tailwind CSS');
 if (!fs.existsSync('js/vendor/jszip.min.js')) failures.push('缺少本機 JSZip');
+if (!fs.existsSync('robots.txt')) failures.push('缺少 robots.txt');
+if (!fs.existsSync('sitemap.xml')) failures.push('缺少 sitemap.xml');
 const appSource = fs.readFileSync('js/app.js', 'utf8');
 if (!/localStorage\.setItem\('pref_lang'/.test(appSource) ||
     !/localStorage\.setItem\('pref_lang_source', 'manual'\)/.test(appSource) ||

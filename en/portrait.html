@@ -26,7 +26,7 @@
   <meta property="og:url" content="https://wei.pictures/en/portrait" />
   <meta property="og:title" content="Wei's Portfolio - Portrait Photography" />
   <meta property="og:description" content="Personal portraits and profile photography that reveal individual character." />
-  <meta property="og:image" content="https://weipic.github.io/assets/images/portrait/passerby (3).webp" />
+  <meta property="og:image" content="https://wei.pictures/assets/images/portrait/passerby (3).webp" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
 
@@ -35,12 +35,14 @@
   <meta name="twitter:url" content="https://wei.pictures/en/portrait" />
   <meta name="twitter:title" content="Wei's Portfolio - Portrait Photography" />
   <meta name="twitter:description" content="Personal portraits and profile photography that reveal individual character." />
-  <meta name="twitter:image" content="https://weipic.github.io/assets/images/portrait/passerby (3).webp" />
+  <meta name="twitter:image" content="https://wei.pictures/assets/images/portrait/passerby (3).webp" />
   <link rel="stylesheet" href="../css/tailwind.generated.css" />
   <link rel="stylesheet" href="../css/style.css" />
   <!-- WEI_LANGUAGE_PREFERENCE_START -->
   <script>
     (() => {
+      const isBot = /bot|crawler|spider|google|bing|yandex|duckduck|slurp|baidu|lighthouse|facebookexternalhit|twitterbot/i.test(navigator.userAgent) || navigator.webdriver;
+      if (isBot) return;
       const current = 'en';
       let preferred = '';
       try { preferred = localStorage.getItem('pref_lang') || ''; } catch (_) {}
@@ -254,7 +256,13 @@
   </header>
 
   <main class="flex-grow">
-    <div id="category-header-container"></div>
+    <div id="category-header-container">
+      <div class="max-w-6xl mx-auto px-6 pt-28 pb-10 text-center space-y-4">
+        <p class="text-amber-400 text-xs sm:text-sm font-semibold tracking-widest uppercase">Portrait Photography</p>
+        <h1 class="text-4xl sm:text-5xl font-bold font-serif-title title-gradient-text">Portrait Photography</h1>
+        <p class="text-gray-400 text-sm sm:text-base max-w-xl mx-auto">Personal portraits and profile photography that reveal individual character.</p>
+      </div>
+    </div>
     <section class="max-w-6xl mx-auto px-6 pb-20">
       <div id="gallery-grid" class="masonry-grid"></div>
     </section>

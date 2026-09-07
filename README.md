@@ -2,17 +2,17 @@
 
 Wei 的個人攝影作品集，記錄人物、舞台、活動與日常風景中的真實瞬間。作品以自然情緒、現場氛圍與光影變化為主，希望每一張照片不只保留畫面，也留下當下的故事。
 
-線上作品集：[https://weipic.github.io/](https://weipic.github.io/)
+線上作品集：[https://wei.pictures/](https://wei.pictures/)
 
 ## 攝影作品
 
-- [商業攝影](https://weipic.github.io/commercial.html)：呈現品牌、商品與空間特色，依拍攝需求建立清楚且具有辨識度的視覺內容。
-- [人像攝影](https://weipic.github.io/portrait.html)：透過自然互動與光線捕捉人物的神情、個性及情緒。
-- [演唱會攝影](https://weipic.github.io/concert.html)：記錄舞台燈光、表演張力，以及表演者與觀眾之間的現場能量。
-- [活動攝影](https://weipic.github.io/event.html)：完整保存活動流程、重要環節與參與者之間的交流。
-- [運動攝影](https://weipic.github.io/sports.html)：凝結高速動作、競技節奏與賽場上的關鍵瞬間。
-- [畢業攝影](https://weipic.github.io/graduation.html)：記錄校園時光、同學情誼與人生階段的重要紀念。
-- [風景攝影](https://weipic.github.io/landscape.html)：以自然光影、季節與環境變化呈現旅途中看見的景色。
+- [商業攝影](https://wei.pictures/commercial.html)：呈現品牌、商品與空間特色，依拍攝需求建立清楚且具有辨識度的視覺內容。
+- [人像攝影](https://wei.pictures/portrait.html)：透過自然互動與光線捕捉人物的神情、個性及情緒。
+- [演唱會攝影](https://wei.pictures/concert.html)：記錄舞台燈光、表演張力，以及表演者與觀眾之間的現場能量。
+- [活動攝影](https://wei.pictures/event.html)：完整保存活動流程、重要環節與參與者之間的交流。
+- [運動攝影](https://wei.pictures/sports.html)：凝結高速動作、競技節奏與賽場上的關鍵瞬間。
+- [畢業攝影](https://wei.pictures/graduation.html)：記錄校園時光、同學情誼與人生階段的重要紀念。
+- [風景攝影](https://wei.pictures/landscape.html)：以自然光影、季節與環境變化呈現旅途中看見的景色。
 
 ## 瀏覽與交件說明
 
@@ -22,7 +22,7 @@ Wei 的個人攝影作品集，記錄人物、舞台、活動與日常風景中�
 
 ## 預約與合作
 
-如有商業拍攝、人像寫真、演唱會、活動、運動賽事、畢業紀錄或其他攝影需求，歡迎透過[預約與聯絡頁面](https://weipic.github.io/contact.html)說明拍攝類型、日期、地點與需求，後續將依內容回覆合作細節。
+如有商業拍攝、人像寫真、演唱會、活動、運動賽事、畢業紀錄或其他攝影需求，歡迎透過[預約與聯絡頁面](https://wei.pictures/contact.html)說明拍攝類型、日期、地點與需求，後續將依內容回覆合作細節。
 
 ## 作品聲明
 

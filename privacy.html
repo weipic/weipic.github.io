@@ -68,6 +68,8 @@
           localStorage.setItem('pref_lang_source', 'auto');
         } catch (_) {}
       }
+      const isBot = /bot|crawler|spider|google|bing|yandex|duckduck|slurp|baidu|lighthouse|facebookexternalhit|twitterbot/i.test(navigator.userAgent) || navigator.webdriver;
+      if (isBot) return;
       const target = window.location.protocol === 'file:'
         ? preferred + '/privacy.html'
         : '/' + preferred + '/privacy';

@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Disallow: /download
+Disallow: /download.html
+Disallow: /en/download
+Disallow: /en/download.html
+Disallow: /jp/download
+Disallow: /jp/download.html
+Disallow: /404
+Disallow: /404.html
+Disallow: /en/404
+Disallow: /en/404.html
+Disallow: /jp/404
+Disallow: /jp/404.html
+
+Sitemap: https://wei.pictures/sitemap.xml

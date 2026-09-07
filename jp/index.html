@@ -18,8 +18,8 @@
   <link rel="apple-touch-icon" href="../assets/images/favicon.png" />
 
   <!-- Primary Meta Tags -->
-  <title>Wei's Portfolio</title>
-  <meta name="title" content="Wei's Portfolio" />
+  <title>Wei's Portfolio - フォトポートフォリオ</title>
+  <meta name="title" content="Wei's Portfolio - フォトポートフォリオ" />
   <meta name="description" content="こんにちは。撮影歴約2年の高校生フォトグラファーです。ポートレート、風景、ストリート、スポーツ、ドキュメンタリーを通して、光と影、物語の可能性を探っています。一度ごとのシャッターを新しい挑戦と学びに。作品のフォローや撮影のご相談もお待ちしています。" />
 
   <!-- Open Graph / Facebook / LINE / iMessage -->
@@ -28,7 +28,7 @@
   <meta property="og:url" content="https://wei.pictures/jp/" />
   <meta property="og:title" content="Wei's Portfolio - フォトポートフォリオ" />
   <meta property="og:description" content="こんにちは。撮影歴約2年の高校生フォトグラファーです。ポートレート、風景、ストリート、スポーツ、ドキュメンタリーを通して、光と影、物語の可能性を探っています。一度ごとのシャッターを新しい挑戦と学びに。作品のフォローや撮影のご相談もお待ちしています。" />
-  <meta property="og:image" content="https://weipic.github.io/assets/images/og_cover.jpg" />
+  <meta property="og:image" content="https://wei.pictures/assets/images/og_cover.jpg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
 
@@ -37,13 +37,44 @@
   <meta name="twitter:url" content="https://wei.pictures/jp/" />
   <meta name="twitter:title" content="Wei's Portfolio - フォトポートフォリオ" />
   <meta name="twitter:description" content="こんにちは。撮影歴約2年の高校生フォトグラファーです。ポートレート、風景、ストリート、スポーツ、ドキュメンタリーを通して、光と影、物語の可能性を探っています。一度ごとのシャッターを新しい挑戦と学びに。作品のフォローや撮影のご相談もお待ちしています。" />
-  <meta name="twitter:image" content="https://weipic.github.io/assets/images/og_cover.jpg" />
+  <meta name="twitter:image" content="https://wei.pictures/assets/images/og_cover.jpg" />
+
+  <!-- Structured Data (Schema.org JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://wei.pictures/#website",
+        "url": "https://wei.pictures/",
+        "name": "Wei's Portfolio",
+        "alternateName": ["Wei Photography", "Wei フォトポートフォリオ"],
+        "description": "こんにちは。撮影歴約2年の高校生フォトグラファーです。ポートレート、風景、ストリート、スポーツ、ドキュメンタリーを通して、光と影、物語の可能性を探っています。一度ごとのシャッターを新しい挑戦と学びに。作品のフォローや撮影のご相談もお待ちしています。",
+        "inLanguage": ["zh-TW", "en", "ja"]
+      },
+      {
+        "@type": "Person",
+        "@id": "https://wei.pictures/#photographer",
+        "name": "Wei",
+        "url": "https://wei.pictures/",
+        "jobTitle": "Photographer / フォトグラファー",
+        "image": "https://wei.pictures/assets/images/profile/avatar.webp",
+        "sameAs": [
+          "https://www.instagram.com/wei.pictures/"
+        ]
+      }
+    ]
+  }
+  </script>
 
   <link rel="stylesheet" href="../css/tailwind.generated.css" />
   <link rel="stylesheet" href="../css/style.css" />
   <!-- WEI_LANGUAGE_PREFERENCE_START -->
   <script>
     (() => {
+      const isBot = /bot|crawler|spider|google|bing|yandex|duckduck|slurp|baidu|lighthouse|facebookexternalhit|twitterbot/i.test(navigator.userAgent) || navigator.webdriver;
+      if (isBot) return;
       const current = 'jp';
       let preferred = '';
       try { preferred = localStorage.getItem('pref_lang') || ''; } catch (_) {}
@@ -277,7 +308,22 @@
     <section id="about-section" class="hero-section">
       <div class="hero-glow"></div>
       <div id="hero-about-container" class="w-full">
-        <!-- Rendered by js/app.js -->
+        <!-- Pre-rendered Semantic Content for Search Engines & Fallback -->
+        <div class="max-w-6xl mx-auto px-6 py-16 lg:py-24 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          <div class="lg:col-span-5 flex justify-center">
+            <div class="relative w-72 h-80 sm:w-80 sm:h-96 rounded-2xl overflow-hidden border border-amber-500/20 shadow-2xl">
+              <img src="../assets/images/profile/avatar.webp" alt="Wei フォトグラファー" loading="eager" decoding="async" class="w-full h-full object-cover" />
+            </div>
+          </div>
+          <div class="lg:col-span-7 space-y-6">
+            <h1 class="text-4xl sm:text-5xl font-bold font-serif-title leading-tight">
+              About <span class="title-gradient-text">Me</span>
+            </h1>
+            <div class="space-y-4 text-gray-300 leading-relaxed text-base sm:text-lg">
+              <p>こんにちは。撮影歴約2年の高校生フォトグラファーです。ポートレート、風景、ストリート、スポーツ、ドキュメンタリーを通して、光と影、物語の可能性を探っています。一度ごとのシャッターを新しい挑戦と学びに。作品のフォローや撮影のご相談もお待ちしています。</p>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 

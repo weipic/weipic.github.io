@@ -26,7 +26,7 @@
   <meta property="og:url" content="https://wei.pictures/graduation" />
   <meta property="og:title" content="Wei's Portfolio - 畢業攝影" />
   <meta property="og:description" content="校園寫真、好友合照，留下青春紀實" />
-  <meta property="og:image" content="https://weipic.github.io/assets/images/graduation/NYCU (6).webp" />
+  <meta property="og:image" content="https://wei.pictures/assets/images/graduation/NYCU (6).webp" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
 
@@ -35,7 +35,7 @@
   <meta name="twitter:url" content="https://wei.pictures/graduation" />
   <meta name="twitter:title" content="Wei's Portfolio - 畢業攝影" />
   <meta name="twitter:description" content="校園寫真、好友合照，留下青春紀實" />
-  <meta name="twitter:image" content="https://weipic.github.io/assets/images/graduation/NYCU (6).webp" />
+  <meta name="twitter:image" content="https://wei.pictures/assets/images/graduation/NYCU (6).webp" />
   <link rel="stylesheet" href="css/tailwind.generated.css" />
   <link rel="stylesheet" href="css/style.css" />
   <!-- WEI_LANGUAGE_REDIRECT_START -->
@@ -87,6 +87,8 @@
           localStorage.setItem('pref_lang_source', 'auto');
         } catch (_) {}
       }
+      const isBot = /bot|crawler|spider|google|bing|yandex|duckduck|slurp|baidu|lighthouse|facebookexternalhit|twitterbot/i.test(navigator.userAgent) || navigator.webdriver;
+      if (isBot) return;
       const target = window.location.protocol === 'file:'
         ? preferred + '/graduation.html'
         : '/' + preferred + '/graduation';
@@ -288,7 +290,13 @@
   </header>
 
   <main class="flex-grow">
-    <div id="category-header-container"></div>
+    <div id="category-header-container">
+      <div class="max-w-6xl mx-auto px-6 pt-28 pb-10 text-center space-y-4">
+        <p class="text-amber-400 text-xs sm:text-sm font-semibold tracking-widest uppercase">Graduation Photography</p>
+        <h1 class="text-4xl sm:text-5xl font-bold font-serif-title title-gradient-text">畢業攝影</h1>
+        <p class="text-gray-400 text-sm sm:text-base max-w-xl mx-auto">畢業寫真與校園回憶，記錄珍貴青春</p>
+      </div>
+    </div>
     <section class="max-w-6xl mx-auto px-6 pb-20">
       <div id="gallery-grid" class="masonry-grid"></div>
     </section>

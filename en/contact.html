@@ -26,7 +26,7 @@
   <meta property="og:url" content="https://wei.pictures/en/contact" />
   <meta property="og:title" content="Wei's Portfolio - Bookings & Contact" />
   <meta property="og:description" content="Commercial campaigns, concert coverage, portraits, and event photography inquiries are welcome." />
-  <meta property="og:image" content="https://weipic.github.io/assets/images/profile/avatar.webp" />
+  <meta property="og:image" content="https://wei.pictures/assets/images/profile/avatar.webp" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
 
@@ -35,12 +35,14 @@
   <meta name="twitter:url" content="https://wei.pictures/en/contact" />
   <meta name="twitter:title" content="Wei's Portfolio - Bookings & Contact" />
   <meta name="twitter:description" content="Commercial campaigns, concert coverage, portraits, and event photography inquiries are welcome." />
-  <meta name="twitter:image" content="https://weipic.github.io/assets/images/profile/avatar.webp" />
+  <meta name="twitter:image" content="https://wei.pictures/assets/images/profile/avatar.webp" />
   <link rel="stylesheet" href="../css/tailwind.generated.css" />
   <link rel="stylesheet" href="../css/style.css" />
   <!-- WEI_LANGUAGE_PREFERENCE_START -->
   <script>
     (() => {
+      const isBot = /bot|crawler|spider|google|bing|yandex|duckduck|slurp|baidu|lighthouse|facebookexternalhit|twitterbot/i.test(navigator.userAgent) || navigator.webdriver;
+      if (isBot) return;
       const current = 'en';
       let preferred = '';
       try { preferred = localStorage.getItem('pref_lang') || ''; } catch (_) {}
@@ -254,7 +256,14 @@
   </header>
 
   <main class="flex-grow">
-    <div id="contact-content"></div>
+    <div id="contact-content">
+      <div class="max-w-4xl mx-auto px-6 pt-32 sm:pt-40 pb-20 text-center space-y-6">
+        <h1 class="text-4xl font-bold font-serif-title title-gradient-text">Bookings & Contact</h1>
+        <p class="text-gray-400 text-sm leading-relaxed max-w-xl mx-auto">
+          Commercial campaigns, concert coverage, portraits, and event photography inquiries are welcome.
+        </p>
+      </div>
+    </div>
   </main>
 
   <footer class="bg-[#08080a] border-t border-white/10 py-12 text-gray-400 text-sm">

@@ -26,7 +26,7 @@
   <meta property="og:url" content="https://wei.pictures/contact" />
   <meta property="og:title" content="Wei's Portfolio - 預約與聯絡 Contact" />
   <meta property="og:description" content="歡迎商業廣告合作、演唱會紀錄、個人寫真與活動拍攝邀約。" />
-  <meta property="og:image" content="https://weipic.github.io/assets/images/profile/avatar.webp" />
+  <meta property="og:image" content="https://wei.pictures/assets/images/profile/avatar.webp" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
 
@@ -35,7 +35,7 @@
   <meta name="twitter:url" content="https://wei.pictures/contact" />
   <meta name="twitter:title" content="Wei's Portfolio - 預約與聯絡 Contact" />
   <meta name="twitter:description" content="歡迎商業廣告合作、演唱會紀錄、個人寫真與活動拍攝邀約。" />
-  <meta name="twitter:image" content="https://weipic.github.io/assets/images/profile/avatar.webp" />
+  <meta name="twitter:image" content="https://wei.pictures/assets/images/profile/avatar.webp" />
   <link rel="stylesheet" href="css/tailwind.generated.css" />
   <link rel="stylesheet" href="css/style.css" />
   <!-- WEI_LANGUAGE_REDIRECT_START -->
@@ -87,6 +87,8 @@
           localStorage.setItem('pref_lang_source', 'auto');
         } catch (_) {}
       }
+      const isBot = /bot|crawler|spider|google|bing|yandex|duckduck|slurp|baidu|lighthouse|facebookexternalhit|twitterbot/i.test(navigator.userAgent) || navigator.webdriver;
+      if (isBot) return;
       const target = window.location.protocol === 'file:'
         ? preferred + '/contact.html'
         : '/' + preferred + '/contact';
@@ -288,7 +290,14 @@
   </header>
 
   <main class="flex-grow">
-    <div id="contact-content"></div>
+    <div id="contact-content">
+      <div class="max-w-4xl mx-auto px-6 pt-32 sm:pt-40 pb-20 text-center space-y-6">
+        <h1 class="text-4xl font-bold font-serif-title title-gradient-text">預約與聯絡</h1>
+        <p class="text-gray-400 text-sm leading-relaxed max-w-xl mx-auto">
+          歡迎商業廣告合作、演唱會紀錄、個人寫真與活動拍攝邀約。
+        </p>
+      </div>
+    </div>
   </main>
 
   <footer class="bg-[#08080a] border-t border-white/10 py-12 text-gray-400 text-sm">

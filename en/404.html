@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://api.wei.pictures https://www.google-analytics.com https://fonts.gstatic.com; connect-src 'self' https://api.wei.pictures https://www.google-analytics.com https://region1.google-analytics.com https://formsubmit.co; frame-src https:; object-src 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co; upgrade-insecure-requests" />
+  <meta name="robots" content="noindex, follow" />
   <link rel="canonical" href="https://wei.pictures/en/404" />
   <link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/404" />
   <link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/404" />
@@ -30,8 +31,8 @@
   <meta property="og:url" content="https://wei.pictures/en/404" />
   <meta property="og:title" content="Client Gallery" />
   <meta property="og:description" content="Access your curated gallery by entering the dedicated password for high-resolution downloads and individual photo previews." />
-  <meta property="og:image" content="https://weipic.github.io/assets/images/og_cover.jpg" />
-  <meta property="og:image:secure_url" content="https://weipic.github.io/assets/images/og_cover.jpg" />
+  <meta property="og:image" content="https://wei.pictures/assets/images/og_cover.jpg" />
+  <meta property="og:image:secure_url" content="https://wei.pictures/assets/images/og_cover.jpg" />
   <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
@@ -41,7 +42,7 @@
   <meta name="twitter:url" content="https://wei.pictures/en/404" />
   <meta name="twitter:title" content="Client Gallery" />
   <meta name="twitter:description" content="Access your curated gallery by entering the dedicated password for high-resolution downloads and individual photo previews." />
-  <meta name="twitter:image" content="https://weipic.github.io/assets/images/og_cover.jpg" />
+  <meta name="twitter:image" content="https://wei.pictures/assets/images/og_cover.jpg" />
   <!-- JSZip Client-side ZIP Generation Library -->
   <script src="../js/vendor/jszip.min.js"></script>
   <link rel="stylesheet" href="../css/tailwind.generated.css" />
@@ -49,6 +50,8 @@
   <!-- WEI_LANGUAGE_PREFERENCE_START -->
   <script>
     (() => {
+      const isBot = /bot|crawler|spider|google|bing|yandex|duckduck|slurp|baidu|lighthouse|facebookexternalhit|twitterbot/i.test(navigator.userAgent) || navigator.webdriver;
+      if (isBot) return;
       const current = 'en';
       let preferred = '';
       try { preferred = localStorage.getItem('pref_lang') || ''; } catch (_) {}

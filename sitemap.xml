@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://wei.pictures/</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://wei.pictures/en/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://wei.pictures/" />
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://wei.pictures/en/</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://wei.pictures/en/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://wei.pictures/" />
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://wei.pictures/jp/</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://wei.pictures/en/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://wei.pictures/" />
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://wei.pictures/commercial</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/commercial" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/commercial" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://wei.pictures/en/commercial" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://wei.pictures/commercial" />
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://wei.pictures/en/commercial</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/commercial" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/commercial" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://wei.pictures/en/commercial" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://wei.pictures/commercial" />
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://wei.pictures/jp/commercial</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/commercial" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/commercial" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://wei.pictures/en/commercial" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://wei.pictures/commercial" />
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://wei.pictures/portrait</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/portrait" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/portrait" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://wei.pictures/en/portrait" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://wei.pictures/portrait" />
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://wei.pictures/en/portrait</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/portrait" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/portrait" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://wei.pictures/en/portrait" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://wei.pictures/portrait" />
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://wei.pictures/jp/portrait</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/portrait" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/portrait" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://wei.pictures/en/portrait" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://wei.pictures/portrait" />
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://wei.pictures/concert</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/concert" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/concert" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://wei.pictures/en/concert" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://wei.pictures/concert" />
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://wei.pictures/en/concert</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/concert" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/concert" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://wei.pictures/en/concert" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://wei.pictures/concert" />
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://wei.pictures/jp/concert</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/concert" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/concert" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://wei.pictures/en/concert" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://wei.pictures/concert" />
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://wei.pictures/event</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/event" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/event" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://wei.pictures/en/event" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://wei.pictures/event" />
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://wei.pictures/en/event</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/event" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/event" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://wei.pictures/en/event" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://wei.pictures/event" />
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://wei.pictures/jp/event</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/event" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/event" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://wei.pictures/en/event" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://wei.pictures/event" />
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://wei.pictures/sports</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/sports" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/sports" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://wei.pictures/en/sports" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://wei.pictures/sports" />
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://wei.pictures/en/sports</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/sports" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/sports" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://wei.pictures/en/sports" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://wei.pictures/sports" />
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://wei.pictures/jp/sports</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/sports" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/sports" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://wei.pictures/en/sports" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://wei.pictures/sports" />
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://wei.pictures/graduation</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/graduation" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/graduation" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://wei.pictures/en/graduation" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://wei.pictures/graduation" />
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://wei.pictures/en/graduation</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/graduation" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/graduation" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://wei.pictures/en/graduation" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://wei.pictures/graduation" />
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://wei.pictures/jp/graduation</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/graduation" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/graduation" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://wei.pictures/en/graduation" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://wei.pictures/graduation" />
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://wei.pictures/landscape</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/landscape" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/landscape" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://wei.pictures/en/landscape" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://wei.pictures/landscape" />
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://wei.pictures/en/landscape</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/landscape" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/landscape" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://wei.pictures/en/landscape" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://wei.pictures/landscape" />
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://wei.pictures/jp/landscape</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/landscape" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/landscape" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://wei.pictures/en/landscape" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://wei.pictures/landscape" />
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://wei.pictures/contact</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/contact" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/contact" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://wei.pictures/en/contact" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://wei.pictures/contact" />
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://wei.pictures/en/contact</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/contact" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/contact" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://wei.pictures/en/contact" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://wei.pictures/contact" />
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://wei.pictures/jp/contact</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/contact" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/contact" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://wei.pictures/en/contact" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://wei.pictures/contact" />
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://wei.pictures/privacy</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/privacy" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/privacy" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://wei.pictures/en/privacy" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://wei.pictures/privacy" />
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://wei.pictures/en/privacy</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/privacy" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/privacy" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://wei.pictures/en/privacy" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://wei.pictures/privacy" />
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://wei.pictures/jp/privacy</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://wei.pictures/privacy" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://wei.pictures/jp/privacy" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://wei.pictures/en/privacy" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://wei.pictures/privacy" />
+    <lastmod>2026-09-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+</urlset>

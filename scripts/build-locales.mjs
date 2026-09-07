@@ -125,6 +125,8 @@ function rootPreferenceRedirect(file) {
           localStorage.setItem('pref_lang_source', 'auto');
         } catch (_) {}
       }
+      const isBot = /bot|crawler|spider|google|bing|yandex|duckduck|slurp|baidu|lighthouse|facebookexternalhit|twitterbot/i.test(navigator.userAgent) || navigator.webdriver;
+      if (isBot) return;
       const target = window.location.protocol === 'file:'
         ? preferred + '/${slug || 'index'}.html'
         : '/' + preferred + '/${slug}';
@@ -139,6 +141,8 @@ function localizedPreferenceRedirect(file, locale) {
   return `  <!-- WEI_LANGUAGE_PREFERENCE_START -->
   <script>
     (() => {
+      const isBot = /bot|crawler|spider|google|bing|yandex|duckduck|slurp|baidu|lighthouse|facebookexternalhit|twitterbot/i.test(navigator.userAgent) || navigator.webdriver;
+      if (isBot) return;
       const current = '${locale.prefix}';
       let preferred = '';
       try { preferred = localStorage.getItem('pref_lang') || ''; } catch (_) {}
@@ -274,5 +278,70 @@ for (const locale of Object.values(localeDefinitions)) {
   );
 }
 
+function generateSitemap() {
+  const publicPages = [
+    { slug: '', priority: '1.0', changefreq: 'daily' },
+    { slug: 'commercial', priority: '0.9', changefreq: 'weekly' },
+    { slug: 'portrait', priority: '0.9', changefreq: 'weekly' },
+    { slug: 'concert', priority: '0.9', changefreq: 'weekly' },
+    { slug: 'event', priority: '0.9', changefreq: 'weekly' },
+    { slug: 'sports', priority: '0.9', changefreq: 'weekly' },
+    { slug: 'graduation', priority: '0.9', changefreq: 'weekly' },
+    { slug: 'landscape', priority: '0.9', changefreq: 'weekly' },
+    { slug: 'contact', priority: '0.8', changefreq: 'weekly' },
+    { slug: 'privacy', priority: '0.5', changefreq: 'monthly' }
+  ];
+
+  const now = new Date().toISOString().split('T')[0];
+  const entries = [];
+
+  for (const page of publicPages) {
+    const zhSuffix = page.slug ? `/${page.slug}` : '/';
+    const enSuffix = `/en${zhSuffix}`;
+    const jpSuffix = `/jp${zhSuffix}`;
+
+    entries.push(`  <url>
+    <loc>${siteUrl}${zhSuffix}</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="${siteUrl}${zhSuffix}" />
+    <xhtml:link rel="alternate" hreflang="ja" href="${siteUrl}${jpSuffix}" />
+    <xhtml:link rel="alternate" hreflang="en" href="${siteUrl}${enSuffix}" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="${siteUrl}${zhSuffix}" />
+    <lastmod>${now}</lastmod>
+    <changefreq>${page.changefreq}</changefreq>
+    <priority>${page.priority}</priority>
+  </url>`);
+
+    entries.push(`  <url>
+    <loc>${siteUrl}${enSuffix}</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="${siteUrl}${zhSuffix}" />
+    <xhtml:link rel="alternate" hreflang="ja" href="${siteUrl}${jpSuffix}" />
+    <xhtml:link rel="alternate" hreflang="en" href="${siteUrl}${enSuffix}" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="${siteUrl}${zhSuffix}" />
+    <lastmod>${now}</lastmod>
+    <changefreq>${page.changefreq}</changefreq>
+    <priority>${(parseFloat(page.priority) - 0.1).toFixed(1)}</priority>
+  </url>`);
+
+    entries.push(`  <url>
+    <loc>${siteUrl}${jpSuffix}</loc>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="${siteUrl}${zhSuffix}" />
+    <xhtml:link rel="alternate" hreflang="ja" href="${siteUrl}${jpSuffix}" />
+    <xhtml:link rel="alternate" hreflang="en" href="${siteUrl}${enSuffix}" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="${siteUrl}${zhSuffix}" />
+    <lastmod>${now}</lastmod>
+    <changefreq>${page.changefreq}</changefreq>
+    <priority>${(parseFloat(page.priority) - 0.1).toFixed(1)}</priority>
+  </url>`);
+  }
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+${entries.join('\n')}
+</urlset>
+`;
+}
+
 fs.writeFileSync(path.join(rootDir, 'js/i18n.js'), buildI18nRuntime());
-console.log(`Built ${pages.length * Object.keys(localeDefinitions).length} localized HTML pages and native language assets.`);
+fs.writeFileSync(path.join(rootDir, 'sitemap.xml'), generateSitemap());
+console.log(`Built ${pages.length * Object.keys(localeDefinitions).length} localized HTML pages, sitemap.xml, and native language assets.`);
