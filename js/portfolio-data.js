@@ -99,7 +99,7 @@ window.PORTFOLIO_DATA = {
     "category": "活動紀錄",
     "description": "中央研究院｜活動紀錄",
     "logoText": "SITCON",
-    galleryId: "ev-5"
+    galleryId: "ev-6"
     },
     {
     "id": "collab-18",
@@ -109,7 +109,7 @@ window.PORTFOLIO_DATA = {
     "category": "活動紀錄",
     "description": "閃動格子 CyberCube｜活動紀錄",
     "logoText": "CyberCube",
-    galleryId: "ev-7"
+    galleryId: "ev-8"
     },
     {
     "id": "collab-17",
@@ -119,7 +119,7 @@ window.PORTFOLIO_DATA = {
     "category": "活動紀錄",
     "description": "社會創新實驗中心｜活動紀錄",
     "logoText": "LiFUNd",
-    galleryId: "ev-4"
+    galleryId: "ev-5"
     },
     {
     "id": "collab-16",
@@ -139,7 +139,7 @@ window.PORTFOLIO_DATA = {
     "category": "活動紀錄",
     "description": "2026 Threads' Party｜活動紀錄",
     "logoText": "Threads",
-    galleryId: "ev-6"
+    galleryId: "ev-7"
     },
     {
     "id": "collab-14",
@@ -149,7 +149,7 @@ window.PORTFOLIO_DATA = {
     "category": "活動紀錄",
     "description": "表彰卓越貢獻傑出校友｜活動紀錄",
     "logoText": "國立臺北科技大學",
-    galleryId: "ev-2"
+    galleryId: "ev-3"
     },
     {
     "id": "collab-13",
@@ -189,7 +189,7 @@ window.PORTFOLIO_DATA = {
     "category": "大型商演",
     "description": "攝影師",
     "logoText": "大環藝術家楊世豪",
-    galleryId: "ev-8"
+    galleryId: "ev-9"
     },
     {
     "id": "collab-9",
@@ -231,7 +231,7 @@ window.PORTFOLIO_DATA = {
     "category": "活動紀錄",
     "description": "活動紀錄",
     "logoText": "NTUT Aliyan",
-    galleryId: "ev-11"
+    galleryId: "ev-12"
     },
     {
     "id": "collab-5",
@@ -1037,6 +1037,47 @@ window.PORTFOLIO_DATA = {
       },
       {
         id: "ev-2",
+        title: "2026秋北科國際交換生迎新派對",
+        client: "NTUT OIA",
+        year: "2026",
+        cover: "assets/images/event/0916WP (2).webp",
+        position: "43% 85%",
+        photos: [
+          "assets/images/event/0916WP (1).webp",
+          "assets/images/event/0916WP (2).webp",
+          "assets/images/event/0916WP (3).webp",
+          "assets/images/event/0916WP (4).webp",
+          "assets/images/event/0916WP (9).webp",
+          "assets/images/event/0916WP (8).webp",
+          "assets/images/event/0916WP (7).webp",
+          "assets/images/event/0916WP (5).webp",
+          "assets/images/event/0916WP (6).webp",
+          "assets/images/event/0916WP (10).webp",
+          "assets/images/event/0916WP (11).webp",
+          "assets/images/event/0916WP (12).webp",
+          "assets/images/event/0916WP (13).webp",
+          "assets/images/event/0916WP (14).webp",
+          "assets/images/event/0916WP (15).webp",
+          "assets/images/event/0916WP (16).webp",
+          "assets/images/event/0916WP (17).webp",
+          "assets/images/event/0916WP (18).webp",
+          "assets/images/event/0916WP (19).webp",
+          "assets/images/event/0916WP (20).webp",
+          "assets/images/event/0916WP (21).webp",
+          "assets/images/event/0916WP (22).webp",
+          "assets/images/event/0916WP (23).webp",
+          "assets/images/event/0916WP (24).webp",
+          "assets/images/event/0916WP (25).webp",
+          "assets/images/event/0916WP (26).webp",
+          "assets/images/event/0916WP (27).webp",
+          "assets/images/event/0916WP (28).webp",
+          "assets/images/event/0916WP (29).webp",
+          "assets/images/event/0916WP (30).webp",
+        ],
+        description: "2026.09.16"
+      },
+      {
+        id: "ev-3",
         title: "北科大114年校慶",
         client: "NTUT",
         year: "2025",
@@ -1070,7 +1111,7 @@ window.PORTFOLIO_DATA = {
         description: "表彰卓越貢獻傑出校友｜顏志發資政、王世堅委員、林添茂董座 獲頒名譽博士"
       },
       {
-        id: "ev-3",
+        id: "ev-4",
         title: "《空白織上》",
         client: "AEUST",
         year: "2026",
@@ -1097,7 +1138,7 @@ window.PORTFOLIO_DATA = {
         description: "亞東科技大學材料織品服裝系第十二屆專題成果展"
       },
       {
-        id: "ev-4",
+        id: "ev-5",
         title: "LiFUNd 第三屆夢想啟航",
         client: "LiFUNd",
         year: "2026",
@@ -1115,7 +1156,7 @@ window.PORTFOLIO_DATA = {
         description: "2026.03.06"
       },
       {
-        id: "ev-5",
+        id: "ev-6",
         title: "SITCON 2026 學生計算機年會",
         client: "SITCON",
         year: "2026",
@@ -1131,7 +1172,7 @@ window.PORTFOLIO_DATA = {
         description: "中央研究院"
       },
       {
-        id: "ev-6",
+        id: "ev-7",
         title: "2026 Threads’ Party",
         client: "Treads",
         year: "2026",
@@ -1146,7 +1187,7 @@ window.PORTFOLIO_DATA = {
         description: "第一屆美式畢業舞會暨春酒晚宴"
       },
       {
-        id: "ev-7",
+        id: "ev-8",
         title: "閃動格子 CyberCube",
         client: "CyberCube",
         year: "2026",
@@ -1161,7 +1202,7 @@ window.PORTFOLIO_DATA = {
         description: "臺北市2026高中職升學進路博覽會"
       },
       {
-        id: "ev-8",
+        id: "ev-9",
         title: "亞洲達人大環秀-楊世豪",
         client: "奇美博物館",
         year: "2025",
@@ -1177,7 +1218,7 @@ window.PORTFOLIO_DATA = {
         description: "許耀中舞蹈教室「舞極X唯一」國標舞晚宴"
       },
       {
-        id: "ev-9",
+        id: "ev-10",
         title: "玖壹壹 X 楊世豪",
         client: "臺北大巨蛋",
         year: "2026",
@@ -1195,7 +1236,7 @@ window.PORTFOLIO_DATA = {
         description: "喬山50週年感恩慈善演唱會"
       },
       {
-        id: "ev-10",
+        id: "ev-11",
         title: "2025 馬戲之門年度製作《狂歡舞會》",
         client: "CIRCUS GATE",
         year: "2025",
@@ -1211,7 +1252,7 @@ window.PORTFOLIO_DATA = {
         description: "誠品黑盒子"
       },
       {
-        id: "ev-11",
+        id: "ev-12",
         title: "《Patikol 洄巢—Torik部落創作樂舞劇場》",
         client: "NTUT Aliyan",
         year: "2025",
@@ -1228,7 +1269,7 @@ window.PORTFOLIO_DATA = {
         description: "國立臺北科技大學Aliyan原住民文化研究社"
       },
       {
-        id: "ev-12",
+        id: "ev-13",
         title: "2025 北科國際處秋季國際學生期中茶歇",
         client: "NTUT OIA",
         year: "2025",
@@ -1243,7 +1284,7 @@ window.PORTFOLIO_DATA = {
         description: "2025.10.29"
       },
       {
-        id: "ev-13",
+        id: "ev-14",
         title: "綠色力量生活節",
         client: "TFG X Taipei 101",
         year: "2025",
@@ -1259,7 +1300,7 @@ window.PORTFOLIO_DATA = {
         description: "臺北101 X 臺北市立第一女子高級中學"
       },
       {
-        id: "ev-14",
+        id: "ev-15",
         title: "2025北海夜金閃閃-北海潮與火",
         client: "NTPC",
         year: "2025",
@@ -1274,7 +1315,7 @@ window.PORTFOLIO_DATA = {
         description: "2025.08.24"
       },
       {
-        id: "ev-15",
+        id: "ev-16",
         title: "2024 Computex Taipei",
         client: "Computex",
         year: "2024",
@@ -1289,7 +1330,7 @@ window.PORTFOLIO_DATA = {
         description: "臺北國際電腦展"
       },
       {
-        id: "ev-16",
+        id: "ev-17",
         title: "甲辰龍年頭份合港田寮永貞宮參香台北池合宮",
         client: "TOUFEN",
         year: "2024",
@@ -1313,7 +1354,7 @@ window.PORTFOLIO_DATA = {
         description: "2024.12.08"
       },
       {
-        id: "ev-17",
+        id: "ev-18",
         title: "113年度苗栗縣客家文藝協會「粽溫飄香慶端午 DIY 暨節能減碳宣導」活動",
         client: "TOUFEN",
         year: "2024",
@@ -1333,7 +1374,7 @@ window.PORTFOLIO_DATA = {
         description: "粽子準備過程記錄"
       },
       {
-        id: "ev-18",
+        id: "ev-19",
         title: "115年慶贊中元｜手作客家新丁粄紀實",
         client: "TOUFEN",
         year: "2025",

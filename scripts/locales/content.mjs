@@ -320,6 +320,7 @@ const galleryProjects = [
   ['2025 馬戲之門年度製作《狂歡舞會》', 'Circus Gate 2025 Annual Production: Carnival Ball', 'CIRCUS GATE 2025 年間公演『カーニバル・ボール』'],
   ['誠品黑盒子', 'Eslite Performance Hall', '誠品ブラックボックス'],
   ['《Patikol 洄巢—Torik部落創作樂舞劇場》', 'Patikol: Returning to the Nest — Torik Tribal Music & Dance Theatre', '『Patikol 帰巣—Torik部落創作音楽舞踊劇』'],
+  ['2026秋北科國際交換生迎新派對', 'NTUT 2026 Fall International Exchange Student Welcome Party', '台北科技大学 2026 秋季国際交換留学生ウェルカムパーティー'],
   ['2025 北科國際處秋季國際學生期中茶歇', 'NTUT OIA 2025 Fall International Student Midterm Gathering', '台北科技大学国際事務処 2025 秋季留学生ミッドターム交流会'],
   ['綠色力量生活節', 'Green Power Life Festival', 'グリーンパワー・ライフフェスティバル'],
   ['臺北101 X 臺北市立第一女子高級中學', 'Taipei 101 × Taipei First Girls High School', '台北101 × 台北市立第一女子高級中学'],
