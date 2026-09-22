@@ -395,13 +395,29 @@ function renderHomePage() {
   if (heroContainer && data.profile) {
     heroContainer.innerHTML = `
       <div class="max-w-6xl mx-auto px-6 py-16 lg:py-24 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-        <!-- Photographer Portrait Avatar -->
+        <!-- Photographer Portrait Avatar with Floating Affiliation Badge -->
         <div class="lg:col-span-5 flex justify-center">
           <div class="relative group cursor-pointer w-72 h-80 sm:w-80 sm:h-96 rounded-2xl overflow-hidden border border-amber-500/20 shadow-2xl">
             <img src="${data.profile.avatar || ''}" alt="${data.profile.name || ''}" loading="lazy" decoding="async" draggable="false" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+
+            <!-- Top-Right Floating Crystal Capsule Badge (Nikon Taiwan 校園創作者) -->
+            ${data.profile.affiliation ? `
+              <div class="absolute top-3 right-3 sm:top-3.5 sm:right-3.5 z-10 flex items-center gap-1.5 sm:gap-2 px-2.5 py-1 sm:px-3 sm:py-1 rounded-full whitespace-nowrap select-none max-w-[calc(100%-24px)] transition-all duration-300 nikon-creator-badge">
+                <div class="nikon-creator-sheen" aria-hidden="true"></div>
+                <div class="w-5 h-5 flex-shrink-0 shadow-sm border border-white/20 nikon-creator-logo">
+                  <img src="${data.profile.affiliation.logo || 'assets/images/profile/Nikon_Logo.webp'}" alt="${data.profile.affiliation.brand || 'Nikon Taiwan'} Logo" loading="lazy" decoding="async" class="w-full h-full object-cover" />
+                </div>
+                <div class="flex items-center gap-1 sm:gap-1.5 whitespace-nowrap text-[11px] sm:text-xs leading-none">
+                  <span class="font-bold tracking-tight sm:tracking-normal text-white">${data.profile.affiliation.brand || 'Nikon Taiwan'}</span>
+                  <span class="font-semibold tracking-tight sm:tracking-normal nikon-creator-text">${data.profile.affiliation.role || '校園創作者'}</span>
+                </div>
+              </div>
+            ` : ''}
+
+            <!-- Bottom Photographer Details -->
             <div class="absolute bottom-6 left-6 right-6">
-              <p class="text-xs uppercase tracking-widest text-amber-400 font-medium mb-1">${data.profile.tagline || ''}</p>
+              ${data.profile.tagline ? `<p class="text-xs uppercase tracking-widest text-amber-400 font-medium mb-1">${data.profile.tagline}</p>` : ''}
               <h3 class="text-2xl font-bold font-serif-title text-white">${data.profile.name || ''}</h3>
               ${data.profile.location ? `
                 <p class="text-xs text-gray-400 flex items-center gap-1 mt-1">

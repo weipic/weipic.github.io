@@ -13,6 +13,11 @@ window.PORTFOLIO_DATA = {
     subTitle: "Freelance Photographer",
     tagline: "",
     avatar: "assets/images/profile/avatar.webp",
+    affiliation: {
+      brand: "Nikon Taiwan",
+      role: "校園創作者",
+      logo: "assets/images/profile/Nikon_Logo.webp"
+    },
     location: "Taipei, Taiwan",
     email: "contact@wei.pictures",
     instagram: "https://www.instagram.com/wei.pictures/",

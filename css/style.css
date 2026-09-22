@@ -865,3 +865,127 @@ img, picture, .no-download {
   box-shadow: 0 0 30px rgba(218, 165, 32, 0.5);
   transform: translateY(-2px);
 }
+
+/* ====================================================================
+   ✨ NIKON CREATOR BADGE - ELEGANT SHIMMER & REVEAL ANIMATION
+   ==================================================================== */
+
+@keyframes nikonBadgeEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes nikonLogoEntrance {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+    filter: brightness(1.3);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+@keyframes nikonTextShine {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}
+
+@keyframes nikonSheenSweep {
+  0% {
+    transform: translateX(-150%) skewX(-25deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.75;
+  }
+  85% {
+    opacity: 0.75;
+  }
+  100% {
+    transform: translateX(250%) skewX(-25deg);
+    opacity: 0;
+  }
+}
+
+.nikon-creator-badge {
+  overflow: hidden;
+  will-change: transform, opacity;
+  animation: nikonBadgeEntrance 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+  background: linear-gradient(135deg, rgba(16, 17, 22, 0.45) 0%, rgba(8, 8, 10, 0.6) 100%);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.12);
+  transition: border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nikon-creator-logo {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  will-change: transform, opacity;
+  animation: nikonLogoEntrance 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
+}
+
+/* Elegant Golden Metallic Shimmer for '校園創作者' text */
+.nikon-creator-text {
+  display: inline-block;
+  background: linear-gradient(
+    100deg,
+    #f59e0b 0%,
+    #fbbf24 22%,
+    #fffdf0 48%,
+    #ffffff 50%,
+    #fffdf0 52%,
+    #fbbf24 78%,
+    #f59e0b 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #fbbf24;
+  will-change: background-position;
+  animation: nikonTextShine 2.8s cubic-bezier(0.16, 1, 0.3, 1) 0.35s 1 normal forwards;
+}
+
+/* Light Sheen / Lens flare sweep across the badge */
+.nikon-creator-sheen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.04) 20%,
+    rgba(251, 191, 36, 0.22) 50%,
+    rgba(255, 255, 255, 0.15) 60%,
+    transparent 100%
+  );
+  pointer-events: none;
+  transform: translateX(-150%) skewX(-25deg);
+  animation: nikonSheenSweep 1.3s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
+}
+
+.nikon-creator-badge:hover,
+.group:hover .nikon-creator-badge {
+  background: linear-gradient(135deg, rgba(22, 23, 30, 0.6) 0%, rgba(12, 12, 16, 0.75) 100%);
+  border-color: rgba(245, 158, 11, 0.5) !important;
+  box-shadow: 0 4px 22px rgba(245, 158, 11, 0.18), inset 0 1px 1px rgba(255, 255, 255, 0.18) !important;
+}
+

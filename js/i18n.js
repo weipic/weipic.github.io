@@ -2,6 +2,8 @@
 (() => {
   const dictionaries = {
   "en": {
+    "Nikon Taiwan 校園創作者": "Nikon Taiwan Campus Creator",
+    "校園創作者": "Campus Creator",
     "嗨，我是一名高中生，攝影資歷約兩年，仍在嘗試各種題材，探索光影與故事的可能性。無論是人像、風景、街拍，或是運動與紀實，每一次快門都是新的挑戰與學習。歡迎追蹤指教，也歡迎拍攝合作需求來信聯繫！": "Hi, I'm a high-school photographer with about two years of experience, exploring how light, shadow, and story can shape portraits, landscapes, street scenes, sports, and documentary work. Every shutter press is a new challenge and lesson. Follow my work or get in touch for a collaboration.",
     "歡迎商業廣告合作、演唱會紀錄、個人寫真與活動拍攝邀約。": "Commercial campaigns, concert coverage, portraits, and event photography inquiries are welcome.",
     "<code>localStorage</code> 儲存 <code>pref_lang</code> 語系偏好": "the <code>pref_lang</code> language preference in <code>localStorage</code>",
@@ -390,6 +392,8 @@
     "漫步幽靜步道，看黃綠色的微光在樹林間點亮夜的微光": "Along a quiet trail, yellow-green fireflies kindle small lights in the forest night."
   },
   "ja": {
+    "Nikon Taiwan 校園創作者": "Nikon Taiwan キャンパスクリエイター",
+    "校園創作者": "キャンパスクリエイター",
     "嗨，我是一名高中生，攝影資歷約兩年，仍在嘗試各種題材，探索光影與故事的可能性。無論是人像、風景、街拍，或是運動與紀實，每一次快門都是新的挑戰與學習。歡迎追蹤指教，也歡迎拍攝合作需求來信聯繫！": "こんにちは。撮影歴約2年の高校生フォトグラファーです。ポートレート、風景、ストリート、スポーツ、ドキュメンタリーを通して、光と影、物語の可能性を探っています。一度ごとのシャッターを新しい挑戦と学びに。作品のフォローや撮影のご相談もお待ちしています。",
     "歡迎商業廣告合作、演唱會紀錄、個人寫真與活動拍攝邀約。": "商業広告、コンサート記録、ポートレート、イベント撮影のご依頼を承ります。",
     "<code>localStorage</code> 儲存 <code>pref_lang</code> 語系偏好": "<code>localStorage</code> に <code>pref_lang</code> 言語設定を保存します",

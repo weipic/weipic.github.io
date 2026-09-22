@@ -5,6 +5,11 @@ window.PORTFOLIO_DATA = {
     "subTitle": "フリーランスフォトグラファー",
     "tagline": "",
     "avatar": "../assets/images/profile/avatar.webp",
+    "affiliation": {
+      "brand": "Nikon Taiwan",
+      "role": "キャンパスクリエイター",
+      "logo": "../assets/images/profile/Nikon_Logo.webp"
+    },
     "location": "台湾・台北",
     "email": "contact@wei.pictures",
     "instagram": "https://www.instagram.com/wei.pictures/",
