@@ -116,7 +116,7 @@ window.PORTFOLIO_DATA = {
       "category": "Event Coverage",
       "description": "Academia Sinica | Event Coverage",
       "logoText": "SITCON",
-      "galleryId": "ev-6"
+      "galleryId": "ev-14"
     },
     {
       "id": "collab-18",
@@ -126,7 +126,7 @@ window.PORTFOLIO_DATA = {
       "category": "Event Coverage",
       "description": "CyberCube | Event Coverage",
       "logoText": "CyberCube",
-      "galleryId": "ev-8"
+      "galleryId": "ev-12"
     },
     {
       "id": "collab-17",
@@ -136,7 +136,7 @@ window.PORTFOLIO_DATA = {
       "category": "Event Coverage",
       "description": "Social Innovation Lab | Event Coverage",
       "logoText": "LiFUNd",
-      "galleryId": "ev-5"
+      "galleryId": "ev-15"
     },
     {
       "id": "collab-16",
@@ -156,7 +156,7 @@ window.PORTFOLIO_DATA = {
       "category": "Event Coverage",
       "description": "2026 Threads' Party | Event Coverage",
       "logoText": "Threads",
-      "galleryId": "ev-7"
+      "galleryId": "ev-13"
     },
     {
       "id": "collab-14",
@@ -166,7 +166,7 @@ window.PORTFOLIO_DATA = {
       "category": "Event Coverage",
       "description": "Honoring Distinguished Alumni | Event Coverage",
       "logoText": "National Taipei University of Technology",
-      "galleryId": "ev-3"
+      "galleryId": "ev-17"
     },
     {
       "id": "collab-13",
@@ -206,7 +206,7 @@ window.PORTFOLIO_DATA = {
       "category": "Large-Scale Performance",
       "description": "Photographer",
       "logoText": "Cyr Wheel Artist Yang Shih-Hao",
-      "galleryId": "ev-9"
+      "galleryId": "ev-11"
     },
     {
       "id": "collab-9",
@@ -236,7 +236,7 @@ window.PORTFOLIO_DATA = {
       "category": "Event Coverage",
       "description": "Event Coverage",
       "logoText": "NTUT Aliyan",
-      "galleryId": "ev-12"
+      "galleryId": "ev-8"
     },
     {
       "id": "collab-5",
@@ -975,7 +975,7 @@ window.PORTFOLIO_DATA = {
     ],
     "event": [
       {
-        "id": "ev-1",
+        "id": "ev-20",
         "title": "Johnson Health Tech 50th Anniversary Charity Concert",
         "client": "Taipei Dome",
         "year": "2026",
@@ -1001,7 +1001,33 @@ window.PORTFOLIO_DATA = {
         "description": "feat. Hank Chen and Lulu"
       },
       {
-        "id": "ev-2",
+        "id": "ev-19",
+        "title": "[Special Lecture] Where Next for Tech Talent in the AI Era?",
+        "client": "NTUT",
+        "year": "2026",
+        "cover": "../assets/images/event/宋恭源1110 (8).webp",
+        "position": "40% 50%",
+        "photos": [
+          "../assets/images/event/宋恭源1110 (1).webp",
+          "../assets/images/event/宋恭源1110 (2).webp",
+          "../assets/images/event/宋恭源1110 (3).webp",
+          "../assets/images/event/宋恭源1110 (4).webp",
+          "../assets/images/event/宋恭源1110 (5).webp",
+          "../assets/images/event/宋恭源1110 (6).webp",
+          "../assets/images/event/宋恭源1110 (7).webp",
+          "../assets/images/event/宋恭源1110 (8).webp",
+          "../assets/images/event/宋恭源1110 (9).webp",
+          "../assets/images/event/宋恭源1110 (10).webp",
+          "../assets/images/event/宋恭源1110 (11).webp",
+          "../assets/images/event/宋恭源1110 (12).webp",
+          "../assets/images/event/宋恭源1110 (13).webp",
+          "../assets/images/event/宋恭源1110 (14).webp",
+          "../assets/images/event/宋恭源1110 (15).webp"
+        ],
+        "description": "Keynote by Lite-On CHRO Liu Pang-Hen"
+      },
+      {
+        "id": "ev-18",
         "title": "NTUT 2026 Fall International Exchange Student Welcome Party",
         "client": "NTUT OIA",
         "year": "2026",
@@ -1042,7 +1068,7 @@ window.PORTFOLIO_DATA = {
         "description": "2026.09.16"
       },
       {
-        "id": "ev-3",
+        "id": "ev-17",
         "title": "NTUT 114th Anniversary",
         "client": "NTUT",
         "year": "2025",
@@ -1097,7 +1123,7 @@ window.PORTFOLIO_DATA = {
         "description": "Honoring distinguished alumni; honorary doctorates awarded to Yen Chih-Fa, Wang Shih-Chien, and Lin Tien-Mao."
       },
       {
-        "id": "ev-4",
+        "id": "ev-16",
         "title": "Woven Upon a Blank Canvas",
         "client": "AEUST",
         "year": "2026",
@@ -1124,7 +1150,7 @@ window.PORTFOLIO_DATA = {
         "description": "12th Graduation Exhibition, Department of Materials and Textiles, Asia Eastern University of Science and Technology"
       },
       {
-        "id": "ev-5",
+        "id": "ev-15",
         "title": "LiFUNd 3rd Dream Launch",
         "client": "LiFUNd",
         "year": "2026",
@@ -1145,7 +1171,7 @@ window.PORTFOLIO_DATA = {
         "description": "2026.03.06"
       },
       {
-        "id": "ev-6",
+        "id": "ev-14",
         "title": "SITCON 2026 Student Computing Conference",
         "client": "SITCON",
         "year": "2026",
@@ -1161,7 +1187,7 @@ window.PORTFOLIO_DATA = {
         "description": "Academia Sinica"
       },
       {
-        "id": "ev-7",
+        "id": "ev-13",
         "title": "2026 Threads’ Party",
         "client": "Treads",
         "year": "2026",
@@ -1176,7 +1202,7 @@ window.PORTFOLIO_DATA = {
         "description": "First American-Style Graduation Prom & Spring Gala"
       },
       {
-        "id": "ev-8",
+        "id": "ev-12",
         "title": "CyberCube",
         "client": "CyberCube",
         "year": "2026",
@@ -1191,7 +1217,7 @@ window.PORTFOLIO_DATA = {
         "description": "2026 Taipei Senior High School Education Expo"
       },
       {
-        "id": "ev-9",
+        "id": "ev-11",
         "title": "Asia’s Got Talent Cyr Wheel Show — Yang Shih-Hao",
         "client": "Chimei Museum",
         "year": "2025",
@@ -1225,7 +1251,7 @@ window.PORTFOLIO_DATA = {
         "description": "Johnson Health Tech 50th Anniversary Charity Concert"
       },
       {
-        "id": "ev-11",
+        "id": "ev-9",
         "title": "Circus Gate 2025 Annual Production: Carnival Ball",
         "client": "CIRCUS GATE",
         "year": "2025",
@@ -1241,7 +1267,7 @@ window.PORTFOLIO_DATA = {
         "description": "Eslite Performance Hall"
       },
       {
-        "id": "ev-12",
+        "id": "ev-8",
         "title": "Patikol: Returning to the Nest — Torik Tribal Music & Dance Theatre",
         "client": "NTUT Aliyan",
         "year": "2025",
@@ -1258,7 +1284,7 @@ window.PORTFOLIO_DATA = {
         "description": "NTUT Aliyan Indigenous Culture Society"
       },
       {
-        "id": "ev-13",
+        "id": "ev-7",
         "title": "NTUT OIA 2025 Fall International Student Midterm Gathering",
         "client": "NTUT OIA",
         "year": "2025",
@@ -1273,7 +1299,7 @@ window.PORTFOLIO_DATA = {
         "description": "2025.10.29"
       },
       {
-        "id": "ev-14",
+        "id": "ev-6",
         "title": "Green Power Life Festival",
         "client": "TFG X Taipei 101",
         "year": "2025",
@@ -1289,7 +1315,7 @@ window.PORTFOLIO_DATA = {
         "description": "Taipei 101 × Taipei First Girls High School"
       },
       {
-        "id": "ev-15",
+        "id": "ev-5",
         "title": "2025 North Coast Shimmering Night — Tides & Fire",
         "client": "NTPC",
         "year": "2025",
@@ -1304,7 +1330,7 @@ window.PORTFOLIO_DATA = {
         "description": "2025.08.24"
       },
       {
-        "id": "ev-16",
+        "id": "ev-4",
         "title": "2024 Computex Taipei",
         "client": "Computex",
         "year": "2024",
@@ -1319,7 +1345,7 @@ window.PORTFOLIO_DATA = {
         "description": "COMPUTEX Taipei"
       },
       {
-        "id": "ev-17",
+        "id": "ev-3",
         "title": "Year of the Dragon Pilgrimage from Toufen Yongzhen Temple to Taipei Chihe Temple",
         "client": "TOUFEN",
         "year": "2024",
@@ -1343,7 +1369,7 @@ window.PORTFOLIO_DATA = {
         "description": "2024.12.08"
       },
       {
-        "id": "ev-18",
+        "id": "ev-2",
         "title": "2024 Miaoli Hakka Arts Association Dragon Boat Festival Rice-Dumpling Workshop & Energy-Saving Campaign",
         "client": "TOUFEN",
         "year": "2024",
@@ -1363,7 +1389,7 @@ window.PORTFOLIO_DATA = {
         "description": "Documenting the rice-dumpling preparation process."
       },
       {
-        "id": "ev-19",
+        "id": "ev-1",
         "title": "2026 Ghost Festival Celebration | Handmade Hakka Newborn Rice Cakes",
         "client": "TOUFEN",
         "year": "2025",

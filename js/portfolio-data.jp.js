@@ -116,7 +116,7 @@ window.PORTFOLIO_DATA = {
       "category": "イベント記録",
       "description": "中央研究院｜イベント記録",
       "logoText": "SITCON",
-      "galleryId": "ev-6"
+      "galleryId": "ev-14"
     },
     {
       "id": "collab-18",
@@ -126,7 +126,7 @@ window.PORTFOLIO_DATA = {
       "category": "イベント記録",
       "description": "CyberCube｜イベント記録",
       "logoText": "CyberCube",
-      "galleryId": "ev-8"
+      "galleryId": "ev-12"
     },
     {
       "id": "collab-17",
@@ -136,7 +136,7 @@ window.PORTFOLIO_DATA = {
       "category": "イベント記録",
       "description": "ソーシャルイノベーションラボ｜イベント記録",
       "logoText": "LiFUNd",
-      "galleryId": "ev-5"
+      "galleryId": "ev-15"
     },
     {
       "id": "collab-16",
@@ -156,7 +156,7 @@ window.PORTFOLIO_DATA = {
       "category": "イベント記録",
       "description": "2026 Threads' Party｜イベント記録",
       "logoText": "Threads",
-      "galleryId": "ev-7"
+      "galleryId": "ev-13"
     },
     {
       "id": "collab-14",
@@ -166,7 +166,7 @@ window.PORTFOLIO_DATA = {
       "category": "イベント記録",
       "description": "卓越した貢献を称える同窓生表彰｜イベント記録",
       "logoText": "国立台北科技大学",
-      "galleryId": "ev-3"
+      "galleryId": "ev-17"
     },
     {
       "id": "collab-13",
@@ -206,7 +206,7 @@ window.PORTFOLIO_DATA = {
       "category": "大型商業公演",
       "description": "フォトグラファー",
       "logoText": "シルホイールアーティスト・楊世豪",
-      "galleryId": "ev-9"
+      "galleryId": "ev-11"
     },
     {
       "id": "collab-9",
@@ -236,7 +236,7 @@ window.PORTFOLIO_DATA = {
       "category": "イベント記録",
       "description": "イベント記録",
       "logoText": "NTUT Aliyan",
-      "galleryId": "ev-12"
+      "galleryId": "ev-8"
     },
     {
       "id": "collab-5",
@@ -975,7 +975,7 @@ window.PORTFOLIO_DATA = {
     ],
     "event": [
       {
-        "id": "ev-1",
+        "id": "ev-20",
         "title": "ジョンソンヘルステック50周年記念チャリティーコンサート",
         "client": "台北ドーム",
         "year": "2026",
@@ -1001,7 +1001,33 @@ window.PORTFOLIO_DATA = {
         "description": "feat. 陳漢典、Lulu"
       },
       {
-        "id": "ev-2",
+        "id": "ev-19",
+        "title": "【特別講義】AI時代、テック人材の進むべき道とは？",
+        "client": "NTUT",
+        "year": "2026",
+        "cover": "../assets/images/event/宋恭源1110 (8).webp",
+        "position": "40% 50%",
+        "photos": [
+          "../assets/images/event/宋恭源1110 (1).webp",
+          "../assets/images/event/宋恭源1110 (2).webp",
+          "../assets/images/event/宋恭源1110 (3).webp",
+          "../assets/images/event/宋恭源1110 (4).webp",
+          "../assets/images/event/宋恭源1110 (5).webp",
+          "../assets/images/event/宋恭源1110 (6).webp",
+          "../assets/images/event/宋恭源1110 (7).webp",
+          "../assets/images/event/宋恭源1110 (8).webp",
+          "../assets/images/event/宋恭源1110 (9).webp",
+          "../assets/images/event/宋恭源1110 (10).webp",
+          "../assets/images/event/宋恭源1110 (11).webp",
+          "../assets/images/event/宋恭源1110 (12).webp",
+          "../assets/images/event/宋恭源1110 (13).webp",
+          "../assets/images/event/宋恭源1110 (14).webp",
+          "../assets/images/event/宋恭源1110 (15).webp",
+        ],
+        "description": "光宝科技（LITEON）CHRO 劉邦亨 氏"
+      },
+      {
+        "id": "ev-18",
         "title": "台北科技大学 2026 秋季国際交換留学生ウェルカムパーティー",
         "client": "NTUT OIA",
         "year": "2026",
@@ -1042,7 +1068,7 @@ window.PORTFOLIO_DATA = {
         "description": "2026.09.16"
       },
       {
-        "id": "ev-3",
+        "id": "ev-17",
         "title": "台北科技大学創立114周年記念式典",
         "client": "NTUT",
         "year": "2025",
@@ -1097,7 +1123,7 @@ window.PORTFOLIO_DATA = {
         "description": "卓越した同窓生を表彰し、顏志發、王世堅、林添茂の各氏に名誉博士号を授与。"
       },
       {
-        "id": "ev-4",
+        "id": "ev-16",
         "title": "『空白に織り上げる』",
         "client": "AEUST",
         "year": "2026",
@@ -1124,7 +1150,7 @@ window.PORTFOLIO_DATA = {
         "description": "亜東科技大学 材料・テキスタイル・服飾学科 第12回卒業制作展"
       },
       {
-        "id": "ev-5",
+        "id": "ev-15",
         "title": "LiFUNd 第3回「夢の出航」",
         "client": "LiFUNd",
         "year": "2026",
@@ -1145,7 +1171,7 @@ window.PORTFOLIO_DATA = {
         "description": "2026.03.06"
       },
       {
-        "id": "ev-6",
+        "id": "ev-14",
         "title": "SITCON 2026 学生コンピューティングカンファレンス",
         "client": "SITCON",
         "year": "2026",
@@ -1161,7 +1187,7 @@ window.PORTFOLIO_DATA = {
         "description": "中央研究院"
       },
       {
-        "id": "ev-7",
+        "id": "ev-13",
         "title": "2026 Threads’ Party",
         "client": "Treads",
         "year": "2026",
@@ -1176,7 +1202,7 @@ window.PORTFOLIO_DATA = {
         "description": "第1回アメリカンスタイル卒業プロム＆春のガラディナー"
       },
       {
-        "id": "ev-8",
+        "id": "ev-12",
         "title": "CyberCube",
         "client": "CyberCube",
         "year": "2026",
@@ -1191,7 +1217,7 @@ window.PORTFOLIO_DATA = {
         "description": "2026 台北市高校進学・キャリアフェア"
       },
       {
-        "id": "ev-9",
+        "id": "ev-11",
         "title": "Asia’s Got Talent シルホイールショー—楊世豪",
         "client": "奇美博物館",
         "year": "2025",
@@ -1225,7 +1251,7 @@ window.PORTFOLIO_DATA = {
         "description": "ジョンソンヘルステック50周年記念チャリティーコンサート"
       },
       {
-        "id": "ev-11",
+        "id": "ev-9",
         "title": "CIRCUS GATE 2025 年間公演『カーニバル・ボール』",
         "client": "CIRCUS GATE",
         "year": "2025",
@@ -1241,7 +1267,7 @@ window.PORTFOLIO_DATA = {
         "description": "誠品ブラックボックス"
       },
       {
-        "id": "ev-12",
+        "id": "ev-8",
         "title": "『Patikol 帰巣—Torik部落創作音楽舞踊劇』",
         "client": "NTUT Aliyan",
         "year": "2025",
@@ -1258,7 +1284,7 @@ window.PORTFOLIO_DATA = {
         "description": "国立台北科技大学 Aliyan 原住民文化研究会"
       },
       {
-        "id": "ev-13",
+        "id": "ev-7",
         "title": "台北科技大学国際事務処 2025 秋季留学生ミッドターム交流会",
         "client": "NTUT OIA",
         "year": "2025",
@@ -1273,7 +1299,7 @@ window.PORTFOLIO_DATA = {
         "description": "2025.10.29"
       },
       {
-        "id": "ev-14",
+        "id": "ev-6",
         "title": "グリーンパワー・ライフフェスティバル",
         "client": "TFG X Taipei 101",
         "year": "2025",
@@ -1289,7 +1315,7 @@ window.PORTFOLIO_DATA = {
         "description": "台北101 × 台北市立第一女子高級中学"
       },
       {
-        "id": "ev-15",
+        "id": "ev-5",
         "title": "2025 北海岸きらめく夜—潮と炎",
         "client": "NTPC",
         "year": "2025",
@@ -1304,7 +1330,7 @@ window.PORTFOLIO_DATA = {
         "description": "2025.08.24"
       },
       {
-        "id": "ev-16",
+        "id": "ev-4",
         "title": "2024 Computex Taipei",
         "client": "Computex",
         "year": "2024",
@@ -1319,7 +1345,7 @@ window.PORTFOLIO_DATA = {
         "description": "COMPUTEX TAIPEI"
       },
       {
-        "id": "ev-17",
+        "id": "ev-3",
         "title": "甲辰龍年・頭份永貞宮から台北池合宮への参香",
         "client": "TOUFEN",
         "year": "2024",
@@ -1343,7 +1369,7 @@ window.PORTFOLIO_DATA = {
         "description": "2024.12.08"
       },
       {
-        "id": "ev-18",
+        "id": "ev-2",
         "title": "2024 苗栗県客家文芸協会 端午節ちまき作り・省エネ啓発イベント",
         "client": "TOUFEN",
         "year": "2024",
@@ -1363,7 +1389,7 @@ window.PORTFOLIO_DATA = {
         "description": "ちまき作りの準備工程を記録。"
       },
       {
-        "id": "ev-19",
+        "id": "ev-1",
         "title": "2026 中元節祭典｜手作り客家新丁粄の記録",
         "client": "TOUFEN",
         "year": "2025",
