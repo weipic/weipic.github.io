@@ -1667,6 +1667,27 @@ window.PORTFOLIO_DATA = {
           "assets/images/graduation/NTUNHS (8).webp",
         ],
         description: "學士照"
+      },
+      {
+        id: "grad-4",
+        title: "國立政治大學",
+        client: "NCCU",
+        year: "2026",
+        cover: "assets/images/graduation/AyanaNCCU (1).webp",
+        position: "50% 70%",
+        photos: [
+          "assets/images/graduation/AyanaNCCU (1).webp",
+          "assets/images/graduation/AyanaNCCU (7).webp",
+          "assets/images/graduation/AyanaNCCU (9).webp",
+          "assets/images/graduation/AyanaNCCU (4).webp",
+          "assets/images/graduation/AyanaNCCU (5).webp",
+          "assets/images/graduation/AyanaNCCU (8).webp",
+          "assets/images/graduation/AyanaNCCU (2).webp",
+          "assets/images/graduation/AyanaNCCU (3).webp",
+          "assets/images/graduation/AyanaNCCU (6).webp",
+          "assets/images/graduation/AyanaNCCU (10).webp",
+        ],
+        description: "學士照"
       }
     ],
     landscape: [

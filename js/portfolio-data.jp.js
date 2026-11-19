@@ -1022,7 +1022,7 @@ window.PORTFOLIO_DATA = {
           "../assets/images/event/宋恭源1110 (12).webp",
           "../assets/images/event/宋恭源1110 (13).webp",
           "../assets/images/event/宋恭源1110 (14).webp",
-          "../assets/images/event/宋恭源1110 (15).webp",
+          "../assets/images/event/宋恭源1110 (15).webp"
         ],
         "description": "光宝科技（LITEON）CHRO 劉邦亨 氏"
       },
@@ -1640,6 +1640,27 @@ window.PORTFOLIO_DATA = {
           "../assets/images/graduation/NTUNHS (6).webp",
           "../assets/images/graduation/NTUNHS (7).webp",
           "../assets/images/graduation/NTUNHS (8).webp"
+        ],
+        "description": "学士課程卒業写真"
+      },
+      {
+        "id": "grad-4",
+        "title": "国立政治大学",
+        "client": "NCCU",
+        "year": "2026",
+        "cover": "../assets/images/graduation/AyanaNCCU (1).webp",
+        "position": "50% 70%",
+        "photos": [
+          "../assets/images/graduation/AyanaNCCU (1).webp",
+          "../assets/images/graduation/AyanaNCCU (7).webp",
+          "../assets/images/graduation/AyanaNCCU (9).webp",
+          "../assets/images/graduation/AyanaNCCU (4).webp",
+          "../assets/images/graduation/AyanaNCCU (5).webp",
+          "../assets/images/graduation/AyanaNCCU (8).webp",
+          "../assets/images/graduation/AyanaNCCU (2).webp",
+          "../assets/images/graduation/AyanaNCCU (3).webp",
+          "../assets/images/graduation/AyanaNCCU (6).webp",
+          "../assets/images/graduation/AyanaNCCU (10).webp"
         ],
         "description": "学士課程卒業写真"
       }

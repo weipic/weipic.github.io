@@ -1642,6 +1642,27 @@ window.PORTFOLIO_DATA = {
           "../assets/images/graduation/NTUNHS (8).webp"
         ],
         "description": "Undergraduate Graduation Portraits"
+      },
+      {
+        "id": "grad-4",
+        "title": "National Chengchi University",
+        "client": "NCCU",
+        "year": "2026",
+        "cover": "../assets/images/graduation/AyanaNCCU (1).webp",
+        "position": "50% 70%",
+        "photos": [
+          "../assets/images/graduation/AyanaNCCU (1).webp",
+          "../assets/images/graduation/AyanaNCCU (7).webp",
+          "../assets/images/graduation/AyanaNCCU (9).webp",
+          "../assets/images/graduation/AyanaNCCU (4).webp",
+          "../assets/images/graduation/AyanaNCCU (5).webp",
+          "../assets/images/graduation/AyanaNCCU (8).webp",
+          "../assets/images/graduation/AyanaNCCU (2).webp",
+          "../assets/images/graduation/AyanaNCCU (3).webp",
+          "../assets/images/graduation/AyanaNCCU (6).webp",
+          "../assets/images/graduation/AyanaNCCU (10).webp"
+        ],
+        "description": "Undergraduate Graduation Portraits"
       }
     ],
     "landscape": [
